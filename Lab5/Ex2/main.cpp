@@ -8,7 +8,6 @@
  */
 #include <iostream>
 #include <pthread.h>
-#include <semaphore.h>
 #include <vector>
 
 /**
@@ -26,11 +25,14 @@ struct ThreadPool {
   void *(*func)(void *);
 };
 
-/** @brief Semaphore para imprimir ping */
-sem_t pingSem;
+/** @brief Mutexes para impressão */
+pthread_mutex_t pingMutex, pongMutex;
 
-/** @brief Semaphore para imprimir pong */
-sem_t pongSem;
+/** @brief Variaveis de condição */
+pthread_cond_t pingCond, pongCond;
+
+/** @brief Controle a ordem de quem vai imprimir */
+bool pingTurn = true;
 
 /**
  * @brief Imprime ping
@@ -43,9 +45,18 @@ sem_t pongSem;
  * @return Sempre um nullptr
  */
 void *printPing(void *_arg) {
-  sem_wait(&pingSem);
+  pthread_mutex_lock(&pingMutex);
+
+  while (!pingTurn) {
+    pthread_cond_wait(&pingCond, &pingMutex);
+  }
+
   std::cout << "ping" << std::endl;
-  sem_post(&pongSem);
+  pingTurn = false;
+
+  pthread_cond_signal(&pongCond);
+  pthread_mutex_unlock(&pongMutex);
+
   return nullptr;
 }
 
@@ -60,9 +71,18 @@ void *printPing(void *_arg) {
  * @return Sempre um nullptr
  */
 void *printPong(void *_arg) {
-  sem_wait(&pongSem);
+  pthread_mutex_lock(&pongMutex);
+
+  while (pingTurn) {
+    pthread_cond_wait(&pongCond, &pongMutex);
+  }
+
   std::cout << "        pong" << std::endl;
-  sem_post(&pingSem);
+  pingTurn = true;
+
+  pthread_cond_signal(&pingCond);
+  pthread_mutex_unlock(&pingMutex);
+
   return nullptr;
 }
 
@@ -189,13 +209,23 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  sem_init(&pingSem, 0, 1);
-  sem_init(&pongSem, 0, 0);
+  // Inicializa os mutexes
+  pthread_mutex_init(&pingMutex, nullptr);
+  pthread_mutex_init(&pongMutex, nullptr);
+
+  // Inicializa as variaveis de condição
+  pthread_cond_init(&pingCond, nullptr);
+  pthread_cond_init(&pongCond, nullptr);
 
   loadBalance(pings, pongs);
 
-  sem_destroy(&pingSem);
-  sem_destroy(&pongSem);
+  // Destroi os mutexes
+  pthread_mutex_destroy(&pingMutex);
+  pthread_mutex_destroy(&pongMutex);
+
+  // Destroi as variaveis de condição
+  pthread_cond_destroy(&pingCond);
+  pthread_cond_destroy(&pongCond);
 
   return 0;
 }
