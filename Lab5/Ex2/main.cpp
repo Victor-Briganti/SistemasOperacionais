@@ -25,8 +25,8 @@ struct ThreadPool {
   void *(*func)(void *);
 };
 
-/** @brief Mutexes para impressão */
-pthread_mutex_t pingMutex, pongMutex;
+/** @brief Mutex para controle da região critica */
+pthread_mutex_t mutex;
 
 /** @brief Variaveis de condição */
 pthread_cond_t pingCond, pongCond;
@@ -45,17 +45,17 @@ bool pingTurn = true;
  * @return Sempre um nullptr
  */
 void *printPing(void *_arg) {
-  pthread_mutex_lock(&pingMutex);
+  pthread_mutex_lock(&mutex);
 
   while (!pingTurn) {
-    pthread_cond_wait(&pingCond, &pingMutex);
+    pthread_cond_wait(&pingCond, &mutex);
   }
 
   std::cout << "ping" << std::endl;
   pingTurn = false;
 
   pthread_cond_signal(&pongCond);
-  pthread_mutex_unlock(&pingMutex);
+  pthread_mutex_unlock(&mutex);
 
   return nullptr;
 }
@@ -71,17 +71,17 @@ void *printPing(void *_arg) {
  * @return Sempre um nullptr
  */
 void *printPong(void *_arg) {
-  pthread_mutex_lock(&pongMutex);
+  pthread_mutex_lock(&mutex);
 
   while (pingTurn) {
-    pthread_cond_wait(&pongCond, &pongMutex);
+    pthread_cond_wait(&pongCond, &mutex);
   }
 
   std::cout << "        pong" << std::endl;
   pingTurn = true;
 
   pthread_cond_signal(&pingCond);
-  pthread_mutex_unlock(&pongMutex);
+  pthread_mutex_unlock(&mutex);
 
   return nullptr;
 }
@@ -207,9 +207,8 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  // Inicializa os mutexes
-  pthread_mutex_init(&pingMutex, nullptr);
-  pthread_mutex_init(&pongMutex, nullptr);
+  // Inicializa o mutex
+  pthread_mutex_init(&mutex, nullptr);
 
   // Inicializa as variaveis de condição
   pthread_cond_init(&pingCond, nullptr);
@@ -217,9 +216,8 @@ int main(int argc, char **argv) {
 
   loadBalance(pings, pongs);
 
-  // Destroi os mutexes
-  pthread_mutex_destroy(&pingMutex);
-  pthread_mutex_destroy(&pongMutex);
+  // Destroi o mutex
+  pthread_mutex_destroy(&mutex);
 
   // Destroi as variaveis de condição
   pthread_cond_destroy(&pingCond);
