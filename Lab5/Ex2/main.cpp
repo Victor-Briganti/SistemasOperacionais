@@ -55,7 +55,7 @@ void *printPing(void *_arg) {
   pingTurn = false;
 
   pthread_cond_signal(&pongCond);
-  pthread_mutex_unlock(&pongMutex);
+  pthread_mutex_unlock(&pingMutex);
 
   return nullptr;
 }
@@ -81,7 +81,7 @@ void *printPong(void *_arg) {
   pingTurn = true;
 
   pthread_cond_signal(&pingCond);
-  pthread_mutex_unlock(&pingMutex);
+  pthread_mutex_unlock(&pongMutex);
 
   return nullptr;
 }
@@ -164,8 +164,6 @@ void balanceSpawn(ThreadPool bigPool, ThreadPool smallPool) {
 
     size -= static_cast<int>(smallPool.threads.size());
   } while (size > 0);
-
-  exit(1);
 
   for (size_t i = 0; i < bigPool.threads.size(); i++) {
     pthread_join(bigPool.threads[i], nullptr);

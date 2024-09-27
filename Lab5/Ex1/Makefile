@@ -12,6 +12,9 @@ main:
 debug:
 	g++ -o main -g $(MATH) $(FLAGS) $(THREADS) matrix.cpp 
 
+debug-thread:
+	g++ -o main -g -fsanitize=thread $(MATH) $(FLAGS) $(THREADS) matrix.cpp 
+
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./main
 
