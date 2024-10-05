@@ -39,10 +39,10 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  struct sigaction actInt = {0};
+  struct sigaction actInt;
   actInt.sa_sigaction = &handleInt;
 
-  struct sigaction actTerm = {0};
+  struct sigaction actTerm;
   actInt.sa_sigaction = &handleInt;
 
   if (sigaction(SIGINT, &actInt, NULL) < 0) {

@@ -20,12 +20,10 @@ static void print_book(Book *book) {
 }
 
 void consumer(void *ptr, sem_t *semCons, sem_t *semProd) {
-  Book *book;
 
   for (int i = 0; i < 5; i++) {
     sem_wait(semCons);
-    memcpy(book, ptr, sizeof(Book));
-    print_book(book);
+    print_book(static_cast<Book *>(ptr));
     sem_post(semProd);
   }
 

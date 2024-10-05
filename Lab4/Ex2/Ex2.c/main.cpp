@@ -11,12 +11,12 @@
 #include <cstdlib>
 #include <iostream>
 
-bool exiting = false;
+volatile sig_atomic_t exiting = 0;
 
 void handleInt(int signo, siginfo_t *info, void *context) { exiting = true; }
 
 int main() {
-  struct sigaction act = {0};
+  struct sigaction act;
   act.sa_sigaction = &handleInt;
 
   if (sigaction(SIGINT, &act, NULL) < 0) {

@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  struct sigaction actHup = {0};
+  struct sigaction actHup;
   actHup.sa_sigaction = &handleInt;
 
   if (sigaction(SIGHUP, &actHup, NULL) < 0) {
