@@ -85,6 +85,14 @@
 \usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
 \usepackage[alf]{pacotes/abntex2cite}	% Citações padrão ABNT
 \usepackage{comment}
+% ---
+
+% ---
+% Meus pacotes
+% ---
+\usepackage{float}
+% ---
+
 % --- 
 % CONFIGURAÇÕES DE PACOTES
 % --- 
@@ -109,21 +117,21 @@
 % ---
 % Informações de dados para CAPA e FOLHA DE ROSTO
 % ---
-\titulo{Título da atividade \\ prática}
-\autor{Hendrick \\João Victor Briganti\\ Luiz Gustavo Takeda}
+\titulo{Instalar o GNU/Linux e compilar o núcleo}
+\autor{Hendrick\\João Victor Briganti\\Luiz Gustavo Takeda}
 \local{Campo Mourão}
 \data{Outubro / 2024}
 \instituicao{%
   Universidade Tecnológica Federal do Paraná -- UTFPR
   \par
-  Departamento Acadêmico de Computação -- DACOM
+  Departa           mento Acadêmico de Computação -- DACOM
   \par
   Bacharelado em Ciência da Computação -- BCC
 }
 \tipotrabalho{Relatório técnico}
 % O preambulo deve conter o tipo do trabalho, o objetivo, 
 % o nome da instituição e a área de concentração 
-\preambulo{Relatório técnico de atividade prática solicitado pelo professor Rodrigo Campiolo na disciplina de Redes de Computadores II do Bacharelado em Ciência da Computação da Universidade Tecnológica Federal do Paraná.}
+\preambulo{Relatório técnico de atividade prática solicitado pelo professor Rodrigo Campiolo na disciplina de Sistemas Operacionais do Bacharelado em Ciência da Computação da Universidade Tecnológica Federal do Paraná.}
 % ---
 
 % ---
@@ -205,18 +213,12 @@
 
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
- O resumo deve ressaltar o objetivo, o método, os resultados e as conclusões do documento. A ordem e a extensão
- destes itens dependem do tipo de resumo (informativo ou indicativo) e do
- tratamento que cada item recebe no documento original. O resumo deve ser
- precedido da referência do documento, com exceção do resumo inserido no
- próprio documento. As palavras-chave devem figurar logo abaixo do
- resumo, antecedidas da expressão Palavras-chave:, separadas entre si por
- ponto e finalizadas também por ponto.
+Este trabalho apresenta os procedimentos necessários para a instalação de uma distribuição GNU/Linux, focando na configuração e compilação do núcleo do sistema operacional. Utilizou-se o hipervisor VirtualBox (versão 7.1.2) para criar uma máquina virtual, na qual foi instalada a distribuição Debian (versão $12.7$) e o núcleo Linux (versão $6.10.11$). Durante o processo, foram executados diversos comandos básicos, possibilitando uma compreensão aprofundada da estrutura do sistema e a aplicação prática dos conceitos aprendidos em sala de aula. Os resultados evidenciam a importância da prática na consolidação do conhecimento teórico.
 
  \vspace{\onelineskip}
     
  \noindent
- \textbf{Palavras-chave}: latex. abntex. editoração de texto.
+ \textbf{Palavras-chave}: núcleo. GNU/Linux. Debian.
 \end{resumo}
 % ---
 
@@ -269,52 +271,342 @@
 \section{Objetivos}
 \label{sec:objetivos}
 
+Este trabalho visa instalar a distribuição GNU/Linux Debian em um ambiente virtual, compilar e instalar o núcleo Linux, e explicar detalhadamente cada um dos comandos utilizados durante todo o procedimento.
+
 \section{Fundamentação}
 \label{sec:fundamentacao}
 
 \section{Materiais}
 \label{sec:materiais}
 
+\begin{itemize}
+  \item Especificações do computador utilizado:
+  \begin{itemize}
+    \item Modelo: Notebook Lenovo Thinkpad E14
+    \item CPU: AMD Ryzen $5$-$3500$U
+    \item Memória Principal: $8$GB RAM
+    \item Memória Secundária: SSD $256$ NVME
+    \item Sistema Operacional: Fedora $40$
+  \end{itemize}
+  \item Hipervisor: VirtualBox $7.1.2$
+  \item Sistema Operacional utilizado no Hipervisor: GNU/Linux Debian $12.7$
+  \item Núcleo: Linux $6.10.11$
+\end{itemize}
+
 \section{Procedimentos e Resultados}
 \label{sec:procedimentos}
 
-Segue um exemplo de como adicionar e referenciar figuras no texto.
+Nesta seção, serão detalhados os procedimentos executados para a instalação da distribuição GNU/Linux Debian em um ambiente virtual, utilizando o hipervisor VirtualBox. Serão abordadas as configurações iniciais do hipervisor, a instalação do sistema operacional, verificações essenciais e os comandos utilizados para garantir o funcionamento correto do ambiente. Além disso, será descrito o processo de compilação do núcleo Linux, incluindo as etapas necessárias para a personalização e instalação da nova versão. 
 
-Observe a Figura \ref{fig:minhafigura} como exemplo.
+\subsection{Configurações do Hipervisor}
+\label{subsec:hipervisor}
 
-%scale: define a escala em percentual (0 a 1)
-\begin{figure}[hp]
+Os passos iniciais se deram por meio da instalação do Oracle VM VirtualBox e também da obtenção da imagem do Debian que será usada para a instalação. 
+
+\begin{figure}[H]
   \centering
-  \includegraphics[scale=0.8]{figuras/figura_exemplo.png}
-  \caption{Exemplo do uso de figuras no latex.}
-  \label{fig:minhafigura}
+  \includegraphics[scale=0.7]{figuras/vm.png}
+  \caption{Configurações do hipervisor.}
+  \label{fig:vm}
 \end{figure}
 
-Segue um exemplo de como adicionar e referenciar tabelas no texto.
+A Figura~\ref{fig:vm} ilustra as principais configurações utilizadas para a instalação do sistema operacional. Para a memória primária, foi selecionado um total de 4 GB e 4 processadores, enquanto a memória secundária foi alocada com 50 GB para uso da máquina virtual.
 
-A Tabela \ref{tab:cenarioenderecos} apresenta as configurações de endereçamento dos nós da rede, isto é, a configuração dos hospedeiros e dos dispositivos de interconexão.
+Além das configurações padrão de processadores e memória, foram incluídas duas placas de rede. O adaptador 1 está configurado como \textit{Network Address Translation} (NAT), permitindo acesso à \textit{internet}, enquanto o adaptador 2 está configurado para uso interno. Essa configuração foi escolhida porque o acesso à máquina será realizado por meio do \textit{Secure Shell Connection} (SSH).
 
-\begin{table}[!htb]
-\centering
-\caption{Configuração de endereçamento das interfaces dos dispositivos de rede do Cenário 1}
-\label{tab:cenarioenderecos}
-\footnotesize   %%diminuir tamanho do fonte (-2)
-%\small          %%diminuir tamanho de fonte (-1)
-\begin{tabular}{l|lll}
-\toprule
-& \textbf{Endereço IP} & \textbf{Máscara de Rede} & \textbf{Gateway}\\ 
-\midrule
-\textbf{PC0} & 192.168.1.2 & 255.255.255.0 & 192.168.1.1 \\
-\textbf{Router0 - Fa0/0} & 192.168.1.1 & 255.255.255.0 & - \\
-\textbf{Router0 - Fa1/0} & 192.168.0.1 & 255.255.255.0 & - \\
-\textbf{Server0} & 192.168.0.2 & 255.255.255.0 & 192.168.0.1 \\
- \bottomrule
-\end{tabular}
-\end{table}
+\subsection{Instalação do Sistema Operacional}
+\label{subsec:instalacao}
 
-\subsection{Nonononono}
- Teste de referência \cite{talbot2012}.
- 
+Os primeiros passos durante a instalação envolveram a seleção do idioma. Para facilitar a referência a manuais durante o processo, optou-se pelo inglês. Após essa configuração, o Brasil foi escolhido como localização, permitindo que o sistema operacional definisse o \textit{locale} a ser utilizado para formatações específicas relacionadas à região do usuário~\cite{kerris2010}. Além disso, o relógio do sistema foi ajustado para o fuso horário de São Paulo, e o teclado foi configurado para a disposição adequada da região.
+
+Após as configurações de região, foram criados um usuário comum e um usuário \textit{root}. Na Figura~\ref{fig:root} temos a descrição do \textit{root} como administrador do sistema, possuindo privilégios amplos e acesso total a todos os recursos e configurações do sistema.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.7]{figuras/root.png}
+  \caption{Criação do usuário \textit{root}.}
+  \label{fig:root}
+\end{figure}
+
+Na Figura~\ref{fig:partition}, estão apresentadas as configurações de particionamento e pontos de montagem do disco. O particionamento permite a divisão entre partições primárias e lógicas, sendo que cada uma delas é derivada do \textit{Master Boot Record} (MBR). De maneira simplificada, as partições primárias são inicializáveis, enquanto as partições lógicas existem apenas como uma forma de contornar algumas limitações existentes na divisão das partições~\cite{archPartition}.
+
+A memória secundária possui 50 GB de armazenamento, o que possibilitou que as partições fossem dispostas da seguinte maneira:
+
+\begin{itemize}
+    \item \textit{/}: É a raiz do sistema de arquivos, servindo como ponto de montagem para todos os outros dispositivos e sistemas de arquivos~\cite{tldpRootDir}. Por ser o local onde o sistema operacional inicia e onde estão armazenados arquivos críticos, foi alocado um tamanho de 4 GB para esta partição.
+    
+    \item \textit{/usr}: Este diretório é responsável por armazenar programas e dados de usuários~\cite{tldpUsrDir}. Por conter a maior quantidade de dados e ser amplamente utilizado durante a compilação, foi escolhido um tamanho de 5 GB para esta partição.
+    
+    \item \textit{/var}: Armazena dados variáveis, como logs e outros arquivos que podem mudar com frequência~\cite{tldpVarDir}. Por não ser uma área crítica para o funcionamento do sistema, neste trabalho em específico, foi definido um tamanho de apenas 2 GB.
+    
+    \item \textit{swap}: Esta partição é utilizada para armazenar páginas de memória que estavam na RAM, funcionando como uma extensão da memória virtual do sistema~\cite{archSwap}. Devido à quantidade de RAM já alocada durante a configuração do hipervisor, optou-se por um tamanho de apenas 500 MB para a partição \textit{swap}.
+    
+    \item \textit{/home}: Este diretório armazena os arquivos de configuração pessoal de cada usuário do sistema~\cite{tldpHomeDir}. Como é uma área frequentemente utilizada pelos usuários, foi definido um tamanho maior do que o das demais partições, totalizando 10 GB.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.7]{figuras/partition.png}
+  \caption{Partições do sistema.}
+  \label{fig:partition}
+\end{figure}
+
+\subsection{Verificações e Comandos}
+\label{subsec:verificacao}
+
+Após o processo de instalação, alguns comandos foram realizados para verificação e teste do sistema instalado.
+
+\subsubsection{ps aux}
+A Figura~\ref{fig:ps}, mostra a saída do comando \textit{ps} utilizado para a verificação dos processos em execução no sistema~\cite{manPs}. A opção ``aux'', é uma divisão de três parâmetros que alteram o comando da seguinte maneira:
+
+\begin{itemize}
+    \item 'a': Mostra os processo de todos os usuários.
+    
+    \item 'u': Altera o formato da saída do programa.
+    
+    \item 'x': Inclui processos de segundo plano, como \textit{daemons}.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.37]{figuras/ps_aux.png}
+  \caption{Saída do comando \textit{ps aux}.}
+  \label{fig:ps}
+\end{figure}
+
+\subsubsection{df}
+A Figura~\ref{fig:df} apresenta a saída do comando \textit{df}, utilizado para verificar o espaço utilizado pelos sistemas de arquivos no sistema~\cite{manDf}. A opção ``-h'' exibe a saída de maneira mais legível, facilitando a interpretação dos dados.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/df.png}
+  \caption{Saída do comando \textit{df -h}.}
+  \label{fig:df}
+\end{figure}
+
+\subsubsection{free}
+A Figura~\ref{fig:free} apresenta a saída do comando \textit{free}, utilizado para verificar a utilização da memória no sistema~\cite{manFree}. A opção ``-b'' exibe os valores de memória em bytes, proporcionando uma visão detalhada da quantidade exata de memória disponível e utilizada.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/free.png}
+  \caption{Saída do comando \textit{free -b}.}
+  \label{fig:free}
+\end{figure}
+
+\subsubsection{cat /proc/meminfo}
+A Figura~\ref{fig:meminfo} apresenta a saída do comando \textit{cat /proc/meminfo}. O comando \textit{cat} é utilizado para exibir o conteúdo de arquivos de texto no terminal~\cite{manCat}. Neste caso, \textit{/proc/meminfo} é um arquivo do sistema que fornece dados em tempo real sobre a utilização da memória física e da \textit{swap}~\cite{tldpProc}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/proc.png}
+  \caption{Saída do comando \textit{cat /proc/meminfo}.}
+  \label{fig:meminfo}
+\end{figure}
+
+\subsubsection{ip}
+
+A Figura~\ref{fig:ip} apresenta as saídas dos comandos \textit{ip -c address show} e \textit{ip -c route}. O comando \textit{ip} é parte das ferramentas do sistema Linux utilizadas para exibir e configurar informações de rede~\cite{manIP}. O parâmetro ''-c`` é utilizado para adicionar cores às saídas, facilitando a leitura das informações.
+
+O comando \textit{ip -c address show} fornece dados importantes, como o endereço Internet Protocol (IP), máscara de rede, \textit{status} das interfaces e outras configurações relevantes.
+
+O comando \textit{ip -c route} exibe a tabela de roteamento.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ip.png}
+  \caption{Saídas dos comandos \textit{ip -c address show} e \textit{ip -c route}.}
+  \label{fig:ip}
+\end{figure}
+
+\subsubsection{cat /etc/resolv.conf}
+A Figura~\ref{fig:resolv} mostra a saída do comando \textit{cat /etc/resolv.conf}, que exibe o conteúdo do arquivo responsável pela configuração dos servidores \textit{Domain Name Server} (DNS) no sistema~\cite{manCat}. Esse arquivo contém informações sobre quais servidores DNS o sistema deve consultar para resolver nomes de domínio em endereços IP. A configuração correta deste arquivo é essencial para garantir que o sistema consiga acessar serviços na internet de forma eficaz. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.37]{figuras/resolv.png}
+  \caption{Conteúdo do arquivo \textit{/etc/resolv.conf}.}
+  \label{fig:resolv}
+\end{figure}
+
+\subsubsection{cat /etc/network/interfaces}
+A Figura~\ref{fig:interfaces} apresenta a saída do comando \textit{cat /etc/network/interfaces}, que exibe as configurações de rede do sistema~\cite{manCat}. Este arquivo define as interfaces de rede disponíveis e suas configurações, como endereços IP, máscara de sub-rede e gateways~\cite{manResolvConf}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.37]{figuras/interfaces.png}
+  \caption{Conteúdo do arquivo \textit{/etc/network/interfaces}.}
+  \label{fig:interfaces}
+\end{figure}
+
+\subsubsection{ping}
+A Figura~\ref{fig:ping} mostra a saída do comando \textit{ping google.com}, utilizado para verificar a conectividade com o host especificado~\cite{manPing}. O comando envia pacotes ICMP Echo Request para o servidor do Google e mede o tempo de resposta, permitindo avaliar a latência da conexão.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.37]{figuras/ping.png}
+  \caption{Saída do comando \textit{ping google.com}.}
+  \label{fig:ping}
+\end{figure}
+
+\subsubsection{Configuração de Repositórios}
+O arquivo \textit{sources.list} é um componente essencial do gerenciador de pacotes \textit{apt} no Debian~\cite{ubuntuApt}. Neste arquivo é definido os repositórios de onde o sistema obtém os pacotes de software e suas respectivas atualizações. Cada linha do arquivo especifica uma fonte de pacotes, que pode ser um repositório oficial ou um repositório de terceiros.
+
+O \textit{security source list} é uma configuração específica que permite ao sistema acessar repositórios dedicados a atualizações de segurança. Esses repositórios contêm pacotes que corrigem vulnerabilidades e problemas de segurança, sendo fundamental para manter o sistema protegido contra ameaças. 
+
+Como apresentado na Figura~\ref{fig:sources} o Debian 12.7 utilizado neste trabalho, já está previamente configurado com as entradas necessárias para acessar os repositórios principais e de segurança.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{figuras/source_list.png}
+  \caption{Conteúdo do arquivo \textit{/etc/apt/sources.list}.}
+  \label{fig:sources}
+\end{figure}
+
+\subsubsection{uname}
+A Figura~\ref{fig:uname} mostra a saída do comando \textit{uname}, utilizado para exibir informações sobre o sistema operacional em execução~\cite{manUname}. Este comando tem como saída detalhes sobre o sistema, como o nome do kernel, a versão do kernel, a arquitetura do processador e o nome do host. O parâmetro ''-a`` é usado para que a saída mostre todas as informações disponíveis.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.43]{figuras/uname.png}
+  \caption{Saída do comando \textit{uname -a}.}
+  \label{fig:uname}
+\end{figure}
+
+\subsubsection{Comandos Gerais}
+Existem comandos fundamentais para a interação com o sistema operacional e a realização de diversas operações. Abaixo, apresentamos uma lista de comumente usados:
+
+\begin{itemize}
+    \item \texttt{clear}: Restaura o terminal a um estado inicial, "limpando" todas as saídas anteriores e comandos executados~\cite{manClear}.
+
+    \item \texttt{ls -l}: Exibe uma lista detalhada dos arquivos e diretórios no diretório especificado. Caso nenhum diretório seja indicado, a listagem será feita do diretório atual~\cite{manLs}.
+
+    \item \texttt{cd}: Altera o diretório de trabalho atual para o diretório especificado no parâmetro, permitindo a navegação pelo sistema de arquivos~\cite{manCd}.
+
+    \item \texttt{cat}: Concatena e exibe o conteúdo de um ou mais arquivos na saída padrão~\cite{manCat}.
+
+    \item \texttt{rm}: Remove permanentemente o arquivo especificado do sistema~\cite{manRm}.
+
+    \item \texttt{nano}: Editor de texto em linha de comando que permite a criação e modificação de arquivos de texto diretamente no terminal~\cite{archNano}.
+
+    \item \texttt{cp}: Copia um arquivo de origem para o destino especificado~\cite{manCp}.
+
+    \item \texttt{grep}: Busca e exibe as linhas de um arquivo que correspondem a um padrão especificado pelo usuário~\cite{manGrep}.
+
+    \item \texttt{head}: Exibe as primeiras linhas de um arquivo, por padrão somente as 10 primeiras linhas são exibidas~\cite{manHead}. 
+
+    \item \texttt{tail}: Mostra as últimas linhas de um arquivo. Similar ao comando \texttt{head}, também exibe 10 linhas por padrão~\cite{manTail}.
+
+    \item \texttt{mv}: Move ou renomeia arquivos e ~\cite{manMv}. 
+\end{itemize}
+
+A Figura~\ref{fig:comandos} e a Figura~\ref{fig:comandos2} ilustram o uso desses comandos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/commons.png}
+  \caption{Exemplo de comandos gerais do Linux em um terminal.}
+  \label{fig:comandos}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/commons2.png}
+  \caption{Exemplo de comandos gerais do Linux em um terminal.}
+  \label{fig:comandos2}
+\end{figure}
+
+\subsection{Compilação do Núcleo}
+\label{subsec:compilacao}
+
+Para o processo de compilação do núcleo Linux, é essencial instalar uma série de programas e bibliotecas necessárias. O comando utilizado para essa instalação é ``apt install build-essentials bc dwarves bison flex gnupg libncurses-dev libelf-dev libssl-dev wget''. Este comando instala um conjunto abrangente de pacotes no sistema, cada um com funções específicas que contribuem para a compilação e configuração do núcleo.
+
+\begin{itemize}
+    \item \texttt{build-essentials}: Um conjunto de pacotes essenciais para construção de pacotes no Debian~\cite{buildEssentials}.
+
+    \item \texttt{bc}: Calculadora de linha de comando~\cite{manBc}.
+
+    \item \texttt{dwarves}: Conjunto de ferramentas depuração para arquivos no formato Executable and Linkable Format(ELF)~\cite{debianDwarf}.
+
+    \item \texttt{bison}: Gerador de analisador sintático de uso geral~\cite{debianBison}. 
+
+    \item \texttt{flex}: Gerador de analisadores léxicos~\cite{debianFlex}.
+    
+    \item \texttt{gnupg}: Ferramenta para encriptação de dados e geração de assinaturas digitais~\cite{debianGnupg}
+
+    \item \texttt{libncurses-dev}: Biblioteca de manipulação de caracteres em terminais~\cite{debianLibncurses}.
+
+    \item \texttt{libelf-dev}: Biblioteca para leitura e escrita de arquivos ELF~\cite{debianLibelf}.
+    
+    \item \texttt{libssl-dev}: Parte do projeto OpenSSL para implementação do protocolo Secure Socket Layer(SSL) e Transport Layer Security (TLS)~\cite{debianLibssl}
+
+    \item \texttt{wget}: Utilitário para obter arquivos usando Hypertext Transfer Protocol (HTTP) ou File Transfer Protocol (FTP)~\cite{debianWget}.
+\end{itemize}
+
+Durante a realização deste trabalho, a versão mais recente do núcleo Linux disponível era a 6.10.11. A obtenção dessa versão foi realizada por meio do comando ``wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.10.11.tar.xz''. O código-fonte é fornecido em um arquivo comprimido, o que requer sua extração. Isso pode ser feito com o comando ``tar -xf linux-6.10.11.tar.xz -C /usr/src/linux-6.10.11/''. A Figura~\ref{wget} ilustra este processo.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{figuras/wget.png}
+  \caption{Obtenção do núcleo e extração do código-fonte.}
+  \label{fig:wget}
+\end{figure}
+
+A compilação do núcleo Linux é baseada em um arquivo de configuração, que no diretório de compilação é denominado por ``.config''. No Debian, esse arquivo pode ser encontrado no diretório ``/boot'', onde estão armazenados diversos parâmetros que serão utilizados durante o processo de compilação. Antes de iniciar a compilação, é necessário obter esse arquivo de configuração e copiá-lo para o diretório onde a compilação será realizada, que neste trabalho é o diretório ``/usr/src/linux-6.10.11/''. Para isso, foi utilizado o comando ``cp /boot/config-\$(uname -r) .config''.
+
+Após essa configuração inicial, o comando ``make localmodconfig'' é executado. Esse comando ajusta o arquivo de configuração de modo que apenas os módulos já carregados no sistema sejam considerados durante a compilação~\cite{kernelConfig}.
+
+Para as configurações de módulo o comando ``make menuconfig'' é usado, com ele uma interface é apresentada para o usuário de modo que o mesmo possa escolher algumas opções que serão ou não compiladas com o núcleo. Na Figura~\ref{fig:usb} temos o uso deste menu para a habilitação do módulo para Universal Serial Bus (USB) \textit{mass storage}, o que basicamente habilita o suporte para \textit{pen drive}, alguns tipos de dispositivos de disco rígido via USB e afins. Já a Figura~\ref{fig:ntfs} utiliza o menu para habilitar o NT File System (NTFS) um sistema de arquivos utilizado no Windows.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{figuras/usb.png}
+  \caption{Habilitando módulo para USB \textit{mass storage}.}
+  \label{fig:usb}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{figuras/ntfs.png}
+  \caption{Habilitando módulo para sistema de arquivos NTFS.}
+  \label{fig:ntfs}
+\end{figure}
+
+O uso deste menu não se limita apenas à habilitação de módulos importantes, mas também permite a desabilitação de módulos que não serão utilizados. A Figura~\ref{fig:macintosh} ilustra a configuração necessária para desabilitar \textit{drivers} de dispositivos específicos para computadores Macintosh.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{figuras/macintosh.png}
+  \caption{Desabilitando módulos de \textit{driver} para computadores Macintosh.}
+  \label{fig:macintosh}
+\end{figure}
+
+Após as configurações no núcleo a compilação pode ser realizada. Na compilação do núcleo o comando ``make -j2 LOCALVERSION=-utfpr'' foi utilizado, onde ``'-j2' especifica a quantidade de núcleos utilizados durante a compilação e ``LOCALVERSION=-utfpr'' é um parametro opcional que especifica um nome que será concatenado ao nome do núcleo.
+
+Após as configurações no núcleo, o processo de compilação pode ser iniciado. Para isso, foi utilizado o comando ``make -j2 LOCALVERSION=-utfpr''. Nesse comando, ``-j2'' especifica o número de núcleos a serem utilizados durante a compilação, otimizando o tempo de execução. O parâmetro opcional ``LOCALVERSION=-utfpr'' adiciona um sufixo ao nome do núcleo, facilitando a identificação da versão compilada.
+
+Uma vez concluída a compilação, o comando ``make modules\_install'' deve ser utilizado para instalar os módulos do núcleo compilado. Em seguida, o comando ``make install'' instala o núcleo em si. Vale ressaltar que o novo núcleo só será utilizado após a reinicialização da máquina. A Figura~\ref{fig:uname_pos} mostra a saída do comando ``uname -a'' após a reinicialização do comando.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{figuras/uname_pos.png}
+  \caption{Saída do comando ``uname -a'' após a compilação do núcleo.}
+  \label{fig:uname_pos}
+\end{figure}
+
+A Figura~\ref{fig:boot} mostra a saída do comando ``du -sh /lib/modules/6.10.11-utfpr/'' que retorna o espaço em disco ocupado pelos módulos do núcleo, e também a saída do comando ``ls -lh /boot'' que tem como saída os arquivos essenciais para o funcionamento do núcleo, nele encontramos duas versões do núcleo sobre o nome ``vmlinuz'', as configurações de compilação do mesmo sobre o nome ``config'' o ``initrd'' usado para iniciar o sistema operacional e por fim ``System.map'' que armazena alguns símbolos do núcleo para facilitar a depuração.
+
+A Figura~\ref{fig:boot} apresenta a saída do comando du -sh /lib/modules/6.10.11-utfpr/'', que indica o espaço em disco ocupado pelos módulos do núcleo. Além disso, a saída do comando ``ls -lh /boot'' exibe os arquivos essenciais para o funcionamento do núcleo. Entre esses arquivos, encontram-se duas versões do núcleo, identificadas pelo nome ``vmlinuz'', além das configurações de compilação correspondentes, listadas sob o nome ``config''. O arquivo ``initrd'' utilizado para iniciar o sistema operacional, enquanto e o ``System.map'' que armazena símbolos do núcleo para depuração e a resolução de problemas.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{figuras/boot.png}
+  \caption{Obtenção do núcleo e extração do código-fonte.}
+  \label{fig:boot}
+\end{figure}
+
+
+
 \section{Discussão dos Resultados}
 \label{sec:discussao}
 
