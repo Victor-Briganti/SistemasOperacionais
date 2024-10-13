@@ -267,9 +267,9 @@ Este trabalho apresenta os procedimentos necessários para a instalação de uma
 
 \section{Introdução}
 \label{sec:introducao}
-Tanenbaum e Bos (2016) apontam que um sistema operacional é um dispositivo de \textit{software} cuja função é tornar o computador mais simples e limpo, além de ser responsável pelo gerenciamento dos recursos da máquina.
+Um sistema operacional é um dispositivo de \textit{software} cuja função é tornar o computador mais simples e limpo, além de ser responsável pelo gerenciamento dos recursos da máquina~\cite{tanenbaum2016}.
 
-Ainda nos termos de Tanenbaum e Bos (2016), a maioria dos computadores possui dois modos de operação: modo núcleo (\textit{kernel}) e modo usuário. O sistema operacional, considerado pelos autores a peça mais fundamental do \textit{software}, opera em modo núcleo, o que garante acesso total ao \textit{hardware}, possibilitando a execução de qualquer instrução suportada pela máquina utilizada.
+A maioria dos computadores possui dois modos de operação: modo núcleo (\textit{kernel}) e modo usuário. O sistema operacional, considerado pelos autores a peça mais fundamental do \textit{software}, opera em modo núcleo, o que garante acesso total ao \textit{hardware}, possibilitando a execução de qualquer instrução suportada pela máquina utilizada~\cite{tanenbaum2016}.
 
 Este trabalho está estruturado da seguinte forma: após a introdução serão apresentados os objetivos do trabalho; em seguida, uma breve fundamentação essencial para o pleno entendimento do trabalho será apresentada; após isso, serão apresentados os materiais utilizados para a realização do trabalho, na seção 4; na seção 5, serão apresentadas e explicadas as etapas realizadas durante esta atividade; a seguir, na seção 6 e 7, os resultados serão discutidos e será apresentado as conclusões do trabalho, respectivamente.
 
@@ -278,11 +278,14 @@ Este trabalho está estruturado da seguinte forma: após a introdução serão a
 \section{Objetivos}
 \label{sec:objetivos}
 
-Este trabalho visa instalar a distribuição GNU/Linux Debian em um ambiente virtual, compilar e instalar o núcleo Linux, e explicar detalhadamente cada um dos comandos utilizados durante todo o procedimento.
+Este trabalho visa instalar a distribuição \textit{GNU/Linux Debian} em um ambiente virtual, compilar e instalar o núcleo \textit{Linux}, e explicar detalhadamente cada um dos comandos utilizados durante todo o procedimento.
 
 \section{Fundamentação}
 \label{sec:fundamentacao}
 
+A primeira versão do \textit{Linux} foi desenvolvida por Linus Torvalds em 1991, como um sistema operacional para computadores que utilizavam o microprocessador \textit{Intel 80386}, que era um processador novo e o mais avançado da época. A parte mais interna de um sistema operacional é denominada \textit{kernel}, um \textit{software} que fornece serviços básicos para todas as outras partes do sistema, gerencia o \textit{hardware} e distribui recursos do sistema~\cite{robert2010}.
+
+Como o código-fonte do \textit{Linux} é aberto, podemos configurá-lo antes de compilarmos, escolhendo apenas os \textit{drivers} e conteúdos específicos que desejamos~\cite{robert2010}. Uma distribuição \textit{GNU/Linux} possui uma combinação específica de \textit{softwares} aliados ao núcleo, o qual pode ser customizado conforme a necessidade. A distribuição utilizada para esta atividade é denominada \textit{GNU/Linux Debian}.
 
 \section{Materiais}
 \label{sec:materiais}
@@ -304,12 +307,12 @@ Este trabalho visa instalar a distribuição GNU/Linux Debian em um ambiente vir
 \section{Procedimentos e Resultados}
 \label{sec:procedimentos}
 
-Nesta seção, serão detalhados os procedimentos executados para a instalação da distribuição GNU/Linux Debian em um ambiente virtual, utilizando o hipervisor VirtualBox. Serão abordadas as configurações iniciais do hipervisor, a instalação do sistema operacional, verificações essenciais e os comandos utilizados para garantir o funcionamento correto do ambiente. Além disso, será descrito o processo de compilação do núcleo Linux, incluindo as etapas necessárias para a personalização e instalação da nova versão. 
+Nesta seção, serão detalhados os procedimentos executados para a instalação da distribuição \textit{GNU/Linux Debian} em um ambiente virtual, utilizando o hipervisor \textit{VirtualBox}. Serão abordadas as configurações iniciais do hipervisor, a instalação do sistema operacional, verificações essenciais e os comandos utilizados para garantir o funcionamento correto do ambiente. Além disso, será descrito o processo de compilação do núcleo \textit{Linux}, incluindo as etapas necessárias para a personalização e instalação da nova versão. 
 
 \subsection{Configurações do Hipervisor}
 \label{subsec:hipervisor}
 
-Os passos iniciais se deram por meio da instalação do Oracle VM VirtualBox e também da obtenção da imagem do Debian que será usada para a instalação. 
+Os passos iniciais se deram por meio da instalação do \textit{Oracle VM VirtualBox} e também da obtenção da imagem do \textit{Debian} que será usada para a instalação. 
 
 \begin{figure}[H]
   \centering
