@@ -310,7 +310,7 @@ Nesta seção, serão detalhados os procedimentos executados para a instalação
 \subsection{Configurações do Hipervisor}
 \label{subsec:hipervisor}
 
-Os passos iniciais se deram por meio da instalação do Oracle VM VirtualBox e também da obtenção da imagem do Debian que foi utilizada para a instalação. 
+Os passos iniciais se deram por meio da instalação do Oracle VM VirtualBox e também da obtenção da imagem do Debian que foi usada para a instalação. 
 
 \begin{figure}[H]
   \centering
@@ -342,13 +342,13 @@ Na Figura~\ref{fig:partition}, estão apresentadas as configurações de partici
 A memória secundária possui 50 GB de armazenamento, o que possibilitou que as partições fossem dispostas da seguinte maneira:
 
 \begin{itemize}
-    \item \textit{/}: É a raiz do sistema de arquivos, servindo como ponto de montagem para todos os outros dispositivos e sistemas de arquivos. Por ser o local onde o sistema operacional inicia e onde estão armazenados arquivos críticos, foi alocado um tamanho de 4 GB para esta partição.
+    \item \textit{/}: É a raiz do sistema de arquivos, servindo como ponto de montagem para todos os outros dispositivos e sistemas de arquivos. Por ser o local onde o sistema operacional inicia e onde estão armazenados arquivos críticos, foi alocado um tamanho de 3.6 GB para esta partição.
     
-    \item \textit{/usr}: Este diretório é responsável por armazenar programas e dados de usuários. Por conter a maior quantidade de dados e ser amplamente utilizado durante a compilação, foi escolhido um tamanho de 5 GB para esta partição.
+    \item \textit{/usr}: Este diretório é responsável por armazenar programas e dados de usuários. Por conter a maior quantidade de dados e ser amplamente utilizado durante a compilação, foi escolhido um tamanho de 32 GB para esta partição.
     
-    \item \textit{/var}: Armazena dados variáveis, como logs e outros arquivos que podem mudar com frequência. Por não ser uma área crítica para o funcionamento do sistema, neste trabalho em específico, foi definido um tamanho de apenas 2 GB.
+    \item \textit{/var}: Armazena dados variáveis, como logs e outros arquivos que podem mudar com frequência. Por não ser uma área crítica para o funcionamento do sistema, neste trabalho em específico, foi definido um tamanho de apenas 2.7 GB.
     
-    \item \textit{swap}: Esta partição é utilizada para armazenar páginas de memória que estavam na RAM, funcionando como uma extensão da memória virtual do sistema. Devido à quantidade de RAM já alocada durante a configuração do hipervisor, optou-se por um tamanho de apenas 500 MB para a partição \textit{swap}.
+    \item \textit{swap}: Esta partição é utilizada para armazenar páginas de memória que estavam na RAM, funcionando como uma extensão da memória virtual do sistema. Devido à quantidade de RAM já alocada durante a configuração do hipervisor, optou-se por um tamanho de 5.4 GB para a partição \textit{swap}.
     
     \item \textit{/home}: Este diretório armazena os arquivos de configuração pessoal de cada usuário do sistema. Como é uma área frequentemente utilizada pelos usuários, foi definido um tamanho maior do que o das demais partições, totalizando 10 GB.
 \end{itemize}
@@ -615,8 +615,12 @@ A Figura~\ref{fig:boot} mostra a saída do comando \textit{du -sh /lib/modules/6
 \section{Discussão dos Resultados}
 \label{sec:discussao}
 
+Os resultados obtidos foram satisfatórios, alcançando o objetivo de instalar o GNU/Linux Debian e compilar o núcleo do Linux com sucesso. No entanto, algumas dificuldades foram encontradas, especialmente em relação ao dimensionamento das partições, o que exigiu ajustes manuais e revisão das etapas de particionamento. Além disso, houve certa confusão com a disposição e clareza das informações sobre o processo de compilação do núcleo, o que tornou a navegação pelos guias e documentação mais desafiadora do que o esperado. Apesar desses obstáculos, foi possível remover módulos desnecessários, como o Macintosh Device Drivers, otimizando o núcleo para o hardware utilizado. O mapeamento detalhado dos passos de instalação e compilação proporcionou uma compreensão prática e aprofundada da estrutura e configuração do sistema.
+
 \section{Conclusões}
 \label{sec:conclusoes}
+
+O objetivo principal de instalar o GNU/Linux Debian, compreender a estrutura básica do Linux, explorar alguns comandos essenciais, e configurar e compilar o núcleo foi atingido com êxito. A grande vantagem desse processo foi a capacidade de personalizar o núcleo, removendo partes que não seriam utilizadas, como módulos irrelevantes, resultando em economia de recursos do sistema. No entanto, para aqueles que buscam uma solução mais prática e \textit{plug and play}, esse processo não é recomendado, pois demanda conhecimentos avançados e pode ser desnecessariamente complexo para usuários comuns. Esse tipo de atividade é mais adequado para profissionais e entusiastas que desejam um controle maior sobre seu sistema operacional.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
