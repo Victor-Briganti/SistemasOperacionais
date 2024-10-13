@@ -218,7 +218,7 @@ Este trabalho apresenta os procedimentos necessários para a instalação de uma
  \vspace{\onelineskip}
     
  \noindent
- \textbf{Palavras-chave}: núcleo. GNU/Linux. Debian.
+ \textbf{Palavras-chave}: VirtualBox. Debian. Sistema Operacional.
 \end{resumo}
 % ---
 
@@ -269,23 +269,21 @@ Este trabalho apresenta os procedimentos necessários para a instalação de uma
 \label{sec:introducao}
 Um sistema operacional é um dispositivo de \textit{software} cuja função é tornar o computador mais simples e limpo, além de ser responsável pelo gerenciamento dos recursos da máquina~\cite{tanenbaum2016}.
 
-A maioria dos computadores possui dois modos de operação: modo núcleo (\textit{kernel}) e modo usuário. O sistema operacional, considerado pelos autores a peça mais fundamental do \textit{software}, opera em modo núcleo, o que garante acesso total ao \textit{hardware}, possibilitando a execução de qualquer instrução suportada pela máquina utilizada~\cite{tanenbaum2016}.
+A maioria dos computadores possui dois modos de operação: modo núcleo e modo usuário. O sistema operacional é um \textit{software} que opera em modo núcleo, garantindo acesso total ao \textit{hardware}, possibilitando a execução de qualquer instrução suportada pela máquina utilizada~\cite{tanenbaum2016}.
 
 Este trabalho está estruturado da seguinte forma: após a introdução serão apresentados os objetivos do trabalho; em seguida, uma breve fundamentação essencial para o pleno entendimento do trabalho será apresentada; após isso, serão apresentados os materiais utilizados para a realização do trabalho, na seção 4; na seção 5, serão apresentadas e explicadas as etapas realizadas durante esta atividade; a seguir, na seção 6 e 7, os resultados serão discutidos e será apresentado as conclusões do trabalho, respectivamente.
-
-
 
 \section{Objetivos}
 \label{sec:objetivos}
 
-Este trabalho visa instalar a distribuição \textit{GNU/Linux Debian} em um ambiente virtual, compilar e instalar o núcleo \textit{Linux}, e explicar detalhadamente cada um dos comandos utilizados durante todo o procedimento.
+Este trabalho visa instalar a distribuição GNU/Linux Debian em um ambiente virtual, compilar e instalar o núcleo Linux, e explicar detalhadamente cada um dos comandos utilizados durante todo o procedimento.
 
 \section{Fundamentação}
 \label{sec:fundamentacao}
 
-A primeira versão do \textit{Linux} foi desenvolvida por Linus Torvalds em 1991, como um sistema operacional para computadores que utilizavam o microprocessador \textit{Intel 80386}, que era um processador novo e o mais avançado da época. A parte mais interna de um sistema operacional é denominada \textit{kernel}, um \textit{software} que fornece serviços básicos para todas as outras partes do sistema, gerencia o \textit{hardware} e distribui recursos do sistema~\cite{robert2010}.
+A primeira versão do Linux foi desenvolvida por Linus Torvalds em 1991, como um sistema operacional para computadores que utilizavam o microprocessador, Intel 80386, que era um processador novo e o mais avançado da época. A parte mais interna de um sistema operacional é denominada núcleo, um \textit{software} que fornece serviços básicos para todas as outras partes do sistema, gerencia o \textit{hardware} e distribui recursos do sistema~\cite{robert2010}.
 
-Como o código-fonte do \textit{Linux} é aberto, podemos configurá-lo antes de compilarmos, escolhendo apenas os \textit{drivers} e conteúdos específicos que desejamos~\cite{robert2010}. Uma distribuição \textit{GNU/Linux} possui uma combinação específica de \textit{softwares} aliados ao núcleo, o qual pode ser customizado conforme a necessidade. A distribuição utilizada para esta atividade é denominada \textit{GNU/Linux Debian}.
+Como o código-fonte do Linux é aberto, podemos configurá-lo antes de compilarmos, escolhendo apenas os \textit{drivers} e conteúdos específicos que desejamos~\cite{robert2010}. Uma distribuição GNU/Linux possui uma combinação específica de \textit{softwares} aliados ao núcleo, o qual pode ser customizado conforme a necessidade. A distribuição utilizada para esta atividade é denominada GNU/Linux Debian.
 
 \section{Materiais}
 \label{sec:materiais}
@@ -307,12 +305,12 @@ Como o código-fonte do \textit{Linux} é aberto, podemos configurá-lo antes de
 \section{Procedimentos e Resultados}
 \label{sec:procedimentos}
 
-Nesta seção, serão detalhados os procedimentos executados para a instalação da distribuição \textit{GNU/Linux Debian} em um ambiente virtual, utilizando o hipervisor \textit{VirtualBox}. Serão abordadas as configurações iniciais do hipervisor, a instalação do sistema operacional, verificações essenciais e os comandos utilizados para garantir o funcionamento correto do ambiente. Além disso, será descrito o processo de compilação do núcleo \textit{Linux}, incluindo as etapas necessárias para a personalização e instalação da nova versão. 
+Nesta seção, serão detalhados os procedimentos executados para a instalação da distribuição GNU/Linux Debian em um ambiente virtual, utilizando o hipervisor VirtualBox. Serão abordadas as configurações iniciais do hipervisor, a instalação do sistema operacional, verificações essenciais e os comandos utilizados para garantir o funcionamento correto do ambiente. Além disso, será descrito o processo de compilação do núcleo Linux, incluindo as etapas necessárias para a personalização e instalação da nova versão. 
 
 \subsection{Configurações do Hipervisor}
 \label{subsec:hipervisor}
 
-Os passos iniciais se deram por meio da instalação do \textit{Oracle VM VirtualBox} e também da obtenção da imagem do \textit{Debian} que será usada para a instalação. 
+Os passos iniciais se deram por meio da instalação do Oracle VM VirtualBox e também da obtenção da imagem do Debian que foi utilizada para a instalação. 
 
 \begin{figure}[H]
   \centering
@@ -323,14 +321,14 @@ Os passos iniciais se deram por meio da instalação do \textit{Oracle VM Virtua
 
 A Figura~\ref{fig:vm} ilustra as principais configurações utilizadas para a instalação do sistema operacional. Para a memória primária, foi selecionado um total de 4 GB e 4 processadores, enquanto a memória secundária foi alocada com 50 GB para uso da máquina virtual.
 
-Além das configurações padrão de processadores e memória, foram incluídas duas placas de rede. O adaptador 1 está configurado como \textit{Network Address Translation} (NAT), permitindo acesso à \textit{internet}, enquanto o adaptador 2 está configurado para uso interno. Essa configuração foi escolhida porque o acesso à máquina será realizado por meio do \textit{Secure Shell Connection} (SSH).
+Além das configurações de processadores e memória, foram incluídas duas placas de rede. O adaptador 1 está configurado como Network Address Translation (NAT), permitindo acesso à Internet, enquanto o adaptador 2 está configurado para uso interno. Essa configuração foi escolhida pois o acesso à máquina será realizado por meio do Secure Shell Connection (SSH).
 
 \subsection{Instalação do Sistema Operacional}
 \label{subsec:instalacao}
 
 Os primeiros passos durante a instalação envolveram a seleção do idioma. Para facilitar a referência a manuais durante o processo, optou-se pelo inglês. Após essa configuração, o Brasil foi escolhido como localização, permitindo que o sistema operacional definisse o \textit{locale} a ser utilizado para formatações específicas relacionadas à região do usuário~\cite{kerris2010}. Além disso, o relógio do sistema foi ajustado para o fuso horário de São Paulo, e o teclado foi configurado para a disposição adequada da região.
 
-Após as configurações de região, foram criados um usuário comum e um usuário \textit{root}. Na Figura~\ref{fig:root} temos a descrição do \textit{root} como administrador do sistema, possuindo privilégios amplos e acesso total a todos os recursos e configurações do sistema.
+Após as configurações de região, foram criados um usuário comum e um usuário \textit{root}. Na Figura~\ref{fig:root} temos a descrição do \textit{root}, administrador do sistema, possuindo privilégios amplos e acesso total a todos os recursos e configurações do sistema.
 
 \begin{figure}[H]
   \centering
@@ -339,20 +337,20 @@ Após as configurações de região, foram criados um usuário comum e um usuár
   \label{fig:root}
 \end{figure}
 
-Na Figura~\ref{fig:partition}, estão apresentadas as configurações de particionamento e pontos de montagem do disco. O particionamento permite a divisão entre partições primárias e lógicas, sendo que cada uma delas é derivada do \textit{Master Boot Record} (MBR). De maneira simplificada, as partições primárias são inicializáveis, enquanto as partições lógicas existem apenas como uma forma de contornar algumas limitações existentes na divisão das partições~\cite{archPartition}.
+Na Figura~\ref{fig:partition}, estão apresentadas as configurações de particionamento e pontos de montagem do disco. O particionamento permite a divisão entre partições primárias e lógicas, sendo que cada uma delas é derivada do Master Boot Record (MBR). De maneira simplificada, as partições primárias são inicializáveis, enquanto as partições lógicas existem apenas como uma forma de contornar algumas limitações existentes na divisão das partições~\cite{negus2012}.
 
 A memória secundária possui 50 GB de armazenamento, o que possibilitou que as partições fossem dispostas da seguinte maneira:
 
 \begin{itemize}
-    \item \textit{/}: É a raiz do sistema de arquivos, servindo como ponto de montagem para todos os outros dispositivos e sistemas de arquivos~\cite{tldpRootDir}. Por ser o local onde o sistema operacional inicia e onde estão armazenados arquivos críticos, foi alocado um tamanho de 4 GB para esta partição.
+    \item \textit{/}: É a raiz do sistema de arquivos, servindo como ponto de montagem para todos os outros dispositivos e sistemas de arquivos. Por ser o local onde o sistema operacional inicia e onde estão armazenados arquivos críticos, foi alocado um tamanho de 4 GB para esta partição.
     
-    \item \textit{/usr}: Este diretório é responsável por armazenar programas e dados de usuários~\cite{tldpUsrDir}. Por conter a maior quantidade de dados e ser amplamente utilizado durante a compilação, foi escolhido um tamanho de 5 GB para esta partição.
+    \item \textit{/usr}: Este diretório é responsável por armazenar programas e dados de usuários. Por conter a maior quantidade de dados e ser amplamente utilizado durante a compilação, foi escolhido um tamanho de 5 GB para esta partição.
     
-    \item \textit{/var}: Armazena dados variáveis, como logs e outros arquivos que podem mudar com frequência~\cite{tldpVarDir}. Por não ser uma área crítica para o funcionamento do sistema, neste trabalho em específico, foi definido um tamanho de apenas 2 GB.
+    \item \textit{/var}: Armazena dados variáveis, como logs e outros arquivos que podem mudar com frequência. Por não ser uma área crítica para o funcionamento do sistema, neste trabalho em específico, foi definido um tamanho de apenas 2 GB.
     
-    \item \textit{swap}: Esta partição é utilizada para armazenar páginas de memória que estavam na RAM, funcionando como uma extensão da memória virtual do sistema~\cite{archSwap}. Devido à quantidade de RAM já alocada durante a configuração do hipervisor, optou-se por um tamanho de apenas 500 MB para a partição \textit{swap}.
+    \item \textit{swap}: Esta partição é utilizada para armazenar páginas de memória que estavam na RAM, funcionando como uma extensão da memória virtual do sistema. Devido à quantidade de RAM já alocada durante a configuração do hipervisor, optou-se por um tamanho de apenas 500 MB para a partição \textit{swap}.
     
-    \item \textit{/home}: Este diretório armazena os arquivos de configuração pessoal de cada usuário do sistema~\cite{tldpHomeDir}. Como é uma área frequentemente utilizada pelos usuários, foi definido um tamanho maior do que o das demais partições, totalizando 10 GB.
+    \item \textit{/home}: Este diretório armazena os arquivos de configuração pessoal de cada usuário do sistema. Como é uma área frequentemente utilizada pelos usuários, foi definido um tamanho maior do que o das demais partições, totalizando 10 GB.
 \end{itemize}
 
 \begin{figure}[H]
@@ -368,7 +366,7 @@ A memória secundária possui 50 GB de armazenamento, o que possibilitou que as 
 Após o processo de instalação, alguns comandos foram realizados para verificação e teste do sistema instalado.
 
 \subsubsection{ps aux}
-A Figura~\ref{fig:ps}, mostra a saída do comando \textit{ps} utilizado para a verificação dos processos em execução no sistema~\cite{manPs}. A opção ``aux'', é uma divisão de três parâmetros que alteram o comando da seguinte maneira:
+A Figura~\ref{fig:ps}, mostra a saída do comando \textit{ps} utilizado para a verificação dos processos em execução no sistema~\cite{negus2012}. A opção ``aux'', é uma divisão de três parâmetros que alteram o comando da seguinte maneira:
 
 \begin{itemize}
     \item 'a': Mostra os processo de todos os usuários.
@@ -386,7 +384,7 @@ A Figura~\ref{fig:ps}, mostra a saída do comando \textit{ps} utilizado para a v
 \end{figure}
 
 \subsubsection{df}
-A Figura~\ref{fig:df} apresenta a saída do comando \textit{df}, utilizado para verificar o espaço utilizado pelos sistemas de arquivos no sistema~\cite{manDf}. A opção ``-h'' exibe a saída de maneira mais legível, facilitando a interpretação dos dados.
+A Figura~\ref{fig:df} apresenta a saída do comando \textit{df}, utilizado para verificar o espaço utilizado pelos sistemas de arquivos no sistema~\cite{negus2012}. A opção ``-h'' exibe a saída de maneira mais legível, facilitando a interpretação dos dados.
 
 \begin{figure}[H]
   \centering
@@ -396,7 +394,7 @@ A Figura~\ref{fig:df} apresenta a saída do comando \textit{df}, utilizado para 
 \end{figure}
 
 \subsubsection{free}
-A Figura~\ref{fig:free} apresenta a saída do comando \textit{free}, utilizado para verificar a utilização da memória no sistema~\cite{manFree}. A opção ``-b'' exibe os valores de memória em bytes, proporcionando uma visão detalhada da quantidade exata de memória disponível e utilizada.
+A Figura~\ref{fig:free} apresenta a saída do comando \textit{free}, utilizado para verificar a utilização da memória no sistema~\cite{shotts2017}. A opção ``-b'' exibe os valores de memória em bytes, proporcionando uma visão detalhada da quantidade exata de memória disponível e utilizada.
 
 \begin{figure}[H]
   \centering
@@ -406,7 +404,7 @@ A Figura~\ref{fig:free} apresenta a saída do comando \textit{free}, utilizado p
 \end{figure}
 
 \subsubsection{cat /proc/meminfo}
-A Figura~\ref{fig:meminfo} apresenta a saída do comando \textit{cat /proc/meminfo}. O comando \textit{cat} é utilizado para exibir o conteúdo de arquivos de texto no terminal~\cite{manCat}. Neste caso, \textit{/proc/meminfo} é um arquivo do sistema que fornece dados em tempo real sobre a utilização da memória física e da \textit{swap}~\cite{tldpProc}.
+A Figura~\ref{fig:meminfo} apresenta a saída do comando \textit{cat /proc/meminfo}. O comando \textit{cat} é utilizado para exibir o conteúdo de arquivos de texto no terminal~\cite{shotts2017}. Neste caso, \textit{/proc/meminfo} é um arquivo do sistema que fornece dados em tempo real sobre a utilização da memória física e da \textit{swap}~\cite{tldpProc}.
 
 \begin{figure}[H]
   \centering
@@ -431,7 +429,7 @@ O comando \textit{ip -c route} exibe a tabela de roteamento.
 \end{figure}
 
 \subsubsection{cat /etc/resolv.conf}
-A Figura~\ref{fig:resolv} mostra a saída do comando \textit{cat /etc/resolv.conf}, que exibe o conteúdo do arquivo responsável pela configuração dos servidores \textit{Domain Name Server} (DNS) no sistema~\cite{manCat}. Esse arquivo contém informações sobre quais servidores DNS o sistema deve consultar para resolver nomes de domínio em endereços IP. A configuração correta deste arquivo é essencial para garantir que o sistema consiga acessar serviços na internet de forma eficaz. 
+A Figura~\ref{fig:resolv} mostra a saída do comando \textit{cat /etc/resolv.conf}, que exibe o conteúdo do arquivo responsável pela configuração dos servidores \textit{Domain Name Server} (DNS) no sistema~\cite{negus2012}. Esse arquivo contém informações sobre quais servidores DNS o sistema deve consultar para resolver nomes de domínio em endereços IP.  
 
 \begin{figure}[H]
   \centering
@@ -441,7 +439,7 @@ A Figura~\ref{fig:resolv} mostra a saída do comando \textit{cat /etc/resolv.con
 \end{figure}
 
 \subsubsection{cat /etc/network/interfaces}
-A Figura~\ref{fig:interfaces} apresenta a saída do comando \textit{cat /etc/network/interfaces}, que exibe as configurações de rede do sistema~\cite{manCat}. Este arquivo define as interfaces de rede disponíveis e suas configurações, como endereços IP, máscara de sub-rede e gateways~\cite{manResolvConf}.
+A Figura~\ref{fig:interfaces} apresenta a saída do comando \textit{cat /etc/network/interfaces}, que exibe as configurações de rede do sistema~\cite{guiafocaIntermediario}. Este arquivo define as interfaces de rede disponíveis e suas configurações, como endereços IP, máscara de sub-rede e gateways.
 
 \begin{figure}[H]
   \centering
@@ -451,7 +449,7 @@ A Figura~\ref{fig:interfaces} apresenta a saída do comando \textit{cat /etc/net
 \end{figure}
 
 \subsubsection{ping}
-A Figura~\ref{fig:ping} mostra a saída do comando \textit{ping google.com}, utilizado para verificar a conectividade com o host especificado~\cite{manPing}. O comando envia pacotes ICMP Echo Request para o servidor do Google e mede o tempo de resposta, permitindo avaliar a latência da conexão.
+A Figura~\ref{fig:ping} mostra a saída do comando \textit{ping google.com}, utilizado para verificar a conectividade com o host especificado~\cite{shotts2017}. O comando envia pacotes ICMP Echo Request para o servidor do Google e mede o tempo de resposta, permitindo avaliar a latência da conexão.
 
 \begin{figure}[H]
   \centering
@@ -461,7 +459,7 @@ A Figura~\ref{fig:ping} mostra a saída do comando \textit{ping google.com}, uti
 \end{figure}
 
 \subsubsection{Configuração de Repositórios}
-O arquivo \textit{sources.list} é um componente essencial do gerenciador de pacotes \textit{apt} no Debian~\cite{ubuntuApt}. Neste arquivo é definido os repositórios de onde o sistema obtém os pacotes de software e suas respectivas atualizações. Cada linha do arquivo especifica uma fonte de pacotes, que pode ser um repositório oficial ou um repositório de terceiros.
+O arquivo \textit{sources.list} é um componente essencial do gerenciador de pacotes \textit{apt} no Debian~\cite{guiafocaIniciante}. Neste arquivo é definido os repositórios de onde o sistema obtém os pacotes de software e suas respectivas atualizações. Cada linha do arquivo especifica uma fonte de pacotes, que pode ser um repositório oficial ou um repositório de terceiros.
 
 O \textit{security source list} é uma configuração específica que permite ao sistema acessar repositórios dedicados a atualizações de segurança. Esses repositórios contêm pacotes que corrigem vulnerabilidades e problemas de segurança, sendo fundamental para manter o sistema protegido contra ameaças. 
 
@@ -475,7 +473,7 @@ Como apresentado na Figura~\ref{fig:sources} o Debian 12.7 utilizado neste traba
 \end{figure}
 
 \subsubsection{uname}
-A Figura~\ref{fig:uname} mostra a saída do comando \textit{uname}, utilizado para exibir informações sobre o sistema operacional em execução~\cite{manUname}. Este comando tem como saída detalhes sobre o sistema, como o nome do kernel, a versão do kernel, a arquitetura do processador e o nome do host. O parâmetro ''-a`` é usado para que a saída mostre todas as informações disponíveis.
+A Figura~\ref{fig:uname} mostra a saída do comando \textit{uname}, utilizado para exibir informações sobre o sistema operacional em execução~\cite{negus2012}. Este comando tem como saída detalhes sobre o sistema, como o nome do kernel, a versão do kernel, a arquitetura do processador e o nome do host. O parâmetro ''-a`` é usado para que a saída mostre todas as informações disponíveis.
 
 \begin{figure}[H]
   \centering
@@ -485,30 +483,30 @@ A Figura~\ref{fig:uname} mostra a saída do comando \textit{uname}, utilizado pa
 \end{figure}
 
 \subsubsection{Comandos Gerais}
-Existem comandos fundamentais para a interação com o sistema operacional e a realização de diversas operações. Abaixo, apresentamos uma lista de comumente usados:
+Existem comandos fundamentais para a interação com o sistema operacional e a realização de diversas operações~\cite{guiafocaIniciante}. Abaixo, apresentamos uma lista de comandos comumente usados:
 
 \begin{itemize}
-    \item \texttt{clear}: Restaura o terminal a um estado inicial, "limpando" todas as saídas anteriores e comandos executados~\cite{manClear}.
+    \item \texttt{clear}: Restaura o terminal a um estado inicial, ``limpando'' todas as saídas anteriores e comandos executados.
 
-    \item \texttt{ls -l}: Exibe uma lista detalhada dos arquivos e diretórios no diretório especificado. Caso nenhum diretório seja indicado, a listagem será feita do diretório atual~\cite{manLs}.
+    \item \texttt{ls -l}: Exibe uma lista detalhada dos arquivos e diretórios no diretório especificado. Caso nenhum diretório seja indicado, a listagem será feita do diretório atual.
 
-    \item \texttt{cd}: Altera o diretório de trabalho atual para o diretório especificado no parâmetro, permitindo a navegação pelo sistema de arquivos~\cite{manCd}.
+    \item \texttt{cd}: Altera o diretório de trabalho atual para o diretório especificado no parâmetro, permitindo a navegação pelo sistema de arquivos.
 
-    \item \texttt{cat}: Concatena e exibe o conteúdo de um ou mais arquivos na saída padrão~\cite{manCat}.
+    \item \texttt{cat}: Concatena e exibe o conteúdo de um ou mais arquivos na saída padrão.
 
-    \item \texttt{rm}: Remove permanentemente o arquivo especificado do sistema~\cite{manRm}.
+    \item \texttt{rm}: Remove permanentemente o arquivo especificado do sistema.
 
-    \item \texttt{nano}: Editor de texto em linha de comando que permite a criação e modificação de arquivos de texto diretamente no terminal~\cite{archNano}.
+    \item \texttt{nano}: Editor de texto em linha de comando que permite a criação e modificação de arquivos de texto diretamente no terminal.
 
-    \item \texttt{cp}: Copia um arquivo de origem para o destino especificado~\cite{manCp}.
+    \item \texttt{cp}: Copia um arquivo de origem para o destino especificado.
 
-    \item \texttt{grep}: Busca e exibe as linhas de um arquivo que correspondem a um padrão especificado pelo usuário~\cite{manGrep}.
+    \item \texttt{grep}: Busca e exibe as linhas de um arquivo que correspondem a um padrão especificado pelo usuário.
 
-    \item \texttt{head}: Exibe as primeiras linhas de um arquivo, por padrão somente as 10 primeiras linhas são exibidas~\cite{manHead}. 
+    \item \texttt{head}: Exibe as primeiras linhas de um arquivo, por padrão somente as 10 primeiras linhas são exibidas. 
 
-    \item \texttt{tail}: Mostra as últimas linhas de um arquivo. Similar ao comando \texttt{head}, também exibe 10 linhas por padrão~\cite{manTail}.
+    \item \texttt{tail}: Mostra as últimas linhas de um arquivo. Similar ao comando \texttt{head}, também exibe 10 linhas por padrão.
 
-    \item \texttt{mv}: Move ou renomeia arquivos e ~\cite{manMv}. 
+    \item \texttt{mv}: Move ou renomeia arquivos. 
 \end{itemize}
 
 A Figura~\ref{fig:comandos} e a Figura~\ref{fig:comandos2} ilustram o uso desses comandos.
@@ -530,31 +528,31 @@ A Figura~\ref{fig:comandos} e a Figura~\ref{fig:comandos2} ilustram o uso desses
 \subsection{Compilação do Núcleo}
 \label{subsec:compilacao}
 
-Para o processo de compilação do núcleo Linux, é essencial instalar uma série de programas e bibliotecas necessárias. O comando utilizado para essa instalação é ``apt install build-essentials bc dwarves bison flex gnupg libncurses-dev libelf-dev libssl-dev wget''. Este comando instala um conjunto abrangente de pacotes no sistema, cada um com funções específicas que contribuem para a compilação e configuração do núcleo.
+Para o processo de compilação do núcleo Linux, é essencial instalar uma série de programas e bibliotecas necessárias. O comando utilizado para essa instalação é  o \textit{apt install build-essentials bc dwarves bison flex gnupg libncurses-dev libelf-dev libssl-dev wget}. Este comando instala um conjunto de pacotes no sistema, cada um com funções específicas que contribuem para a compilação e configuração do núcleo.
 
 \begin{itemize}
-    \item \texttt{build-essentials}: Um conjunto de pacotes essenciais para construção de pacotes no Debian~\cite{buildEssentials}.
+    \item \texttt{build-essentials}: Um conjunto de pacotes essenciais para construção de pacotes no Debian.
 
-    \item \texttt{bc}: Calculadora de linha de comando~\cite{manBc}.
+    \item \texttt{bc}: Calculadora de linha de comando.
 
-    \item \texttt{dwarves}: Conjunto de ferramentas depuração para arquivos no formato Executable and Linkable Format(ELF)~\cite{debianDwarf}.
+    \item \texttt{dwarves}: Conjunto de ferramentas depuração para arquivos no formato Executable and Linkable Format(ELF).
 
-    \item \texttt{bison}: Gerador de analisador sintático de uso geral~\cite{debianBison}. 
+    \item \texttt{bison}: Gerador de analisador sintático de uso geral. 
 
-    \item \texttt{flex}: Gerador de analisadores léxicos~\cite{debianFlex}.
+    \item \texttt{flex}: Gerador de analisadores léxicos.
     
-    \item \texttt{gnupg}: Ferramenta para encriptação de dados e geração de assinaturas digitais~\cite{debianGnupg}
+    \item \texttt{gnupg}: Ferramenta para encriptação de dados e geração de assinaturas digitais.
 
-    \item \texttt{libncurses-dev}: Biblioteca de manipulação de caracteres em terminais~\cite{debianLibncurses}.
+    \item \texttt{libncurses-dev}: Biblioteca de manipulação de caracteres em terminais.
 
-    \item \texttt{libelf-dev}: Biblioteca para leitura e escrita de arquivos ELF~\cite{debianLibelf}.
+    \item \texttt{libelf-dev}: Biblioteca para leitura e escrita de arquivos ELF.
     
-    \item \texttt{libssl-dev}: Parte do projeto OpenSSL para implementação do protocolo Secure Socket Layer(SSL) e Transport Layer Security (TLS)~\cite{debianLibssl}
+    \item \texttt{libssl-dev}: Parte do projeto OpenSSL para implementação do protocolo Secure Socket Layer(SSL) e Transport Layer Security (TLS).
 
-    \item \texttt{wget}: Utilitário para obter arquivos usando Hypertext Transfer Protocol (HTTP) ou File Transfer Protocol (FTP)~\cite{debianWget}.
+    \item \texttt{wget}: Utilitário para obter arquivos usando Hypertext Transfer Protocol (HTTP) ou File Transfer Protocol (FTP).
 \end{itemize}
 
-Durante a realização deste trabalho, a versão mais recente do núcleo Linux disponível era a 6.10.11. A obtenção dessa versão foi realizada por meio do comando ``wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.10.11.tar.xz''. O código-fonte é fornecido em um arquivo comprimido, o que requer sua extração. Isso pode ser feito com o comando ``tar -xf linux-6.10.11.tar.xz -C /usr/src/linux-6.10.11/''. A Figura~\ref{wget} ilustra este processo.
+Durante a realização deste trabalho, a versão mais recente do núcleo Linux disponível era a 6.10.11. A obtenção dessa versão foi realizada por meio do comando \textit{wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.10.11.tar.xz}. O código-fonte é fornecido em um arquivo comprimido, requerendo sua extração. Isso pode ser feito com o comando \textit{tar -xf linux-6.10.11.tar.xz -C /usr/src/linux-6.10.11/}. A Figura~\ref{fig:wget} ilustra este processo.
 
 \begin{figure}[H]
   \centering
@@ -563,11 +561,11 @@ Durante a realização deste trabalho, a versão mais recente do núcleo Linux d
   \label{fig:wget}
 \end{figure}
 
-A compilação do núcleo Linux é baseada em um arquivo de configuração, que no diretório de compilação é denominado por ``.config''. No Debian, esse arquivo pode ser encontrado no diretório ``/boot'', onde estão armazenados diversos parâmetros que serão utilizados durante o processo de compilação. Antes de iniciar a compilação, é necessário obter esse arquivo de configuração e copiá-lo para o diretório onde a compilação será realizada, que neste trabalho é o diretório ``/usr/src/linux-6.10.11/''. Para isso, foi utilizado o comando ``cp /boot/config-\$(uname -r) .config''.
+A compilação do núcleo Linux é baseada em um arquivo de configuração, que no diretório de compilação é denominado por \textit{.config}. No Debian, esse arquivo pode ser encontrado no diretório \textit{/boot}, onde estão armazenados diversos parâmetros que serão utilizados durante o processo de compilação. Antes de iniciar a compilação, é necessário obter este arquivo de configuração e copiá-lo para o diretório onde a compilação será realizada, que neste trabalho é o diretório \textit{/usr/src/linux-6.10.11/}. Para isso, foi utilizado o comando \textit{cp /boot/config-\$(uname -r) .config}.
 
-Após essa configuração inicial, o comando ``make localmodconfig'' é executado. Esse comando ajusta o arquivo de configuração de modo que apenas os módulos já carregados no sistema sejam considerados durante a compilação~\cite{kernelConfig}.
+Após essa configuração inicial, o comando \textit{make localmodconfig} é executado. Esse comando ajusta o arquivo de configuração de modo que apenas os módulos já carregados no sistema sejam considerados durante a compilação.
 
-Para as configurações de módulo o comando ``make menuconfig'' é usado, com ele uma interface é apresentada para o usuário de modo que o mesmo possa escolher algumas opções que serão ou não compiladas com o núcleo. Na Figura~\ref{fig:usb} temos o uso deste menu para a habilitação do módulo para Universal Serial Bus (USB) \textit{mass storage}, o que basicamente habilita o suporte para \textit{pen drive}, alguns tipos de dispositivos de disco rígido via USB e afins. Já a Figura~\ref{fig:ntfs} utiliza o menu para habilitar o NT File System (NTFS) um sistema de arquivos utilizado no Windows.
+Para as configurações de módulo o comando \textit{make menuconfig} é usado, com ele uma interface é apresentada para o usuário de modo que o mesmo possa escolher algumas opções que serão ou não compiladas com o núcleo. Na Figura~\ref{fig:usb} temos o uso deste menu para a habilitação do módulo para Universal Serial Bus (USB) \textit{mass storage}, o que basicamente habilita o suporte para \textit{pen drive}, alguns tipos de dispositivos de disco rígido via USB e afins. Já a Figura~\ref{fig:ntfs} utiliza o menu para habilitar o NT File System (NTFS) um sistema de arquivos utilizado no Windows.
 
 \begin{figure}[H]
   \centering
@@ -592,20 +590,20 @@ O uso deste menu não se limita apenas à habilitação de módulos importantes,
   \label{fig:macintosh}
 \end{figure}
 
-Após as configurações no núcleo a compilação pode ser realizada. Na compilação do núcleo o comando ``make -j2 LOCALVERSION=-utfpr'' foi utilizado, onde ``'-j2' especifica a quantidade de núcleos utilizados durante a compilação e ``LOCALVERSION=-utfpr'' é um parametro opcional que especifica um nome que será concatenado ao nome do núcleo.
+Após as configurações no núcleo a compilação pode ser realizada. Na compilação do núcleo o comando \textit{make -j2 LOCALVERSION=-utfpr} foi utilizado, onde \textit{-j2} especifica a quantidade de núcleos utilizados durante a compilação e \textit{LOCALVERSION=-utfpr} é um parâmetro opcional que especifica um nome que será concatenado ao nome do núcleo.
 
-Após as configurações no núcleo, o processo de compilação pode ser iniciado. Para isso, foi utilizado o comando ``make -j2 LOCALVERSION=-utfpr''. Nesse comando, ``-j2'' especifica o número de núcleos a serem utilizados durante a compilação, otimizando o tempo de execução. O parâmetro opcional ``LOCALVERSION=-utfpr'' adiciona um sufixo ao nome do núcleo, facilitando a identificação da versão compilada.
+Após as configurações no núcleo, o processo de compilação pode ser iniciado. Para isso, foi utilizado o comando \textit{make -j2 LOCALVERSION=-utfpr}. Nesse comando, ``-j2'' especifica o número de núcleos a serem utilizados durante a compilação, otimizando o tempo de execução. O parâmetro opcional \textit{LOCALVERSION=-utfpr} adiciona um sufixo ao nome do núcleo, facilitando a identificação da versão compilada.
 
-Uma vez concluída a compilação, o comando ``make modules\_install'' deve ser utilizado para instalar os módulos do núcleo compilado. Em seguida, o comando ``make install'' instala o núcleo em si. Vale ressaltar que o novo núcleo só será utilizado após a reinicialização da máquina. A Figura~\ref{fig:uname_pos} mostra a saída do comando ``uname -a'' após a reinicialização do comando.
+Uma vez concluída a compilação, o comando \textit{make modules\_install} deve ser utilizado para instalar os módulos do núcleo compilado. Em seguida, o comando \textit{make install} instala o núcleo em si. Vale ressaltar que o novo núcleo só será utilizado após a reinicialização da máquina. A Figura~\ref{fig:uname_pos} mostra a saída do comando \textit{uname -a} após a reinicialização do comando.
 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.3]{figuras/uname_pos.png}
-  \caption{Saída do comando ``uname -a'' após a compilação do núcleo.}
+  \caption{Saída do comando \textit{uname -a} após a compilação do núcleo.}
   \label{fig:uname_pos}
 \end{figure}
 
-A Figura~\ref{fig:boot} mostra a saída do comando ``du -sh /lib/modules/6.10.11-utfpr/'' que retorna o espaço em disco ocupado pelos módulos do núcleo, e também a saída do comando ``ls -lh /boot'' que tem como saída os arquivos essenciais para o funcionamento do núcleo, nele encontramos duas versões do núcleo sobre o nome ``vmlinuz'', as configurações de compilação do mesmo sobre o nome ``config'' o ``initrd'' usado para iniciar o sistema operacional e por fim ``System.map'' que armazena alguns símbolos do núcleo para facilitar a depuração~\ref{linuxKernel}.
+A Figura~\ref{fig:boot} mostra a saída do comando \textit{du -sh /lib/modules/6.10.11-utfpr/} que retorna o espaço em disco ocupado pelos módulos do núcleo, e também a saída do comando \textit{ls -lh /boot} que têm como saída os arquivos essenciais para o funcionamento do núcleo, nele encontramos duas versões do núcleo sobre o nome \textit{vmlinuz}, as configurações de compilação do mesmo sobre o nome \textit{config} o \textit{initrd} usado para iniciar o sistema operacional e por fim \textit{System.map} que armazena alguns símbolos do núcleo para facilitar a depuração~\cite{linuxKernel}.
 
 \begin{figure}[H]
   \centering
@@ -613,8 +611,6 @@ A Figura~\ref{fig:boot} mostra a saída do comando ``du -sh /lib/modules/6.10.11
   \caption{Obtenção do núcleo e extração do código-fonte.}
   \label{fig:boot}
 \end{figure}
-
-
 
 \section{Discussão dos Resultados}
 \label{sec:discussao}
@@ -639,41 +635,5 @@ A Figura~\ref{fig:boot} mostra a saída do comando ``du -sh /lib/modules/6.10.11
 \prebibhook}
 
 \bibliography{abntex2-modelo-references}
-
-
-
-% ----------------------------------------------------------
-% Apêndices
-% ----------------------------------------------------------
-
-% ---
-% Inicia os apêndices
-% ---
-\begin{apendicesenv}
-
-% ----------------------------------------------------------
-\section*{Apêndice A - Nome do Apêndice}
-\addcontentsline{toc}{section}{Apêndice A - Nome do Apêndice}
-% ----------------------------------------------------------
-
-\end{apendicesenv}
-% ---
-
-
-% ----------------------------------------------------------
-% Anexos
-% ----------------------------------------------------------
-
-% ---
-% Inicia os anexos
-% ---
-\begin{anexosenv}
-
-% ---
-\section*{Anexo A - Nome do Anexo}
-\addcontentsline{toc}{section}{Anexo A - Nome do Anexo}
-% ---
-\end{anexosenv}
-
 
 \end{document}
