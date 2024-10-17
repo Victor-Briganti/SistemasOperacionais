@@ -92,121 +92,98 @@ void *columns(void *arg) {
 }
 
 /**
- * @brief Dividi o trabalho de calcular linhas entre as threads.
+ * @brief Dividi o trabalho de entre as threads, e escreve as saídas no arquivo.
  *
- * Realiza a divisão das partes das linhas da matrix que serão calculadas por
- * cada thread.
+ * Dividi o trabalho das threads entre os cálculos de linhas e colunas.
  *
- * @param tid vetor das threads a serem criadas
+ * @param tid Vetor das threads a serem criadas
+ * @param file Arquivo de saída
  */
-void row_threads(std::vector<pthread_t> &tid, std::ofstream &file) {
-  int chunkSize = static_cast<int>(matrix->row_size() / tid.size());
-  int excess = static_cast<int>(matrix->row_size() % tid.size());
+void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
+  int numRows = matrix->row_size();
+  int numCols = matrix->column_size();
 
-  int iteration = 0;
-  if (matrix->row_size() > tid.size()) {
-    iteration = static_cast<int>(tid.size());
-  } else {
-    iteration = static_cast<int>(matrix->row_size());
-  }
+  int numThreads = tid.size();
+  int halfThreads = numThreads / 2;
 
-  int end, start = 0;
-  for (int i = 0; i < iteration; i++) {
-    end = start + chunkSize + (i < excess ? 1 : 0);
+  int chunkSizeRow = numRows / halfThreads;
+  int excessRow = numRows % halfThreads;
+
+  int start = 0;
+  for (int i = 0; i < halfThreads; i++) {
+    int end = start + chunkSizeRow + (i < excessRow ? 1 : 0);
 
     Bound *bound = new Bound(start, end);
     int err =
         pthread_create(&(tid[i]), nullptr, rows, static_cast<void *>(bound));
     if (err) {
-      printf("Could not create thread %d\n", i);
+      std::cerr << "Could not create thread for row " << i << std::endl;
     }
 
     start = end;
   }
 
-  std::vector<double> results;
-  results.resize(matrix->row_size());
-  for (int i = 0; i < iteration; i++) {
-    void *res = nullptr;
-    pthread_join(tid[i], &res);
+  int chunkSizeCol = numCols / (numThreads - halfThreads);
+  int excessCol = numCols % (numThreads - halfThreads);
 
-    if (res == nullptr) {
-      std::cout << "Something went terrible wrong\n";
-      continue;
-    }
-
-    Bound *bound = static_cast<Bound *>(res);
-
-    for (int i = bound->start, j = 0; i < bound->end; i++, j++) {
-      results[i] = bound->values[j];
-    }
-    delete static_cast<Bound *>(res);
-  }
-
-  file << "Linhas:\n";
-  file << "[ ";
-  for (auto a : results) {
-    file << a << " ";
-  }
-  file << "]\n";
-}
-
-/**
- * @brief Dividi o trabalho de calcular coluna entre as threads.
- *
- * Realiza a divisão das partes das colunas da matrix que serão calculadas por
- * cada thread.
- * Se nada de errado tiver acontecido salva as informações no arquivo passado.
- *
- * @param tid vetor das threads a serem criadas
- */
-void column_threads(std::vector<pthread_t> &tid, std::ofstream &file) {
-  int chunkSize = static_cast<int>(matrix->column_size() / tid.size());
-  int excess = static_cast<int>(matrix->column_size() % tid.size());
-
-  int iteration = 0;
-  if (matrix->column_size() > tid.size()) {
-    iteration = static_cast<int>(tid.size());
-  } else {
-    iteration = static_cast<int>(matrix->column_size());
-  }
-
-  int end, start = 0;
-  for (int i = 0; i < iteration; i++) {
-    end = start + chunkSize + (i < excess ? 1 : 0);
+  start = 0;
+  for (int i = halfThreads; i < numThreads; i++) {
+    int end = start + chunkSizeCol + (i - halfThreads < excessCol ? 1 : 0);
 
     Bound *bound = new Bound(start, end);
     int err =
         pthread_create(&(tid[i]), nullptr, columns, static_cast<void *>(bound));
     if (err) {
-      printf("Could not create thread %d\n", i);
+      std::cerr << "Could not create thread for column " << i << std::endl;
     }
 
     start = end;
   }
 
-  std::vector<double> results;
-  results.resize(matrix->column_size());
-  for (int i = 0; i < iteration; i++) {
+  std::vector<double> rowResults(numRows);
+  for (int i = 0; i < halfThreads; i++) {
     void *res = nullptr;
     pthread_join(tid[i], &res);
 
     if (res == nullptr) {
-      std::cout << "Something went terrible wrong\n";
+      std::cerr << "Something went terribly wrong in row thread " << i
+                << std::endl;
       continue;
     }
 
     Bound *bound = static_cast<Bound *>(res);
-
-    for (int i = bound->start, j = 0; i < bound->end; i++, j++) {
-      results[i] = bound->values[j];
+    for (int j = bound->start, k = 0; j < bound->end; j++, k++) {
+      rowResults[j] = bound->values[k];
     }
-    delete static_cast<Bound *>(res);
+    delete bound;
   }
 
-  file << "Coluna:\n";
-  file << "[ ";
-  for (auto a : results) {
+  file << "Linhas:\n[ ";
+  for (auto a : rowResults) {
+    file << a << " ";
+  }
+  file << "]\n\n";
+
+  std::vector<double> colResults(numCols);
+  for (int i = halfThreads; i < numThreads; i++) {
+    void *res = nullptr;
+    pthread_join(tid[i], &res);
+
+    if (res == nullptr) {
+      std::cerr << "Something went terribly wrong in column thread " << i
+                << std::endl;
+      continue;
+    }
+
+    Bound *bound = static_cast<Bound *>(res);
+    for (int j = bound->start, k = 0; j < bound->end; j++, k++) {
+      colResults[j] = bound->values[k];
+    }
+    delete bound;
+  }
+
+  file << "Colunas:\n[ ";
+  for (auto a : colResults) {
     file << a << " ";
   }
   file << "]\n";
@@ -237,9 +214,7 @@ int main(int argc, char **argv) {
   }
 
   std::vector<pthread_t> tid(numThreads);
-  row_threads(tid, file);
-  file << "\n\n";
-  column_threads(tid, file);
+  thread_manager(tid, file);
 
   delete matrix;
   return 0;
