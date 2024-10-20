@@ -33,7 +33,7 @@ void pstree() {
  * @param max_level Nível máximo que os processos podem chegar
  */
 void process_tree(int level, const int max_level) {
-  if (level == max_level) {
+  if (level > max_level) {
     return;
   }
 
