@@ -5,22 +5,26 @@
  * Author: Victor Briganti, Luiz Takeda
  * License: BSD 2
  */
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <math.h>
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define SLEEP_SEC 1
-
 /**
- * @brief Mostra a árvore de processos do programa
+ * @brief Mostra mostra o ID do pai e do processo em execução
+ *
+ * @param level Nível do processo
  */
-void pstree() {
-  std::string str("pstree -c -p ");
-  str += std::to_string(getppid());
-  sleep(SLEEP_SEC);
-  system(str.c_str());
+void pstree(int level) {
+  std::string out = "(Nível:" + std::to_string(level) + ")";
+  for (int i = 0; i < level - 1; i++) {
+    out += "    ";
+  }
+  out += "PPID[" + std::to_string(getppid()) + "]:";
+  out += "PID[" + std::to_string(getpid()) + "]";
+  std::printf("%s\n", out.c_str());
 }
 
 /**
@@ -36,6 +40,8 @@ void process_tree(int level, const int max_level) {
   if (level > max_level) {
     return;
   }
+
+  pstree(level);
 
   // Cria o processo filho a esquerda
   pid_t left_child = fork();
@@ -63,14 +69,6 @@ void process_tree(int level, const int max_level) {
     process_tree(level + 1, max_level);
     exit(0);
   }
-
-  // Dorme por alguns segundos e então mostra a árvore de processos.
-  sleep(SLEEP_SEC);
-  pstree();
-
-  // Espera pelo processo a direita e a esquerda terminarem
-  wait(NULL);
-  wait(NULL);
 }
 
 int main(int argc, char **argv) {
@@ -80,11 +78,18 @@ int main(int argc, char **argv) {
   }
 
   const int N = atoi(argv[1]);
-  if (N < 1 || sysconf(_SC_CHILD_MAX) < (N * 2 + 1)) {
+
+  // Verifica se é um número válido de processos no sistema
+  if (N < 1 || sysconf(_SC_CHILD_MAX) < static_cast<long int>(pow(2, N))) {
     printf("%d é um número inválido de processos", N);
     return 1;
   }
 
   process_tree(1, N);
+
+  // Espera os processos terminarem
+  while (wait(NULL) >= 0) {
+  }
+
   return 0;
 }
