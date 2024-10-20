@@ -304,7 +304,7 @@ Nesta seção, serão detalhados os procedimentos executados para o gerenciament
 \subsection{Listagem de Processos}
 \label{subsec:proc}
 
-A listagem dos processos pode ser realizada com o comando \textit{ps aux}, sua saída pode ser observada na Figura~\ref{fig:ps}.
+A listagem dos processos pode ser realizada com o comando \texttt{ps aux}, sua saída pode ser observada na Figura~\ref{fig:ps}.
 
 \begin{figure}[H]
   \centering
@@ -318,7 +318,7 @@ O comando \textit{ps aux}, apresenta as seguintes colunas~\cite{shotts2017}:
 \begin{itemize}
     \item \textbf{USER:} Descreve o usuário que é dono deste processo.
     
-    \item \textbf{PID:} \textit{Process ID} é o identificador númerico deste processo que está executando no sistema. Usado para o controle do processo no Sistema Operacional.
+    \item \textbf{PID:} \textit{Process ID} é o identificador númerico deste processo que está executando no sistema. Usado para o controle do processo no sistema operacional.
     \item \textbf{\%CPU:} A porcentagem de tempo em execução durante todo o tempo de vida de um processo.
     
     \item \textbf{\%MEM:} Total de memória ocupada pelo processo, expresso em porcentagem.
@@ -327,14 +327,14 @@ O comando \textit{ps aux}, apresenta as seguintes colunas~\cite{shotts2017}:
     
     \item \textbf{RSS:} Quantidade de memória física que um processo está utilizando ativamente no momento, excluindo a memória que está em \textit{swap}.
     
-    \item \textbf{TTY:} Terminal de controle associado a este processo. Processos que não possuem um terminal associado, como no caso de \textit{daemons}, sendo representados com o ``?'', caso contrário o nome do terminal de controle irá aparecer.
+    \item \textbf{TTY:} Terminal de controle associado a este processo. Processos que não possuem um terminal associado, como \textit{daemons}, sendo representados com o símbolo ``?'', caso contrário o nome do terminal de controle irá aparecer.
     
     \item \textbf{STAT:} Descreve o estado do processo. Alguns dos estados comumente encontrados são:
     
     \begin{itemize}
         \item \textbf{D:} \textit{Uninterruptible sleep}, o processo está esperando por uma operação de entrada/saída e não pode ser interrompido.
         \item \textbf{I:} \textit{Idle kernel thread}, o processo é uma \textit{thread} do núcleo que está ociosa, aguardando trabalho.
-        \item \textbf{R:}\textit{Running or runnable}, o processo está em execução ou está pronto para ser executado.
+        \item \textbf{R:}\textit{Running} ou \textit{runnable}, o processo está em execução ou está pronto para ser executado.
         \item \textbf{S:} \textit{Interruptible sleep}, o processo está esperando por um evento para completar e pode ser interrompido por sinais.
         \item \textbf{Z:} \textit{Defunct (``zombie'')}, o processo foi terminado, mas não foi ``recolhido'' pelo seu processo pai.
     \end{itemize}
@@ -343,10 +343,10 @@ O comando \textit{ps aux}, apresenta as seguintes colunas~\cite{shotts2017}:
     
     \item \textbf{TIME:} Indica o tempo total de CPU que o processo consumiu desde sua inicialização.
     
-    \item \textbf{COMMAND:} Exibe o nome do comando executável que está sendo executado pelo processo.
+    \item \textbf{COMMAND:} Exibe o nome do comando que está sendo executado pelo processo.
 \end{itemize}
 
-Os processos de usuário podem ser facilmente identificados pelo nome do usuário que os possui; a Figura~\ref{fig:user} ilustra a saída com alguns desses processos. Já os processos daemon, que geralmente são iniciados com o Sistema Operacional, podem ser um pouco mais difíceis de identificar. No entanto, é comum que seus nomes terminem com a letra ``d'', o que pode ser observado na Figura~\ref{fig:daemon}~\cite{negus2012}.
+Os processos de usuário podem ser facilmente identificados pelo nome do usuário que os possui; a Figura~\ref{fig:user} ilustra a saída com alguns desses processos. Já os \textit{daemons}, que geralmente são iniciados com o sistema operacional, podem ser um pouco mais difíceis de identificar. No entanto, é comum que seus nomes terminem com a letra ``d'', o que pode ser observado na Figura~\ref{fig:daemon}~\cite{negus2012}.
 
 \begin{figure}[H]
   \centering
@@ -365,9 +365,9 @@ Os processos de usuário podem ser facilmente identificados pelo nome do usuári
 \subsection{Processos \textit{zombie}}
 \label{subsec:zombie}
 
-Um processo está no estado \textit{zombie} quando já concluiu sua execução, mas o sistema ainda não liberou os recursos que lhe foram alocados~\cite{stallings2018}. Por vezes em um processo em execução, ocorre do processo que é denominado ``pai'' criar um processo ``filho'' e espera que este termine sua execução, usualmente com o comandfo \textit{wait} (em sistemas UNIX). O estado \textit{zombie} se faz necessário, pois o processo pai pode precisar da saída do processo filho para continuar sua execução. O pai só consegue acessar essa informação se o processo filho permanecer na tabela de processos do sistema operacional.
+Um processo está no estado \textit{zombie} quando já concluiu sua execução, mas o sistema ainda não liberou os recursos que lhe foram alocados~\cite{stallings2018}. Por vezes em um processo em execução, ocorre do processo que é denominado ``pai'' criar um processo ``filho'' e esperar que este termine sua execução, usualmente com o comando \textit{wait} (em sistemas UNIX). O estado \textit{zombie} se faz necessário, pois o processo pai pode precisar da saída do processo filho para continuar sua execução. O pai só consegue acessar essa informação se o processo filho permanecer na tabela de processos do sistema operacional.
 
-Assim, um processo em estado zumbi é equivalente a um processo que já foi concluído. Por esse motivo, ele não pode ser afetado por sinais como o SIGKILL, que pode ser enviado a um processo por meio do comando \textit{kill -SIGKILL pid}, onde \textit{pid} é o identificador do processo. A Figura~\ref{fig:kill} ilustra um programa que recebeu o sinal SIGKILL e foi finalizado, enquanto a Figura~\ref{fig:zombie} mostra um processo que recebeu o mesmo sinal, mas continuou na tabela de processos.
+Assim, um processo em estado zumbi é equivalente a um processo que já foi concluído. Por esse motivo, ele não pode ser afetado por sinais como o \textit{SIGKILL}, que pode ser enviado a um processo por meio do comando \texttt{kill -SIGKILL pid}, onde \textit{pid} é o identificador do processo. A Figura~\ref{fig:kill} ilustra um programa que recebeu o sinal \textit{SIGKILL} e foi finalizado, enquanto a Figura~\ref{fig:zombie} mostra um processo que recebeu o mesmo sinal, mas por estar no estado \textit{zombie} continuou na tabela de processos.
 
 \begin{figure}[H]
   \centering
@@ -386,7 +386,7 @@ Assim, um processo em estado zumbi é equivalente a um processo que já foi conc
 \subsection{Suspendendo Processos}
 \label{subsec:suspendendo}
 
-O comando \textit{kill} pode ser utilizado para enviar sinais a processos em execução, e este comando pode ser usado para suspender ou retomar a execução de um programa~\cite{guiafoca}. A Figura~\ref{fig:interrupt} mostra o código sendo executado, já a  Figura~\ref{fig:signal} mostra o uso deste comando com o sinal ``STOP'' para suspender um processo e também mostra o uso deste comando com o sinal ``CONT'' para retomar a execução do programa.
+O comando \textit{kill} pode ser utilizado para enviar sinais a processos em execução, sinais como \textit{STOP} e \textit{CONT} podem ser usados junto a este comando para suspender ou retomar a execução de um processo~\cite{guiafoca}. A Figura~\ref{fig:interrupt} mostra o código sendo executado, já a  Figura~\ref{fig:signal} mostra o uso do \textit{kill} com os sinais para suspender e retomar a execução do processo.
 
 \begin{figure}[H]
   \centering
@@ -398,7 +398,7 @@ O comando \textit{kill} pode ser utilizado para enviar sinais a processos em exe
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.45]{figuras/signal.png}
-  \caption{Comando \textit{kill} com sinais ``STOP'' e ``CONT'' em um processo executando.}
+  \caption{Comando \textit{kill} com sinais \textit{STOP} e \textit{CONT} em um processo executando.}
   \label{fig:signal}
 \end{figure}
 
@@ -449,7 +449,7 @@ O código apresentado na Figura~\ref{fig:fork} foi desenvolvido para demonstrar 
   \label{fig:fork}
 \end{figure}
 
-A Figura~\ref{fig:ulimit} exibe a saída do comando \textit{ulimit -a}, que detalha os limites de uso dos recursos do sistema. Nela, podemos observar que o sistema tem um limite máximo de 15.587 processos. 
+A Figura~\ref{fig:ulimit} exibe a saída do comando \texttt{ulimit -a}, que detalha os limites de uso dos recursos do sistema. Nela, podemos observar que o sistema tem um limite máximo de 15.587 processos. 
 
 \begin{figure}[H]
   \centering
@@ -458,7 +458,7 @@ A Figura~\ref{fig:ulimit} exibe a saída do comando \textit{ulimit -a}, que deta
   \label{fig:ulimit}
 \end{figure}
 
-Já na Figura~\ref{fig:bomb}, após a execução do programa que cria processos filhos de maneira recursiva, o sistema impede a criação de novos processos, impedindo a utilização do programa \textit{ps} para visualização dos processos no sistema. Isso ilustra os riscos associados a esse tipo de programa, evidenciando como pode impactar negativamente o sistema operacional.
+A Figura~\ref{fig:bomb} demonstra os efeitos dessa criação desenfreada de processos no sistema. Após a execução do programa que cria processos filhos de maneira recursiva, o sistema chegou no seu limite máximo de processos e não foi mais possível executar nenhum outro tipo de comando, impedindo até mesmo a utilização do comando \textit{ps} para visualização dos processos no sistema. O que evidencia o como este tipo de programa afeta negativamente o sistema operacional.
 
 \begin{figure}[H]
   \centering
