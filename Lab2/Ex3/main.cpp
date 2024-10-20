@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
   }
 
   int numProcess = atoi(argv[1]);
-  if (numProcess < 0) {
+  if (numProcess < 1 || sysconf(_SC_CHILD_MAX) < (numProcess * 2 + 1)) {
     printf("Número de processos inválido: %d\n", numProcess);
     return 1;
   }

@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
   }
 
   const int N = atoi(argv[1]);
-  if (N < 1) {
+  if (N < 1 || sysconf(_SC_CHILD_MAX) < (N * 2 + 1)) {
     printf("%d é um número inválido de processos", N);
     return 1;
   }
