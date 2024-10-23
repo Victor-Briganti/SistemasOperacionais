@@ -48,13 +48,13 @@ void process_tree(int level, const int max_level) {
 
   if (left_child < 0) {
     printf("Process(%d): fail %d\n", getpid(), left_child);
-    exit(1);
+    _exit(EXIT_FAILURE);
   }
 
   if (left_child == 0) {
     // Chama recusivamente a função para criar sues processos filhos
     process_tree(level + 1, max_level);
-    exit(0);
+    _exit(EXIT_SUCCESS);
   }
 
   // Cria o processo filho a direita
@@ -62,13 +62,17 @@ void process_tree(int level, const int max_level) {
 
   if (right_child < 0) {
     printf("Process(%d): fail %d\n", getpid(), right_child);
-    exit(1);
+    _exit(EXIT_FAILURE);
   }
 
   if (right_child == 0) {
     process_tree(level + 1, max_level);
-    exit(0);
+    _exit(EXIT_SUCCESS);
   }
+
+  // Espera pelo processo a direita e a esquerda terminarem
+  wait(NULL);
+  wait(NULL);
 }
 
 int main(int argc, char **argv) {
