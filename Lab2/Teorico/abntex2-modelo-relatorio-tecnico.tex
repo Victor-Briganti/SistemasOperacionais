@@ -213,7 +213,7 @@
 
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
-FAZER
+Este trabalho visa aplicar conceitos práticos sobre gerência e criação de processos, desde a listagem de processos à criação de processos de forma recursiva. Utilizando hipervisor VirtualBox (versão 7.1.2) para criar e utilizar uma máquina virtual, na qual foi realizada uma sequência de procedimentos, sendo eles a listagem de processos, observação de processos \textit{zombies}, suspensão de processos, verificação da utilização de recursos do sistema e criação de processos recursivamente. Os resultados foram satisfatórios, cumprindo o objetivo do trabalho, resultando em uma melhor compreensão sobre manipulação de processos em um sistema operacional.
 
  \vspace{\onelineskip}
     
@@ -267,7 +267,9 @@ FAZER
 
 \section{Introdução}
 \label{sec:introducao}
-FAZER
+Para cumprir os objetivos que o computador se propõe a cumprir durante seu uso, ele precisa realizar diversas tarefas, que podem ser representadas por sequências de instruções para realizar um objetivo. Quase sempre um computador possui mais tarefas a executar simultaneamente do que processadores disponíveis, daí surge a necessidade de criar métodos para multiplexar o(s) processador(es) do computador entre as tarefas em execução~\cite{maziero2019}.
+
+Gerenciar recursos do \textit{hardware} da máquina, como o(s) processador(es), é responsabilidade do sistema operacional, logo, gerenciar o uso do(s) processador(es) pelos processos em execução é uma de suas funções~\cite{tanenbaum2016}. Cada execução de um programa resulta na criação de um processo, a instância do programa em execução na máquina. Se um programa for executado 10 vezes simultaneamente, serão gerados 10 processos paralelos. O sistema operacional é responsável por gerenciar esses processos, garantindo que eles possam operar de maneira eficiente e coordenada. O foco deste trabalho será a análise e gestão desses processos.
 
 \section{Objetivos}
 \label{sec:objetivos}
@@ -276,8 +278,11 @@ Este trabalho visa explorar e detalhar a criação e manipulação de processos 
 
 \section{Fundamentação}
 \label{sec:fundamentacao}
+Os processos em execução na máquina podem estar sendo executados em primeiro ou segundo plano. Quando executados em primeiro plano, interagem com o usuário e realizam as funções exigidas por ele. Quando executados em segundo plano, muitas vezes não estão associados a um usuário em particular, mas realizam funções importantes para o funcionamento da máquina. Por exemplo, processos que esperam por um evento para serem executados, como um processo projetado para aceitar \textit{e-mails}, que fica ocioso na maior parte do tempo, mas quando recebe um \textit{e-mail} entra em ação. Estes processos em segundo plano são chamados \textit{daemons}~\cite{tanenbaum2016}.
 
-FAZER
+Processos possuem um ciclo de vida baseado em estados, um novo processo gerado está no estado "novo", quando este processo estiver pronto para ser executado seu estado será "pronto", durante sua execução passará ao estado "executando", caso não seja possível executar completamente o processo no momento ele entrará em estado de "suspenso" esperando para entrar no estado "pronto" novamente, caso ele seja executado corretamente passará ao estado "terminado", encerrando o ciclo de vida do processo~\cite{maziero2019}.
+
+Em sistemas UNIX, existe uma hierarquia entre processos, ou seja, processos podem ser filhos de outros processos, formando uma árvore de processos, facilitando a gerência de processos, permitindo a manipulação coletiva de processos relacionados~\cite{maziero2019}. A criação de processos em sistemas UNIX acontece em duas etapas, inicialmente, o processo cria uma cópia de si utilizando a chamada de sistema \textit{fork} e todo o espaço de memória do processo "pai" (inicial) é copiado para o processo "filho" (novo). Em seguida, o processo "filho" utiliza a chamada de sistema\textit{execve} para carregar um novo código binário em sua memória, substituindo o código do processo "pai"~\cite{maziero2019}.
 
 \section{Materiais}
 \label{sec:materiais}
@@ -309,16 +314,17 @@ A listagem dos processos pode ser realizada com o comando \texttt{ps aux}, sua s
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.45]{figuras/ps.png}
-  \caption{Saída do comando \textit{ps aux}.}
+  \caption{Saída do comando \texttt{ps aux}.}
   \label{fig:ps}
 \end{figure}
 
-O comando \textit{ps aux}, apresenta as seguintes colunas~\cite{shotts2017}:
+O comando \texttt{ps aux}, apresenta as seguintes colunas~\cite{shotts2017}:
 
 \begin{itemize}
     \item \textbf{USER:} Descreve o usuário que é dono deste processo.
     
-    \item \textbf{PID:} \textit{Process ID} é o identificador númerico deste processo que está executando no sistema. Usado para o controle do processo no sistema operacional.
+    \item \textbf{PID:} \textit{Process ID} é o identificador numérico deste processo que está executando no sistema. Usado para o controle do processo no sistema operacional.
+
     \item \textbf{\%CPU:} A porcentagem de tempo em execução durante todo o tempo de vida de um processo.
     
     \item \textbf{\%MEM:} Total de memória ocupada pelo processo, expresso em porcentagem.
@@ -343,10 +349,10 @@ O comando \textit{ps aux}, apresenta as seguintes colunas~\cite{shotts2017}:
     
     \item \textbf{TIME:} Indica o tempo total de CPU que o processo consumiu desde sua inicialização.
     
-    \item \textbf{COMMAND:} Exibe o nome do comando que está sendo executado pelo processo.
+    \item \textbf{COMMAND:} Exibe o nome do comando que está sendo executado pelo processo. 
 \end{itemize}
-
-Os processos de usuário podem ser facilmente identificados pelo nome do usuário que os possui; a Figura~\ref{fig:user} ilustra a saída com alguns desses processos. Já os \textit{daemons}, que geralmente são iniciados com o sistema operacional, podem ser um pouco mais difíceis de identificar. No entanto, é comum que seus nomes terminem com a letra ``d'', o que pode ser observado na Figura~\ref{fig:daemon}~\cite{negus2012}.
+    
+Os processos de usuário podem ser facilmente identificados pelo nome do usuário que os possui; a Figura~\ref{fig:user} ilustra a saída com alguns desses processos. Já os \textit{daemons}, que geralmente são iniciados com o sistema operacional, podem ser um pouco mais difíceis de identificar. No entanto, é comum que seus nomes terminem com a letra ``d'', esse nome pode ser observado na Figura~\ref{fig:daemon}~\cite{negus2012}.
 
 \begin{figure}[H]
   \centering
@@ -365,9 +371,9 @@ Os processos de usuário podem ser facilmente identificados pelo nome do usuári
 \subsection{Processos \textit{zombie}}
 \label{subsec:zombie}
 
-Um processo está no estado \textit{zombie} quando já concluiu sua execução, mas o sistema ainda não liberou os recursos que lhe foram alocados~\cite{stallings2018}. Por vezes em um processo em execução, ocorre do processo que é denominado ``pai'' criar um processo ``filho'' e esperar que este termine sua execução, usualmente com o comando \textit{wait} (em sistemas UNIX). O estado \textit{zombie} se faz necessário, pois o processo pai pode precisar da saída do processo filho para continuar sua execução. O pai só consegue acessar essa informação se o processo filho permanecer na tabela de processos do sistema operacional.
+Um processo está no estado \textit{zombie} quando já concluiu sua execução, mas o sistema ainda não liberou os recursos que lhe foram alocados~\cite{stallings2018}. Por vezes em um processo em execução, ocorre do processo ``pai'' criar um processo ``filho'' e esperar que este termine sua execução, usualmente com o comando \textit{wait} (em sistemas UNIX). O estado \textit{zombie} se faz necessário, pois o processo pai pode precisar da saída do processo filho para continuar sua execução. O pai só consegue acessar essa informação se o processo filho permanecer na tabela de processos do sistema operacional.
 
-Assim, um processo em estado zumbi é equivalente a um processo que já foi concluído. Por esse motivo, ele não pode ser afetado por sinais como o \textit{SIGKILL}, que pode ser enviado a um processo por meio do comando \texttt{kill -SIGKILL pid}, onde \textit{pid} é o identificador do processo. A Figura~\ref{fig:kill} ilustra um programa que recebeu o sinal \textit{SIGKILL} e foi finalizado, enquanto a Figura~\ref{fig:zombie} mostra um processo que recebeu o mesmo sinal, mas por estar no estado \textit{zombie} continuou na tabela de processos.
+Assim, um processo em estado \textit{zombie} é equivalente a um processo que já foi concluído. Por esse motivo, ele não pode ser afetado por sinais como o \textit{SIGKILL}, que pode ser enviado a um processo por meio do comando \texttt{kill -SIGKILL pid}, onde \textit{pid} é o identificador do processo. A Figura~\ref{fig:kill} ilustra um programa que recebeu o sinal \textit{SIGKILL} e foi finalizado, enquanto a Figura~\ref{fig:zombie} mostra um processo que recebeu o mesmo sinal, mas por estar no estado \textit{zombie} continuou na tabela de processos.
 
 \begin{figure}[H]
   \centering
@@ -402,7 +408,7 @@ O comando \textit{kill} pode ser utilizado para enviar sinais a processos em exe
   \label{fig:signal}
 \end{figure}
 
-Outra forma de suspender um processo em execução é utilizando o comando \textit{Ctrl+Z}, que o coloca em segundo plano. Para listar os processos em segundo plano, podemos usar o comando \textit{jobs}. Para retomar um processo colocado em segundo plano, utilizamos o comando \textit{fg}, que traz o processo de volta ao primeiro plano. A Figura~\ref{fig:background} ilustra o uso de cada um desses comandos.
+Outra maneira de suspender um processo em execução é utilizando o comando \textit{Ctrl+Z}, que transforma o processo em primeiro plano em um processo em segundo plano. Para listar os processos em segundo plano, podemos usar o comando \textit{jobs}. Para retomar um processo colocado em segundo plano, utilizamos o comando \textit{fg}, que traz o processo de volta ao primeiro plano. A Figura~\ref{fig:background} ilustra a utilização de cada um desses comandos.
 
 \begin{figure}[H]
   \centering
@@ -414,7 +420,7 @@ Outra forma de suspender um processo em execução é utilizando o comando \text
 \subsection{Utilização de Recursos do Sistema}
 \label{subsec:recursos}
 
-Na máquina virtual analisada, não houve uso significativo de recursos de CPU, memória ou tempo, evidenciando um desempenho estável e eficiente do sistema. A Figura~\ref{fig:cpu}, Figura~\ref{fig:mem} e a Figura~\ref{fig:time} ilustram, respectivamente, a utilização de CPU, memória e tempo de execução do sistema.
+Na máquina virtual analisada, não houve uso significativo de recursos de CPU, memória ou tempo de execução, evidenciando um desempenho estável e eficiente do sistema. A Figura~\ref{fig:cpu}, Figura~\ref{fig:mem} e a Figura~\ref{fig:time} ilustram, respectivamente, a utilização de CPU, memória e tempo de execução do sistema.
 
 \begin{figure}[H]
   \centering
@@ -469,13 +475,11 @@ A Figura~\ref{fig:bomb} demonstra os efeitos dessa criação desenfreada de proc
 
 \section{Discussão dos Resultados}
 \label{sec:discussao}
-
-FAZER
+Observando os objetivos propostos pelo trabalho, podemos afirmar que o resultado obtidos com esta atividade prática foram satisfatórios, visto que processos foram criados e gerenciados com sucesso em um ambiente GNU/Linux. As dificuldades encontradas nesta prática se mostram na complexidade de compreender a criação e gestão de processos, visto que erros durante a criação de novos processos podem acarretar problemas de sobrecarga de processos na máquina, causando a queda de desempenho e até mesmo o travamento da máquina.
 
 \section{Conclusões}
 \label{sec:conclusoes}
-
-FAZER
+O principal objetivo desta atividade é compreender a estrutura de processos em um ambiente GNU/Linux e a manipulação desses processos. Ao final deste trabalho, fica evidente que esse objetivo foi alcançado. Entender a estrutura de processos, embora seja um desafio, é extremamente vantajoso, pois proporciona uma visão mais clara sobre o funcionamento da máquina após a execução de um programa.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
