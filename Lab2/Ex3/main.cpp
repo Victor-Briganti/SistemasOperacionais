@@ -3,15 +3,16 @@
  * Descrição: Realiza a busca em um vetor dividindo a mesma entre vários
  * processos.
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 22/10/2024
  */
-#include "process_vector.hpp"
-#include <cstdio>
-#include <cstdlib>
-#include <sys/wait.h>
-#include <unistd.h>
 
+#include "process_vector.hpp" // VectorProcess
+#include <cstdio>             // printf()
+#include <sys/wait.h>         // wait()
+#include <unistd.h>           // fork(), _exit(), sysconf()
 VectorProcess *vectorProcess;
 
 /**
@@ -25,10 +26,10 @@ VectorProcess *vectorProcess;
  */
 void search(int start, int end, int num) {
   if (!vectorProcess->search(start, end, num)) {
-    exit(1);
+    _exit(EXIT_FAILURE);
   }
 
-  exit(0);
+  _exit(EXIT_SUCCESS);
 }
 
 /**
@@ -41,10 +42,15 @@ void search(int start, int end, int num) {
  * @param num Valor sendo buscado
  */
 void big_vector(int numProcess, int num) {
+  // Calcula o tamanho do vetor que cada processo irá receber
   int chunk = static_cast<int>(vectorProcess->vector.size()) / numProcess;
+
+  // Calcula a quantidade de elementos que restaram após a divisão do vetor
   int excess = static_cast<int>(vectorProcess->vector.size()) % numProcess;
 
   pid_t pid = 0;
+
+  // Realiza o fork e passa o tamanho da busca que cada vetor terá que realizar
   for (int i = 0; i < numProcess; i++) {
     pid = fork();
     if (pid < 0) {
@@ -53,7 +59,11 @@ void big_vector(int numProcess, int num) {
     }
 
     if (pid == 0) {
+      // Calcula o inicio da busca. min() é usado para verificar se este vetor
+      // irá receber um pedaço em "excesso" ou não
       int start = i * chunk + std::min(i, excess);
+
+      // Calcula o fim das busca no vetor.
       int end = (i + 1) * chunk + std::min(i + 1, excess);
       search(start, end, num);
     }
@@ -73,11 +83,13 @@ void small_vector(int num) {
   for (int i = 0; i < static_cast<int>(vectorProcess->vector.size()); i++) {
     pid = fork();
     if (pid < 0) {
-      printf("Process(%d): fail %d", getpid(), pid);
+      std::printf("Process(%d): fail %d", getpid(), pid);
       return;
     }
 
     if (pid == 0) {
+      // Como o vetor é pequeno, não há necessidade de criar vários processos,
+      // apenas use a quantidade necessária para alcançar o objetivo da busca.
       search(i, i + 1, num);
     }
   }
@@ -101,7 +113,7 @@ bool wait_processes(int num) {
   while (wpid >= 0) {
     wpid = wait(&status);
     if (status == 0 && wpid != -1) {
-      printf("Process(%d) found %d\n", wpid, num);
+      std::printf("Process(%d) found %d\n", wpid, num);
       found = true;
     }
   }
@@ -111,25 +123,32 @@ bool wait_processes(int num) {
 
 int main(int argc, char **argv) {
   if (argc < 4) {
-    printf("%s <num_processes> <vector_size> <num_searched>\n", argv[0]);
+    std::printf("%s <num_processes> <vector_size> <num_searched>\n", argv[0]);
     return 1;
   }
 
   int numProcess = atoi(argv[1]);
+
+  // Verifica se é um número válido de processos no sistema.
+  // Para isso ele deve ser maior que 1 e menor que o limite de filhos que um
+  // processo pode ter.
   if (numProcess < 1 || sysconf(_SC_CHILD_MAX) < (numProcess * 2 + 1)) {
-    printf("Número de processos inválido: %d\n", numProcess);
+    std::printf("Número de processos inválido: %d\n", numProcess);
     return 1;
   }
 
   int vectorSize = atoi(argv[2]);
+
+  // O vetor deve ter um tamanho inteiro positivo.
   if (vectorSize < 0) {
-    printf("Tamanho de vetor inválido: %d\n", vectorSize);
+    std::printf("Tamanho de vetor inválido: %d\n", vectorSize);
     return 1;
   }
 
   int num = atoi(argv[3]);
   vectorProcess = new VectorProcess(vectorSize);
 
+  // Dividi o vetor e a quantidade de processos conforme os valores passados
   if (vectorSize > numProcess) {
     big_vector(numProcess, num);
   } else {
@@ -139,7 +158,7 @@ int main(int argc, char **argv) {
   vectorProcess->print();
 
   if (!wait_processes(num)) {
-    std::cout << "Could not found " << num << std::endl;
+    std::cout << "Não foi possível encontrar " << num << std::endl;
   }
 
   delete vectorProcess;

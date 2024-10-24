@@ -3,18 +3,20 @@
  * Descrição: Recebe um comando para ser executado como um processo filho deste
  * executável.
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 21/10/2024
  */
-#include <cerrno>
-#include <cstring>
-#include <iostream>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <cerrno>     // errno
+#include <cstdio>     // printf()
+#include <cstring>    // strerror()
+#include <sys/wait.h> // wait()
+#include <unistd.h>   // fork(), execvp()
 
 int main(int argc, char **argv) {
   if (argc < 2) {
-    printf("%s <process> [<arg>, ...]", argv[0]);
+    std::printf("%s <process> [<arg>, ...]", argv[0]);
     return 1;
   }
 
@@ -23,11 +25,8 @@ int main(int argc, char **argv) {
 
   // Verifica se o fork foi bem sucedido
   if (pid < 0) {
-    std::cout << "Process(";
-    std::cout << getpid();
-    std::cout << "): " << strerror(errno);
-    std::cout << "with code " << pid;
-    std::cout << "\n";
+    std::printf("Process(%d): %s with code %d\n", getpid(),
+                std::strerror(errno), pid);
     return 1;
   }
 
@@ -39,12 +38,12 @@ int main(int argc, char **argv) {
 
     // Se o programa cair neste pedaço do código significa que o mesmo não foi
     // substituído. Então houve algum erro.
-    printf("execvp(): failed %s\n", strerror(errno));
+    std::printf("execvp(): failed %s\n", std::strerror(errno));
     return 1;
   }
 
   // Espera o processo terminar de executar
   wait(NULL);
-  std::cout << argv[0] << " finished\n";
+  std::printf("%s finished\n", argv[0]);
   return 0;
 }

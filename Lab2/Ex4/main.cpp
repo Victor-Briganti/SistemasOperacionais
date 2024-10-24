@@ -2,17 +2,17 @@
  * Shell Simples
  * Descrição: Shell simples usado para execução de processos.
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 22/10/2024
  */
-#include <cctype>
-#include <cstring>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cctype>   // isprint()
+#include <cstring>  // strdup()
+#include <iostream> // cout
 #include <string>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <sys/wait.h> // wait()
+#include <unistd.h>   // fork(), _exit(), execvp()
 #include <vector>
 
 /**
@@ -88,7 +88,7 @@ int execute_command_wait(std::string args) {
 
   if (pid == 0) {
     execvp(vector[0], vector.data());
-    exit(1);
+    _exit(EXIT_FAILURE);
   }
 
   wait(NULL);
@@ -116,7 +116,7 @@ int execute_command(std::string args) {
 
   if (pid == 0) {
     execvp(vector[0], vector.data());
-    exit(1);
+    _exit(EXIT_FAILURE);
   }
 
   for (char *arg : vector) {

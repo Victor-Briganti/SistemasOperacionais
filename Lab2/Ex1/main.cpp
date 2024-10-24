@@ -2,20 +2,22 @@
  * Hierarquia de Processos
  * Descrição: Cria processos em N níveis e mostra a árvore de visualização.
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 21/10/2024
  */
-#include <cstdio>
-#include <cstdlib>
-#include <math.h>
-#include <string>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <cstdio>     // printf()
+#include <cstdlib>    // atoi()
+#include <math.h>     // pow()
+#include <string>     // string
+#include <sys/wait.h> // wait()
+#include <unistd.h>   // _exit(), fork(), sysconf(), EXIT_FAILURE, EXIT_SUCCESS
 
 /**
  * @brief Mostra mostra o ID do pai e do processo em execução
  *
- * @param level Nível do processo
+ * @param level Nível atual do processo
  */
 void pstree(int level) {
   std::string out = "(Nível:" + std::to_string(level) + ")";
@@ -46,13 +48,15 @@ void process_tree(int level, const int max_level) {
   // Cria o processo filho a esquerda
   pid_t left_child = fork();
 
+  // Se menor que zero houve falha na criação
   if (left_child < 0) {
     printf("Process(%d): fail %d\n", getpid(), left_child);
     _exit(EXIT_FAILURE);
   }
 
+  // Se a criação resultou em zero, este é o processo filho
   if (left_child == 0) {
-    // Chama recusivamente a função para criar sues processos filhos
+    // Chama recusivamente a função para criar seus processos filhos
     process_tree(level + 1, max_level);
     _exit(EXIT_SUCCESS);
   }
@@ -60,11 +64,13 @@ void process_tree(int level, const int max_level) {
   // Cria o processo filho a direita
   pid_t right_child = fork();
 
+  // Se menor que zero houve falha na criação
   if (right_child < 0) {
     printf("Process(%d): fail %d\n", getpid(), right_child);
     _exit(EXIT_FAILURE);
   }
 
+  // Se a criação resultou em zero, este é o processo filho
   if (right_child == 0) {
     process_tree(level + 1, max_level);
     _exit(EXIT_SUCCESS);
@@ -83,7 +89,9 @@ int main(int argc, char **argv) {
 
   const int N = atoi(argv[1]);
 
-  // Verifica se é um número válido de processos no sistema
+  // Verifica se é um número válido de processos no sistema.
+  // Para isso ele deve ser maior que 1 e menor que o limite de filhos que um
+  // processo pode ter.
   if (N < 1 || sysconf(_SC_CHILD_MAX) < static_cast<long int>(pow(2, N))) {
     printf("%d é um número inválido de processos", N);
     return 1;
@@ -91,7 +99,7 @@ int main(int argc, char **argv) {
 
   process_tree(1, N);
 
-  // Espera os processos terminarem
+  // Espera os processos filhos terminarem
   while (wait(NULL) >= 0) {
   }
 
