@@ -6,8 +6,6 @@ Este programa tem como objetivo mostrar a criação da hierarquia de processos d
 
 As bibliotecas usadas neste programa foram:
 
-#include <thread>     // this_thread
-
 - cstdlib, desta biblioteca foi utilizado o atoi() responsável por transformar um caracter em um número(se possível).
 - math.h, usada para realizar o cálculo da quantidade de processos que podem ser criados no sistema.
 - iostream, biblioteca padrão da linguagem C++ para entrada e saída
