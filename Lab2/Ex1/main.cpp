@@ -13,7 +13,6 @@
 #include <string>     // string
 #include <sys/wait.h> // wait()
 #include <unistd.h>   // exit() fork(), sysconf(), execlp()
-#include <chrono>     // chrono
 #include <thread>     // this_thread
 
 /**
