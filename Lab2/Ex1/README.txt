@@ -14,9 +14,9 @@ As bibliotecas usadas neste programa foram:
 - thread, desta biblioteca foi utilizado sleep_for, que permite colocar para dormir o processo.
 - unistd.h, desta biblioteca foi utilizado o seguinte:
   - fork(), usado para criar um filho do processo atual, por meio de um clone.
-  - exit(), usado para finalizar um processo.
+  - _exit(), usado para finalizar um processo.
   - sysconf(), permite configurar e obter certos valores de configuração do sistema. 
-  - execlp(), usado para executar o clear.
+  - sleep(), faz com que o processo atual durma por x segundos. 
 
 ## Compilação
 
