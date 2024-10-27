@@ -6,15 +6,17 @@ Este programa tem como objetivo mostrar a criação da hierarquia de processos d
 
 As bibliotecas usadas neste programa foram:
 
-- cstdio, desta biblioteca foi utilizado a função printf() que imprime caracteres na tela.
 - cstdlib, desta biblioteca foi utilizado o atoi() responsável por transformar um caracter em um número(se possível).
 - math.h, usada para realizar o cálculo da quantidade de processos que podem ser criados no sistema.
+- iostream, biblioteca padrão da linguagem C++ para entrada e saída
 - string, biblioteca de string padrão da linguagem C++
 - sys/wait.h, desta biblioteca foi utilizado o wait() que permite que o processo pai espere e recolha o valor de retorno do processo filho.
+- thread, desta biblioteca foi utilizado sleep_for, que permite colocar para dormir o processo.
 - unistd.h, desta biblioteca foi utilizado o seguinte:
-  - fork() usado para criar um filho do processo atual, por meio de um clone.
-  - _exit() usado para finalizar um processo. Diferentemente do exit() este finaliza o processo sem execuções de funções de cleanup. Junto a esta função as macros EXIT_FAILURE e EXIT_SUCCESS também foram usadas, para definir se a saída foi bem sucedida ou não.
+  - fork(), usado para criar um filho do processo atual, por meio de um clone.
+  - exit(), usado para finalizar um processo.
   - sysconf(), permite configurar e obter certos valores de configuração do sistema. 
+  - execlp(), usado para executar o clear.
 
 ## Compilação
 

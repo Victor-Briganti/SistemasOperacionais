@@ -1,22 +1,21 @@
-Hierarquia de Processos
+Shell Simples
 
-Este programa tem como objetivo mostrar a criação da hierarquia de processos de um programa.
-
+Um shell simples que permite a execução de processos. Ele pode executar comandos em segundo plano ou em primeiro plano, aguardando a conclusão do processo.
 
 ## Bibliotecas
 
 As bibliotecas usadas neste programa foram:
 
-- cstring, desta biblioteca foi utilizado o strdup() que duplica uma string.
-- iostream, desta biblioteca foi utilizado o cout para imprimir informações. cin foi utilizado para verificar se a entrada era um eof. getline() foi utilizado para obter o que o usuário escreveu.
-- cctype, a função isprint foi utilizado para verificar se os caracteres passados são válidos.
-- string, desta biblioteca foi utilizado a estrutura string.
-- vector, desta biblioteca foi utilizado a estrutura vector
-- sys/wait.h, desta biblioteca foi utilizado o wait() que permite que o processo pai espere e recolha o valor de retorno do processo filho.
-- unistd.h, desta biblioteca foi utilizado o seguinte:
-  - fork() usado para criar um filho do processo atual, por meio de um clone.
-  - _exit() usado para finalizar um processo. Diferentemente do exit() este finaliza o processo sem execuções de funções de cleanup. Junto a esta função as macros EXIT_FAILURE e EXIT_SUCCESS também foram usadas, para definir se a saída foi bem sucedida ou não.
-  - execvp() usado para substituir a imagem do processo atual pela imagem de outro programa. Está versão do programa realiza a busca do programa por meio do PATH.
+cctype: Utiliza isprint() para verificar se os caracteres são imprimíveis.
+cstring: Utiliza strdup() para duplicar strings.
+iostream: Usa cout para impressão e cin para entrada.
+string: Utiliza a estrutura string.
+sys/wait.h: Usa wait() para aguardar a conclusão do processo filho.
+unistd.h:
+  fork(): Cria um novo processo.
+  _exit(): Finaliza um processo imediatamente.
+  execvp(): Executa um comando substituindo a imagem do processo atual.
+vector: Utiliza a estrutura vector para gerenciar listas de argumentos.
 
 ## Compilação
 
@@ -28,9 +27,7 @@ make
 
 Para executar este basta realizar o seguinte:
 
-./main <num_process>
+./main
 
-Onde num_process é o nível da árvore de processos que se deseja criar. 
-
-
+Realiza os comandos até que o usuário termine a execução com <C-c> ou <C-d>.
 
