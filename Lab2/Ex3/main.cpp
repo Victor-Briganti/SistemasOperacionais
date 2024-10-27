@@ -12,7 +12,7 @@
 #include "process_vector.hpp" // VectorProcess
 #include <cstdio>             // printf()
 #include <sys/wait.h>         // wait()
-#include <unistd.h>           // fork(), _exit(), sysconf()
+#include <unistd.h>           // fork(), _exit(), sysconf(), getpid()
 VectorProcess *vectorProcess;
 
 /**
@@ -54,7 +54,7 @@ void big_vector(int numProcess, int num) {
   for (int i = 0; i < numProcess; i++) {
     pid = fork();
     if (pid < 0) {
-      std::cout << "Process(" << getpid() << "): fail " << pid << "\n";
+      std::cout << "Processo(" << getpid() << "): falhou " << pid << "\n";
       return;
     }
 
@@ -83,7 +83,7 @@ void small_vector(int num) {
   for (int i = 0; i < static_cast<int>(vectorProcess->vector.size()); i++) {
     pid = fork();
     if (pid < 0) {
-      std::printf("Process(%d): fail %d", getpid(), pid);
+      std::printf("Processo(%d): falhou %d", getpid(), pid);
       return;
     }
 
@@ -113,7 +113,7 @@ bool wait_processes(int num) {
   while (wpid >= 0) {
     wpid = wait(&status);
     if (status == 0 && wpid != -1) {
-      std::printf("Process(%d) found %d\n", wpid, num);
+      std::printf("Process(%d) encontrou %d\n", wpid, num);
       found = true;
     }
   }

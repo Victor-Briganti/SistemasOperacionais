@@ -139,7 +139,7 @@ int main() {
       if (std::cin.eof()) {
         return 0;
       } else {
-        std::cerr << "Could not read input\n";
+        std::cerr << "Não foi possível ler entrada\n";
         continue;
       }
     }
@@ -151,7 +151,7 @@ int main() {
 
     // Verifica se os caracteres podem ser colocados na tela.
     if (!verify_string(args)) {
-      std::cout << "Invalid characters passed\n";
+      std::cout << "Caracteres inválidos\n";
       continue;
     }
 
@@ -159,12 +159,12 @@ int main() {
     // contrário execute e espere.
     if (args[args.size() - 1] == '&') {
       if (execute_command(args) < 0) {
-        std::cout << "Could not load the program\n";
+        std::cout << "Não foi possível carregar o programa\n";
         continue;
       }
     } else {
       if (execute_command_wait(args) < 0) {
-        std::cout << "Could not load the program\n";
+        std::cout << "Não foi possível carregar o programa\n";
         continue;
       }
     }

@@ -12,7 +12,7 @@
 #include <cstdio>     // printf()
 #include <cstring>    // strerror()
 #include <sys/wait.h> // wait()
-#include <unistd.h>   // fork(), execvp()
+#include <unistd.h>   // fork(), execvp(), getpid()
 
 int main(int argc, char **argv) {
   if (argc < 2) {

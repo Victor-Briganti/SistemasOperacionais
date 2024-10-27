@@ -13,6 +13,7 @@ As bibliotecas usadas neste programa foram:
 - vector, desta biblioteca foi utilizado a estrutura de dados vector.
 - sys/wait.h, desta biblioteca foi utilizado o wait() que permite que o processo pai espere e recolha o valor de retorno do processo filho.
 - unistd.h, desta biblioteca foi utilizado o seguinte:
+  - getpid(), retorna o ID do processo atual
   - fork() usado para criar um filho do processo atual, por meio de um clone.
   - _exit() usado para finalizar um processo. Diferentemente do exit() este finaliza o processo sem execuções de funções de cleanup. Junto a esta função as macros EXIT_FAILURE e EXIT_SUCCESS também foram usadas, para definir se a saída foi bem sucedida ou não.
   - sysconf(), permite configurar e obter certos valores de configuração do sistema. 

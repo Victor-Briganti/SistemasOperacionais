@@ -1,4 +1,4 @@
-.PHONY: main debug clear valgrind
+.PHONY: main debug valgrind
 
 CXX = g++
 LFLAG = -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-sign-conversion -Wconversion

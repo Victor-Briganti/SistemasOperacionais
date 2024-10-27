@@ -12,7 +12,7 @@
 #include <math.h>     // pow()
 #include <string>     // string
 #include <sys/wait.h> // wait()
-#include <unistd.h>   // _exit() fork(), sysconf(), sleep()
+#include <unistd.h>   // _exit() fork(), sysconf(), sleep(), getpid(), execlp()
 
 /**
  * @brief Cria uma árvore de processos
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
   // Verifica se é um número válido de processos no sistema.
   // Para isso ele deve ser maior que 1 e menor que o limite de filhos que um
   // processo pode ter.
-  if (N < 1 || sysconf(_SC_CHILD_MAX) < static_cast<long int>(pow(2, N))) {
+  if (N < 1 || static_cast<long double>(sysconf(_SC_CHILD_MAX)) < pow(2, N)) {
     std::cout << N << " é um número inválido de processos" << std::endl;
     return 1;
   }
@@ -87,16 +87,27 @@ int main(int argc, char **argv) {
 
   // Atualiza a visualização da hierarquia de processos
   while (true) {
-    // Dorme por um segundo antes de mostrar a árvore de processos
-    sleep(1);
+    // Cria processo para executar comando clear
+    pid_t pid_clear = fork();
+    if (pid_clear == 0) {
+      // Limpa a tela
+      execlp("clear", "clear", nullptr);
+      exit(0);
+    }
+
+    // Aguarda o processo filho de limpar a tela
+    waitpid(pid_clear, nullptr, 0);
 
     // Executa o pstree para o processo main
     std::string command_pstree = "pstree -p " + std::to_string(pid);
-    std::cout << command_pstree << std::endl;
     system(command_pstree.c_str());
 
-    if (wait(nullptr) < 0) {
-      break;
+    // Espera um pouco antes de atualizar novamente
+    sleep(1);
+
+    // Verifica se todos os filhos terminaram
+    if (waitpid(-1, nullptr, WNOHANG) > 0) {
+      break; // Se algum filho terminou, sai do loop
     }
   }
 
