@@ -12,6 +12,8 @@
 #include <fstream>
 #include <iostream>
 
+#define MAX_THREADS_FILE "/proc/sys/kernel/threads-max"
+
 /**
  * @brief Estrutura de limites da execução
  *
@@ -92,6 +94,68 @@ void *columns(void *arg) {
 }
 
 /**
+ * @brief Cria uma thread para realizar o cálculo de uma matrix, e escreve as
+ * saídas no arquivo.
+ *
+ * @param tid Vetor da thread a ser criada
+ * @param file Arquivo de saída
+ */
+void thread_single(std::vector<pthread_t> &tid, std::ofstream &file) {
+  Bound *bound = new Bound(0, matrix->row_size());
+  int err =
+      pthread_create(&(tid[0]), nullptr, rows, static_cast<void *>(bound));
+  if (err) {
+    std::cerr << "Could not create thread for row" << std::endl;
+    return;
+  }
+
+  void *res = nullptr;
+  pthread_join(tid[0], &res);
+  if (res == nullptr) {
+    std::cerr << "Something went terribly wrong during the row calculation\n";
+    return;
+  }
+
+  std::vector<double> results(matrix->row_size());
+  for (int i = bound->start; i < bound->end; i++) {
+    results[i] = bound->values[i];
+  }
+  delete bound;
+
+  file << "Linhas:\n[ ";
+  for (auto a : results) {
+    file << a << " ";
+  }
+  file << "]\n\n";
+
+  bound = new Bound(0, matrix->column_size());
+  err = pthread_create(&(tid[0]), nullptr, columns, static_cast<void *>(bound));
+  if (err) {
+    std::cerr << "Could not create thread for row" << std::endl;
+    return;
+  }
+
+  pthread_join(tid[0], &res);
+  if (res == nullptr) {
+    std::cerr
+        << "Something went terribly wrong during the column calculation\n";
+    return;
+  }
+
+  results.resize(matrix->column_size());
+  for (int i = bound->start; i < bound->end; i++) {
+    results[i] = bound->values[i];
+  }
+  delete bound;
+
+  file << "Colunas:\n[ ";
+  for (auto a : results) {
+    file << a << " ";
+  }
+  file << "]\n\n";
+}
+
+/**
  * @brief Dividi o trabalho de entre as threads, e escreve as saídas no arquivo.
  *
  * Dividi o trabalho das threads entre os cálculos de linhas e colunas.
@@ -103,7 +167,7 @@ void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
   int numRows = matrix->row_size();
   int numCols = matrix->column_size();
 
-  int numThreads = tid.size();
+  int numThreads = static_cast<int>(tid.size());
   int halfThreads = numThreads / 2;
 
   int chunkSizeRow = numRows / halfThreads;
@@ -189,6 +253,13 @@ void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
   file << "]\n";
 }
 
+int max_threads() {
+  std::ifstream file(MAX_THREADS_FILE);
+  std::string max;
+  std::getline(file, max);
+  return std::atoi(max.c_str());
+}
+
 int main(int argc, char **argv) {
   if (argc < 3) {
     std::cout << argv[0] << " <input_file> <output_file> <num_threads>\n";
@@ -208,13 +279,17 @@ int main(int argc, char **argv) {
   }
 
   int numThreads = std::atoi(argv[3]);
-  if (numThreads <= 0) {
+  if (numThreads <= 0 || max_threads() < numThreads) {
     std::cout << numThreads << " invalid number of threads\n";
     return 1;
   }
 
   std::vector<pthread_t> tid(numThreads);
-  thread_manager(tid, file);
+  if (numThreads == 1) {
+    thread_single(tid, file);
+  } else {
+    thread_manager(tid, file);
+  }
 
   delete matrix;
   return 0;

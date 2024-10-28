@@ -77,7 +77,7 @@ public:
       return -1;
     }
 
-    return matrix.size() - 1;
+    return static_cast<int>(matrix.size()) - 1;
   }
 
   int column_size() {
@@ -85,6 +85,6 @@ public:
       return -1;
     }
 
-    return matrix[0].size() - 1;
+    return static_cast<int>(matrix[0].size()) - 1;
   }
 };
