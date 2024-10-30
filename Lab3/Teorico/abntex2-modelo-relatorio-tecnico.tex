@@ -91,6 +91,7 @@
 % Meus pacotes
 % ---
 \usepackage{float}
+\usepackage{array}
 % ---
 
 % --- 
@@ -352,6 +353,40 @@ Informações sobre o número máximo de \textit{threads} que podem ser criadas 
 
 \subsection{Tempo de Execução}
 \label{subsec:time}
+
+Utilizando a biblioteca \textit{pthread}, foi desenvolvido um programa para calcular, de maneira paralela, a média aritmética das linhas e a média geométrica das colunas de uma matriz $M \times N$. Os resultados são salvos em um arquivo de texto especificado pelo usuário.
+
+Esta implementação adota técnicas de paralelização de funções e dados, distribuindo as tarefas de cálculo entre várias threads para maximizar a eficiência do processamento.
+
+As especificações do sistema que executou o programa, estão detalhadas na Seção~\ref{sec:materiais}, e a matriz de entrada possui o tamanho $100 \times 200$. A Tabela~\ref{table:time} mostra o tempo de execução do programa com 1, 2, 4, 8 e 16 \textit{threads}, destacando o impacto da paralelização.
+
+\begin{table}[!htb]
+\centering
+\caption{Tempo de execução para diferentes quantidades de \textit{threads}}
+\label{table:time}
+\footnotesize
+\begin{tabular}{@{}l|lll@{}}
+\toprule
+\textbf{Número de \textit{threads}} & \textbf{Tempo Real (ms)} & \textbf{Tempo de Sistema (ms)} & \textbf{Tempo de Usuário (ms)}\\ 
+\midrule
+1 & 24 & 8 & 7 \\
+2 & 24 & 11 & 4 \\
+4 & 20 & 15 & 15 \\
+8 & 20 & 13 & 20 \\
+16 & 21 & 13 & 15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para cada execução, foram medidos três tipos de tempo:
+
+\begin{itemize}
+    \item \textbf{Tempo Real:} Representa o tempo total decorrido durante a execução.
+    \item \textbf{Tempo de Sistema:} Indica o tempo gasto de execução operações do núcleo.
+    \item \textbf{Tempo de Usuário:} Indica o tempo dedicado à execução do código de usuário do programa.
+\end{itemize}
+
+Os resultados mostram que o tempo real permaneceu estável, em torno de 20 ms, independentemente do número de \textit{threads}. O tempo de sistema variou, com a execução em uma única \textit{thread} apresentando um tempo menor em relação às demais, enquanto nas execuções com múltiplas \textit{threads}, o tempo aumentou ligeiramente, atingindo valores entre 11 e 15 ms. Por outro lado, o tempo de usuário foi menor para a execução com 2 \textit{threads}, atingindo um tempo médio de 4 ms, em comparação com as execuções com 4 \textit{threads} ou mais, nas quais variou entre 13 e 20 ms.
 
 \section{Discussão dos Resultados}
 \label{sec:discussao}
