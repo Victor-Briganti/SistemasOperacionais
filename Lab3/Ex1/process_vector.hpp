@@ -3,15 +3,16 @@
  * Descrição: Wrapper da estrutura vector de C++ para facilitar a manipulação do
  * mesmo.
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 30/10/2024
  */
 #pragma once
 
-#include <algorithm>
-#include <cstdlib>
-#include <iostream>
-#include <vector>
+#include <algorithm> // find(), swap()
+#include <iostream>  // cout
+#include <vector>    // vector
 
 #define SEED 1
 

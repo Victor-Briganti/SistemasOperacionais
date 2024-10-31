@@ -3,16 +3,21 @@
  * Descrição: Calcula média aritmética das linhas da matrix. Calcula média
  * geométrica das linhas da matrix.
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 30/10/2024
  */
-
 #include "matrix.hpp"
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
+#include <fstream>   // ifstream, ofstream
+#include <iostream>  // cout, cerr
+#include <pthread.h> // phtread_join(), phtread_create()
 
+// Arquivo do sistema que delimita a quantidade máxima de threads
 #define MAX_THREADS_FILE "/proc/sys/kernel/threads-max"
+
+/** @brief Estrutura global da matrix */
+Matrix *matrix = nullptr;
 
 /**
  * @brief Estrutura de limites da execução
@@ -27,9 +32,6 @@ struct Bound {
   int end;                    ///< Delimita a linha/coluna final
   std::vector<double> values; ///< Armazena os valores calculados
 };
-
-/** @brief Estrutura global da matrix */
-Matrix *matrix = nullptr;
 
 /**
  * @brief Realiza média aritmética nas linhas da matrix
@@ -97,11 +99,17 @@ void *columns(void *arg) {
  * @brief Cria uma thread para realizar o cálculo de uma matrix, e escreve as
  * saídas no arquivo.
  *
+ * Está função realiza a criação de uma única thread para realizar todos os
+ * calculos, aqui a thread principal não está sendo considerada.
+ *
  * @param tid Vetor da thread a ser criada
  * @param file Arquivo de saída
  */
 void thread_single(std::vector<pthread_t> &tid, std::ofstream &file) {
+  // Cria os limites das linhas que serão calculados
   Bound *bound = new Bound(0, matrix->row_size());
+
+  // Inicia a thread
   int err =
       pthread_create(&(tid[0]), nullptr, rows, static_cast<void *>(bound));
   if (err) {
@@ -109,6 +117,7 @@ void thread_single(std::vector<pthread_t> &tid, std::ofstream &file) {
     return;
   }
 
+  // Realiza o join da thread e verifica se o seu resultado é válido
   void *res = nullptr;
   pthread_join(tid[0], &res);
   if (res == nullptr) {
@@ -116,18 +125,21 @@ void thread_single(std::vector<pthread_t> &tid, std::ofstream &file) {
     return;
   }
 
+  // Salva os resultados finais
   std::vector<double> results(matrix->row_size());
   for (int i = bound->start; i < bound->end; i++) {
     results[i] = bound->values[i];
   }
   delete bound;
 
+  // Escreve em um arquivo os resultados salvos
   file << "Linhas:\n[ ";
   for (auto a : results) {
     file << a << " ";
   }
   file << "]\n\n";
 
+  // Cria os limites das colunas que serão calculados
   bound = new Bound(0, matrix->column_size());
   err = pthread_create(&(tid[0]), nullptr, columns, static_cast<void *>(bound));
   if (err) {
@@ -135,6 +147,7 @@ void thread_single(std::vector<pthread_t> &tid, std::ofstream &file) {
     return;
   }
 
+  // Realiza o join da thread e verifica se o seu resultado é válido
   pthread_join(tid[0], &res);
   if (res == nullptr) {
     std::cerr
@@ -142,12 +155,14 @@ void thread_single(std::vector<pthread_t> &tid, std::ofstream &file) {
     return;
   }
 
+  // Salva os resultados finais
   results.resize(matrix->column_size());
   for (int i = bound->start; i < bound->end; i++) {
     results[i] = bound->values[i];
   }
   delete bound;
 
+  // Escreve em um arquivo os resultados salvos
   file << "Colunas:\n[ ";
   for (auto a : results) {
     file << a << " ";
@@ -164,15 +179,23 @@ void thread_single(std::vector<pthread_t> &tid, std::ofstream &file) {
  * @param file Arquivo de saída
  */
 void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
+  // Verifica o tamanho total de linhas e colunas da matriz
   int numRows = matrix->row_size();
   int numCols = matrix->column_size();
 
+  // Verifica o número total de threads
   int numThreads = static_cast<int>(tid.size());
+
+  // Realiza a divisão do número total de threads. Uma parte será usada com
+  // linhas e a outra com colunas
   int halfThreads = numThreads / 2;
 
+  // Realiza a divisão dos "pedaços" matriz relacionada as linhas para cada
+  // thread
   int chunkSizeRow = numRows / halfThreads;
   int excessRow = numRows % halfThreads;
 
+  // Cria as threads que irão realizar o cálculo das linhas
   int start = 0;
   for (int i = 0; i < halfThreads; i++) {
     int end = start + chunkSizeRow + (i < excessRow ? 1 : 0);
@@ -187,9 +210,12 @@ void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
     start = end;
   }
 
+  // Realiza a divisão dos "pedaços" matriz relacionada as linhas para cada
+  // thread
   int chunkSizeCol = numCols / (numThreads - halfThreads);
   int excessCol = numCols % (numThreads - halfThreads);
 
+  // Cria as threads que irão realizar o cálculo das colunas
   start = 0;
   for (int i = halfThreads; i < numThreads; i++) {
     int end = start + chunkSizeCol + (i - halfThreads < excessCol ? 1 : 0);
@@ -204,6 +230,7 @@ void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
     start = end;
   }
 
+  // Realiza o join de todas as threads relacionada as linhas
   std::vector<double> rowResults(numRows);
   for (int i = 0; i < halfThreads; i++) {
     void *res = nullptr;
@@ -222,12 +249,14 @@ void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
     delete bound;
   }
 
+  // Salva os resultados das linhas
   file << "Linhas:\n[ ";
   for (auto a : rowResults) {
     file << a << " ";
   }
   file << "]\n\n";
 
+  // Realiza o join de todas as threads relacionada as colunas
   std::vector<double> colResults(numCols);
   for (int i = halfThreads; i < numThreads; i++) {
     void *res = nullptr;
@@ -246,6 +275,7 @@ void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
     delete bound;
   }
 
+  // Salva os resultados das colunas
   file << "Colunas:\n[ ";
   for (auto a : colResults) {
     file << a << " ";
@@ -253,6 +283,11 @@ void thread_manager(std::vector<pthread_t> &tid, std::ofstream &file) {
   file << "]\n";
 }
 
+/**
+ * @brief Verifica o número máximo de threads do sistema.
+ *
+ * @return Número total de threads que podem ser criadas no sistema
+ */
 int max_threads() {
   std::ifstream file(MAX_THREADS_FILE);
   std::string max;
@@ -285,6 +320,9 @@ int main(int argc, char **argv) {
   }
 
   std::vector<pthread_t> tid(numThreads);
+
+  // Verifica o número total de threads e realiza a chamada de função conforme a
+  // necessidade
   if (numThreads == 1) {
     thread_single(tid, file);
   } else {

@@ -1,19 +1,14 @@
 /*
- * Busca um valor em um vetor
- * Descrição: Localiza um valor em um vetor usando N threads.
+ * Busca um valor em um vetor utilizando threads
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 30/10/2024
  */
 #include "process_vector.hpp"
-#include <cstdlib>
-#include <iostream>
-#include <limits.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <vector>
+#include <iostream>  // cout, atoi()
+#include <pthread.h> // pthread_create(), pthread_join()
 
 /**
  * @brief Estrutura de limites da busca
@@ -65,9 +60,15 @@ void *search(void *arg) {
  */
 bool big_vector(std::vector<pthread_t> &tid, int num) {
   bool found = false;
+
+  // Define o tamanho que cada thread irá receber na sua busca
   int chunkSize = static_cast<int>(vectorProcess->vector.size() / tid.size());
+
+  // Caso não seja possível dividir igualmente os tamanos, temos um excesso que
+  // é distribuido conforme for possível
   int excess = static_cast<int>(vectorProcess->vector.size() % tid.size());
 
+  // Cria as threads com os limites que eles irão usar na busca
   int end, start = 0;
   for (int i = 0; i < static_cast<int>(tid.size()); i++) {
     end = start + chunkSize + (i < excess ? 1 : 0);
@@ -82,6 +83,7 @@ bool big_vector(std::vector<pthread_t> &tid, int num) {
     start = end;
   }
 
+  // Realiza um join com cada uma das threads criadas anteriorermente
   for (int i = 0; i < static_cast<int>(tid.size()); i++) {
     void *x = nullptr;
     pthread_join(tid[i], &x);
@@ -112,6 +114,7 @@ bool big_vector(std::vector<pthread_t> &tid, int num) {
 bool small_vector(std::vector<pthread_t> &tid, int num) {
   bool found = false;
 
+  // Cria as threads um a um para que realizem a busca no vetor
   for (int i = 0; i < static_cast<int>(vectorProcess->vector.size()); i++) {
     Bound *bound = new Bound(i, i + 1, num);
     int err =
@@ -121,6 +124,7 @@ bool small_vector(std::vector<pthread_t> &tid, int num) {
     }
   }
 
+  // Realiza um join com cada uma das threads criadas anteriorermente
   for (int i = 0; i < static_cast<int>(vectorProcess->vector.size()); i++) {
     void *x = nullptr;
     pthread_join(tid[i], &x);
@@ -159,12 +163,15 @@ int main(int argc, char **argv) {
   int num = std::atoi(argv[3]);
   std::vector<pthread_t> tid(num_threads, 0);
 
+  // Verifica a quantidade de threads e o tamanho do vetor fornecido pelo
+  // usuário.
   if (vector_size > num_threads) {
-    if (!big_vector(tid, num)) {
+    if (!big_vector(tid, num)) { // Número de threads menor que o tamanho vetor
       std::cout << "Not found!\n";
     }
   } else {
-    if (!small_vector(tid, num)) {
+    if (!small_vector(
+            tid, num)) { // Número de threads maior ou igual que o tamanho vetor
       std::cout << "Not found!\n";
     }
   }
