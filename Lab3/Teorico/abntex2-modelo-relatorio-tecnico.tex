@@ -268,7 +268,9 @@ Este trabalho visa aplicar conceitos práticos sobre operações com \textit{thr
 
 \section{Introdução}
 \label{sec:introducao}
-FAZER
+A princípio, os sistemas operacionais não suportavam mais de uma tarefa por processo, o que se tornou um grande problema conforme a complexidade das aplicações desenvolvidas se tornou maior. Uma mesma aplicação atualmente exerce diversas funções simultâneas, o que gerou a necessidade de mais de uma tarefa em um mesmo processo, operando sob os mesmos recursos~\cite{maziero2019}.
+
+Para resolver o problema citado anteriormente, surgem fluxos de execuções independentes menores em um mesmo processo, denominados \textit{threads}, que compartilham recursos umas com as outras~\cite{maziero2019}. Tais \textit{threads} são essenciais em aplicações que exigem que diversas funções sejam executadas simultaneamente, e são muito mais leves, tornado-as mais rápidas para criar e destruir, além de favorecerem o desempenho das aplicações, visto que torna a computação e entradas/saídas substanciais, permitindo a sobreposição destas atividades~\cite{tanenbaum2016}. 
 
 \section{Objetivos}
 \label{sec:objetivos}
@@ -277,7 +279,11 @@ Este trabalho tem como objetivo explorar e detalhar a criação e manipulação 
 
 \section{Fundamentação}
 \label{sec:fundamentacao}
-FAZER
+\textit{Threads} de núcleo são utilizadas para mapear \textit{threads} de usuário dentro do núcleo do sistema operacional. Além de serem utilizadas por atividades internas do próprio núcleo. A forma como as \textit{threads} de usuário serão mapeadas para as de núcleo dependem do modelo de implementação utilizado~\cite{maziero2019}.
+
+Os principais modelos de \textit{threads} são os seguintes modelos: N:1, onde várias \textit{threads} de usuários são mapeadas para uma \textit{thread} de núcleo, reduzindo a carga de gerência, visto que o núcleo enxerga tudo como uma única \textit{thread}. Temos também o modelo 1:1, onde cada \textit{thread} de  usuário gera uma de núcleo, tornando a distribuição do processamento entre \textit{threads} mais justa, porém é pouco escalável devido à grande carga de \textit{threads} de núcleo geradas em aplicações maiores. E por fim temos o modelo N:M, que é uma abordagem híbrida entre os dois modelos citados anteriormente, onde N \textit{thread} de usuário são mapeadas para M \textit{threads} de núcleo (sendo M<N), esta abordagem, embora mais complexa, explora o melhor de cada um dos outros dois modelos~\cite{maziero2019}.
+
+Antes de 1995, cada sistema operacional criava sua própria interface para a programação de \textit{threads}. Mas no ano citado, foi estabelecido o padrão \textit{IEEE POSIX 1003.1c}, popularmente conhecido como \textit{POSIX Threads}, e abreviado ainda para \textit{PThreads}, este padrão determina uma interface para a utilização de \textit{threads} na linguagem C e ainda é amplamente suportado e disseminado atualmente~\cite{maziero2019}.
 
 \section{Materiais e Equipamentos}
 \label{sec:materiais}
