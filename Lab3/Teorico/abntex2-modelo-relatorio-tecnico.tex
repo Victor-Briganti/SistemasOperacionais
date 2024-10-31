@@ -1,4 +1,4 @@
-%% abtex2-modelo-relatorio-tecnico.tex, v-1.7.1 laurocesar
+ %% abtex2-modelo-relatorio-tecnico.tex, v-1.7.1 laurocesar
 %% Copyright 2012-2013 by abnTeX2 group at http://abntex2.googlecode.com/ 
 %%
 %% This work may be distributed and/or modified under the
@@ -396,11 +396,13 @@ Os resultados mostram que o tempo real permaneceu estável, em torno de 20 ms, i
 
 \section{Discussão dos Resultados}
 \label{sec:discussao}
-FAZER
+Os resultados mostram que o tempo real de execução se mantém estável em cerca de 20 ms, independentemente do número de \textit{threads}, o que indica uma limitação de escalabilidade para a aplicação testada. O tempo de sistema aumenta com a adição de mais \textit{threads}, refletindo a sobrecarga do núcleo na criação, destruição e sincronização dessas \textit{threads}, o que impacta negativamente o desempenho geral. O tempo de usuário é otimizado com duas \textit{threads}, alcançando uma média de 4 ms, mas eleva-se com quatro ou mais \textit{threads}, sugerindo que duas \textit{threads} oferecem o melhor equilíbrio entre paralelização e sobrecarga. Além disso, o aumento no número de \textit{threads} evidencia custos adicionais de comunicação e sincronização entre elas, tornando-se mais evidente em operações com cálculos paralelos que exigem troca frequente de dados. Esse comportamento indica que a escalabilidade é limitada para tarefas com baixa complexidade e alta dependência entre dados compartilhados, onde o aumento do número de \textit{threads} não gera ganhos de desempenho significativos.
 
 \section{Conclusões}
 \label{sec:conclusoes}
-FAZER
+Este estudo demonstra que o uso de \textit{threads} em um ambiente GNU/Linux pode melhorar o desempenho em operações paralelas, mas que essa melhoria depende fortemente do tipo de tarefa executada e da complexidade da aplicação. Em tarefas com pouca carga de dados ou que exigem sincronização frequente, o aumento no número de threads pode resultar em sobrecarga, reduzindo o benefício da paralelização.
+
+Para maximizar o desempenho, é fundamental avaliar o custo-benefício do uso de múltiplas \textit{threads} em cada contexto específico. Aplicações mais complexas e que exigem alto processamento podem se beneficiar da criação de \textit{threads} adicionais, desde que haja um balanceamento cuidadoso entre o número de \textit{threads} e a capacidade de gerenciamento do sistema.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
