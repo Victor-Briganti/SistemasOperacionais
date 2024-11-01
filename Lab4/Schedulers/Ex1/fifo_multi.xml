@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process_scheduler>
+  <params>
+    <object management="FCFS">
+      <multiprogramming>true</multiprogramming>
+      <preemptive>false</preemptive>
+      <quantum>1</quantum>
+    </object>
+  </params>
+  <ready_queue>
+    <object pid="6">
+      <name>P1</name>
+      <prio>1</prio>
+      <submission>0</submission>
+      <periodic>false</periodic>
+      <bursts>0 0 1 1 0 1 0</bursts>
+      <color>-6708277</color>
+    </object>
+    <object pid="7">
+      <name>P2</name>
+      <prio>1</prio>
+      <submission>0</submission>
+      <periodic>false</periodic>
+      <bursts>0 0 0 0 0 1 0</bursts>
+      <color>-2696200</color>
+    </object>
+    <object pid="8">
+      <name>P3</name>
+      <prio>1</prio>
+      <submission>0</submission>
+      <periodic>false</periodic>
+      <bursts>0 0 0 0 1 1 0 0</bursts>
+      <color>-2188876</color>
+    </object>
+    <object pid="9">
+      <name>P4</name>
+      <prio>1</prio>
+      <submission>0</submission>
+      <periodic>false</periodic>
+      <bursts>0 0 0 0</bursts>
+      <color>-2562603</color>
+    </object>
+  </ready_queue>
+  <arriving_queue />
+</process_scheduler>
+
