@@ -296,14 +296,36 @@ int max_threads() {
 }
 
 int main(int argc, char **argv) {
-  if (argc < 3) {
+  if (argc <= 2) {
+    std::cout << "Para criar uma matriz:\n";
+    std::cout << argv[0] << " <rows> <columns>\n";
+    std::cout << "Para realizar o cálculo das médias:\n";
     std::cout << argv[0] << " <input_file> <output_file> <num_threads>\n";
     return 1;
   }
 
+  // Realiza a criação da matriz
+  if (argc == 3) {
+    int rows = std::atoi(argv[1]);
+    int cols = std::atoi(argv[2]);
+
+    if (rows <= 0 || cols <= 0) {
+      std::cout << "Número de colunas/linhas inválido\n";
+      return 1;
+    }
+
+    if (Matrix::create_matrix(rows, cols) < 0) {
+      std::cout << "Não foi possível criar a matriz\n";
+      return 1;
+    }
+
+    std::cout << "Matriz criada\n";
+    return 0;
+  }
+
   matrix = new Matrix(argv[1]);
   if (!matrix) {
-    std::cout << "Could not allocate the matrix\n";
+    std::cout << "Não foi possível alocar a matrix\n";
     return 1;
   }
 

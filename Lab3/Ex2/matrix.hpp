@@ -6,9 +6,16 @@
  *
  * Data: 30/10/2024
  */
-#include <cmath>    // nan(), pow()
+#include <cmath> // nan(), pow()
+#include <cstdio>
+#include <fstream>  // ofstream
 #include <iostream> // fopen(), fscanf(), cout
 #include <vector>   // vector
+
+#define MATRIX_FILE "matrix.txt"
+
+#define MAX_ROWS 500
+#define MAX_COLS 500
 
 class Matrix {
   std::vector<std::vector<int>> matrix;
@@ -39,6 +46,49 @@ public:
     }
 
     fclose(fd);
+  }
+
+  /*
+   * @brief Cria uma matriz aleatória em um arquivo
+   *
+   * Cria uma matriz aleatória com números aleatórios maiores que 0. E salva a
+   * matriz no arquivo MATRIX_FILE.
+   *
+   * @param rows Tamanho linhas a ser criado
+   * @param cols Tamanho colunas a ser criado
+   *
+   * @return 0 se a matriz foi criada com sucesso, -1 caso contrário
+   */
+  static int create_matrix(int rows, int cols) {
+    // srand(1); // Usado para debug
+
+    if (rows > MAX_ROWS || cols > MAX_COLS) {
+      return -1;
+    }
+
+    std::ofstream file(MATRIX_FILE);
+    if (!file) {
+      return -1;
+    }
+
+    std::vector<std::vector<int>> createdMatrix =
+        std::vector<std::vector<int>>(rows, std::vector<int>(cols));
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        createdMatrix[i][j] = rand() % MAX_COLS + 1;
+      }
+    }
+
+    file << rows << "x" << cols << "\n";
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        file << createdMatrix[i][j] << " ";
+      }
+      file << "\n";
+    }
+
+    return 0;
   }
 
   /*

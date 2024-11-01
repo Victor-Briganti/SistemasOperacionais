@@ -214,12 +214,12 @@
 
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
-Este trabalho visa aplicar conceitos práticos sobre operações com \textit{threads}, explorando o uso da biblioteca \textit{pthreadsto} para a criação de programas. Utiliando o hipervisor VirtualBox versão 7.1.2 para configurar uma máquina virtual com o sistema operacional GNU/Linux Debian. Os procedimentos realizados foram a listagem das \textit{threads} em execução, verificação do número máximo de \textit{threads} que o sistema suporta e a medição do tempo de execução de um programa que realiza cálculos de matrizes. Os resultados foram satisfatórios, alcançando os objetivos propostos e proporcionando uma melhor compreensão sobre a utilização de \textit{threads} na programação.
+Este trabalho visa aplicar conceitos práticos sobre operações com \textit{threads}, explorando o uso da biblioteca POSIX Threads para a criação de programas. Utilizando o hipervisor VirtualBox versão 7.1.2 para configurar uma máquina virtual com o sistema operacional GNU/Linux Debian. Os procedimentos realizados foram a listagem das \textit{threads} em execução, verificação do número máximo de \textit{threads} que o sistema suporta e a medição do tempo de execução de um programa que realiza cálculos de matrizes. Os resultados foram satisfatórios, alcançando os objetivos propostos e proporcionando uma melhor compreensão sobre a utilização de \textit{threads} na programação.
 
  \vspace{\onelineskip}
     
  \noindent
- \textbf{Palavras-chave}: VirtualBox. Debian. Sistema Operacional.
+ \textbf{Palavras-chave}: VirtualBox. POSIX Threads. GNU/Linux Debian.
 \end{resumo}
 % ---
 
@@ -270,20 +270,20 @@ Este trabalho visa aplicar conceitos práticos sobre operações com \textit{thr
 \label{sec:introducao}
 A princípio, os sistemas operacionais não suportavam mais de uma tarefa por processo, o que se tornou um grande problema conforme a complexidade das aplicações desenvolvidas se tornou maior. Uma mesma aplicação atualmente exerce diversas funções simultâneas, o que gerou a necessidade de mais de uma tarefa em um mesmo processo, operando sob os mesmos recursos~\cite{maziero2019}.
 
-Para resolver o problema citado anteriormente, surgem fluxos de execuções independentes menores em um mesmo processo, denominados \textit{threads}, que compartilham recursos umas com as outras~\cite{maziero2019}. Tais \textit{threads} são essenciais em aplicações que exigem que diversas funções sejam executadas simultaneamente, e são muito mais leves, tornado-as mais rápidas para criar e destruir, além de favorecerem o desempenho das aplicações, visto que torna a computação e entradas/saídas substanciais, permitindo a sobreposição destas atividades~\cite{tanenbaum2016}. 
+Para resolver o problema citado anteriormente, surgem fluxos de execuções independentes menores em um mesmo processo, denominados \textit{threads}, que compartilham recursos entre si~\cite{maziero2019}. As \textit{threads} são essenciais em aplicações que exigem a execução simultânea de várias funções. São muito mais leves, o que as torna mais rápidas para criar e destruir, além disso, favorecem o desempenho das aplicações ao otimizar a computação e as operações de entrada/saída, permitindo a sobreposição dessas atividades.~\cite{tanenbaum2016}. 
 
 \section{Objetivos}
 \label{sec:objetivos}
 
-Este trabalho tem como objetivo explorar e detalhar a criação e manipulação de \textit{threads} em um ambiente GNU/Linux, fornecendo explicações abrangentes sobre a biblioteca utilizada para essa manipulação.
+Este trabalho visa explorar e detalhar a criação e manipulação de \textit{threads} em um ambiente GNU/Linux, fornecendo explicações abrangentes sobre a biblioteca utilizada para essa manipulação.
 
 \section{Fundamentação}
 \label{sec:fundamentacao}
-\textit{Threads} de núcleo são utilizadas para mapear \textit{threads} de usuário dentro do núcleo do sistema operacional. Além de serem utilizadas por atividades internas do próprio núcleo. A forma como as \textit{threads} de usuário serão mapeadas para as de núcleo dependem do modelo de implementação utilizado~\cite{maziero2019}.
+\textit{Threads} de núcleo são utilizadas para mapear \textit{threads} de usuário no núcleo do sistema operacional. Além de serem utilizadas por atividades internas do próprio núcleo. A maneira como essas \textit{threads} de usuário são mapeadas para as de núcleo dependem do modelo de implementação utilizado~\cite{maziero2019}.
 
-Os principais modelos de \textit{threads} são os seguintes modelos: N:1, onde várias \textit{threads} de usuários são mapeadas para uma \textit{thread} de núcleo, reduzindo a carga de gerência, visto que o núcleo enxerga tudo como uma única \textit{thread}. Temos também o modelo 1:1, onde cada \textit{thread} de  usuário gera uma de núcleo, tornando a distribuição do processamento entre \textit{threads} mais justa, porém é pouco escalável devido à grande carga de \textit{threads} de núcleo geradas em aplicações maiores. E por fim temos o modelo N:M, que é uma abordagem híbrida entre os dois modelos citados anteriormente, onde N \textit{thread} de usuário são mapeadas para M \textit{threads} de núcleo (sendo M<N), esta abordagem, embora mais complexa, explora o melhor de cada um dos outros dois modelos~\cite{maziero2019}.
+Os principais modelos de \textit{threads} são os seguintes modelos: N:1, onde várias \textit{threads} de usuários são mapeadas para uma \textit{thread} de núcleo, reduzindo a carga de gerência, visto que o núcleo enxerga tudo como uma única \textit{thread}. Temos também o modelo 1:1, onde cada \textit{thread} de  usuário gera uma de núcleo, tornando a distribuição do processamento entre \textit{threads} mais justa, porém é pouco escalável devido à grande carga de \textit{threads} de núcleo geradas em aplicações maiores. E por fim temos o modelo N:M, sendo uma abordagem híbrida entre os dois modelos citados anteriormente, onde N \textit{thread} de usuário são mapeadas para M \textit{threads} de núcleo (sendo M<N), esta abordagem, embora mais complexa, explora o melhor de cada um dos outros dois modelos~\cite{maziero2019}.
 
-Antes de 1995, cada sistema operacional criava sua própria interface para a programação de \textit{threads}. Mas no ano citado, foi estabelecido o padrão \textit{IEEE POSIX 1003.1c}, popularmente conhecido como \textit{POSIX Threads}, e abreviado ainda para \textit{PThreads}, este padrão determina uma interface para a utilização de \textit{threads} na linguagem C e ainda é amplamente suportado e disseminado atualmente~\cite{maziero2019}.
+Antes de 1995, cada sistema operacional criava sua própria interface para a programação de \textit{threads}. Mas no ano citado, foi estabelecido o padrão IEEE POSIX 1003.1c, popularmente conhecido como POSIX Threads, este padrão determina uma interface para a utilização de \textit{threads} na linguagem C e ainda é amplamente suportado e disseminado atualmente~\cite{maziero2019}.
 
 \section{Materiais e Equipamentos}
 \label{sec:materiais}
@@ -310,7 +310,7 @@ Nesta seção, apresentaremos os procedimentos utilizados para a manipulação d
 \subsection{Listagem de \textit{Threads}}
 \label{subsec:list_threads}
 
-No sistema GNU/Linux, é possível obter informações sobre o estado do sistema através da leitura de arquivos localizados em \texttt{/proc}~\cite{negus2012}. Na Figura~\ref{fig:total_tid}, apresentamos a leitura do arquivo \texttt{/proc/loadavg}, que fornece dados sobre a carga média de execução do sistema. Na quarta coluna, após o símbolo ``/'', verificamos que o sistema possui 115 \textit{threads} em execução.
+No sistema GNU/Linux, é possível obter informações sobre o estado do sistema através da leitura de arquivos localizados em \texttt{/proc}~\cite{negus2012}. Na Figura~\ref{fig:total_tid}, apresentamos a leitura do arquivo \texttt{/proc/loadavg}, que fornece dados sobre a carga média de execução do sistema, na quarta coluna, após o símbolo ``/'', verificamos que o sistema possui 115 \textit{threads} em execução.
 
 \begin{figure}[H]
   \centering
@@ -394,15 +394,13 @@ Para cada execução, foram medidos três tipos de tempo:
 
 Os resultados mostram que o tempo real permaneceu estável, em torno de 20 ms, independentemente do número de \textit{threads}. O tempo de sistema variou, com a execução em uma única \textit{thread} apresentando um tempo menor em relação às demais, enquanto nas execuções com múltiplas \textit{threads}, o tempo aumentou ligeiramente, atingindo valores entre 11 e 15 ms. Por outro lado, o tempo de usuário foi menor para a execução com 2 \textit{threads}, atingindo um tempo médio de 4 ms, em comparação com as execuções com 4 \textit{threads} ou mais, nas quais variou entre 13 e 20 ms.
 
-\section{Discussão dos Resultados}
-\label{sec:discussao}
-Os resultados mostram que o tempo real de execução se mantém estável em cerca de 20 ms, independentemente do número de \textit{threads}, o que indica uma limitação de escalabilidade para a aplicação testada. O tempo de sistema aumenta com a adição de mais \textit{threads}, refletindo a sobrecarga do núcleo na criação, destruição e sincronização dessas \textit{threads}, o que impacta negativamente o desempenho geral. O tempo de usuário é otimizado com duas \textit{threads}, alcançando uma média de 4 ms, mas eleva-se com quatro ou mais \textit{threads}, sugerindo que duas \textit{threads} oferecem o melhor equilíbrio entre paralelização e sobrecarga. Além disso, o aumento no número de \textit{threads} evidencia custos adicionais de comunicação e sincronização entre elas, tornando-se mais evidente em operações com cálculos paralelos que exigem troca frequente de dados. Esse comportamento indica que a escalabilidade é limitada para tarefas com baixa complexidade e alta dependência entre dados compartilhados, onde o aumento do número de \textit{threads} não gera ganhos de desempenho significativos.
-
 \section{Conclusões}
 \label{sec:conclusoes}
-Este estudo demonstra que o uso de \textit{threads} em um ambiente GNU/Linux pode melhorar o desempenho em operações paralelas, mas que essa melhoria depende fortemente do tipo de tarefa executada e da complexidade da aplicação. Em tarefas com pouca carga de dados ou que exigem sincronização frequente, o aumento no número de threads pode resultar em sobrecarga, reduzindo o benefício da paralelização.
+Este trabalho explorou o uso da biblioteca de \textit{threads} em um ambiente GNU/Linux. Um dos principais benefícios dessa abordagem é a sua simplicidade em comparação com o uso de processos, especialmente pela facilidade de compartilhamento do mesmo espaço de endereçamento, facilitando a divisão de carga de trabalho entre as \textit{threads}. No entanto, vale ressaltar que está simplicidade traz que um erro em uma \textit{thread} pode afetar todo o processo.
 
-Para maximizar o desempenho, é fundamental avaliar o custo-benefício do uso de múltiplas \textit{threads} em cada contexto específico. Aplicações mais complexas e que exigem alto processamento podem se beneficiar da criação de \textit{threads} adicionais, desde que haja um balanceamento cuidadoso entre o número de \textit{threads} e a capacidade de gerenciamento do sistema.
+A decisão de empregar exclusivamente \textit{threads} deve ser fundamentada na análise das necessidades específicas da aplicação, visando otimizar o desempenho e gerenciar os riscos associados. Como discutido na Subseção~\ref{subsec:time}, a criação de \textit{threads} para tarefas simples pode não resultar em ganhos significativos de desempenho.
+
+Este trabalho destaca a importância das \textit{threads} para o desenvolvimento de sistemas que demandam agilidade e eficiência, enfatizando a necessidade de uma análise cuidadosa na implementação.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS

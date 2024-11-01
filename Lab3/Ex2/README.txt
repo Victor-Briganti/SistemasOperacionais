@@ -6,6 +6,7 @@ Este programa tem como objetivo realizar uma execução paralela com threads do 
 
 As bibliotecas usadas neste programa foram:
 
+- fstream, desta biblioteca foi utilizado a classe ofstream para salvar os dados nos arquivos.
 - cmath, biblioteca usada para cálculos matemáticos. Deste biblioteca foram utilizados os seguinte:
   - nan() retorna que o o cálculo realizado foi um Not a Number(não é um número válido), como é o caso de uma divisão por zero.
   - pow() usada para calcular a potência de um número. math.h, usada para realizar o cálculo da quantidade de processos que podem ser criados no sistema.
@@ -26,14 +27,18 @@ make
 Para executar este basta realizar o seguinte:
 
 ```sh
+# Para realizar o cálculo da matriz
 ./main <input_file> <output_file> <num_threads>
+# Para criar a matriz
+./main <rows> <cols>
 ```
 
-Onde input_file é o arquivo de entrada(neste caso é a matriz), output_file é o arquivo de saída e por fim num_threads é a quantidade de threads que será criada para realizar o cálculo.
+No cálculo da matriz temos input_file como o arquivo de entrada, output_file o arquivo de saída e num_threads o número de threads que será criada.
+Já para a criação da matriz temos rows que define a quantidade de linhas e cols que define a quantidade de colunas, o arquivo gerado tem o nome de 'matrix.txt'.
 
 ## Testes
 
-Alguns testes realizados com este programa foram:
+Alguns testes realizados para o cálculo de matrizes com este programa foram:
 
 ```sh
 $ ./main data_matriz_100_200.in out 1
@@ -41,4 +46,12 @@ $ ./main data_matriz_100_200.in out 2
 $ ./main data_matriz_100_200.in out 4
 $ ./main data_matriz_100_200.in out 8
 $ ./main data_matriz_100_200.in out 16
+```
+
+Os testes realizados para a criação de matrizes foi:
+
+```sh
+$ ./main 100 200
+$ ./main 300 300
+$ ./main 10 5
 ```

@@ -12,7 +12,7 @@ debug:
 	g++ -o main -g $(FLAGS) $(THREADS) main.cpp 
 
 valgrind: debug
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./main data_matriz_100_200.in out 1
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./main 100 200 out 1
 
 clear:
 	rm -rf main
