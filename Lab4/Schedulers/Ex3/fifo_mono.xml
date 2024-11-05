@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <process_scheduler>
   <params>
-    <object management="PRI">
-      <multiprogramming>true</multiprogramming>
-      <preemptive>true</preemptive>
+    <object management="FCFS">
+      <multiprogramming>false</multiprogramming>
+      <preemptive>false</preemptive>
       <quantum>1</quantum>
     </object>
   </params>

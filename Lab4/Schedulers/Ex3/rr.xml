@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <process_scheduler>
   <params>
-    <object management="PRI">
+    <object management="RR">
       <multiprogramming>true</multiprogramming>
       <preemptive>true</preemptive>
-      <quantum>1</quantum>
+      <quantum>2</quantum>
     </object>
   </params>
   <ready_queue>
