@@ -388,6 +388,166 @@ A Figura~\ref{fig:table_prio_sem_preemp} mostra uma tabela com algumas informaç
 \subsection{Comparação Entre Algoritmos}
 \label{subsec:algoritmos}
 
+Para realizar a comparação entre os algoritmos foram usados 5 algoritmos diferentes, sendo eles~\cite{maziero2019}:
+
+\begin{itemize}
+  \item FCFS: Neste algoritmo o primeiro processo a chegar e o primeiro a ser atendido. Foi testado sua versão monoprogramada e multiprogamada.
+  \item SJF (\textit{Shortest Job First}): Algoritmo onde o primeiro processo com menos tempo de execução são sempre executados primeiro. Foi testado sua versão com e sem preempção.
+  \item Prioridade: Algoritmo de prioridade estático, onde o processo com maior prioridade na fila de aptos é escolhido para ser executado. Foi testado sua versão com e sem preempção.
+  \item \textit{Round-Robin}: Neste algoritmo cada processo recebe uma fatia do tempo de execução, também chamada de \textit{quantum}, ao final deste período o processo dá espaço para que outro execute.
+\end{itemize}
+
+A simulação foi realizada com 4 processos, a configuração de cada processo pode ser observada na Tabela~\ref{fig:fcfs-mono}.
+
+\begin{table}[H]
+\centering
+\caption{Informações de execução de cada processo}
+\label{tab:processos}
+\footnotesize
+\begin{tabular}{l|c|c|l}
+\toprule
+\textbf{Processo} & \textbf{Tempo de Submissão} & \textbf{Prioridade} & \textbf{\textit{Burst} (Duração e Tipo)} \\ 
+\midrule
+\textbf{P1} & 0  & 4 & 1 CPU + 1 E/S + 1 CPU + 1 E/S + 1 CPU \\
+\textbf{P2} & 0  & 2 & 3 CPU + 1 E/S + 3 CPU \\
+\textbf{P3} & 3  & 6 & 4 CPU + 4 E/S + 2 CPU \\
+\textbf{P4} & 6  & 3 & 4 CPU \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Execução FCFS Monoprogramado}
+\label{subsubsec:fcfs_mono}
+
+A Figura~\ref{fig:ex3/diagrama/fcfs_mono} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo FCFS no ambiente monoprogramado. A Figura~\ref{fig:ex3/tabela/fcfs_mono} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex3/diagrama/fcfs_mono.png}
+  \caption{Diagrama de Grant do algoritmo FCFS Monoprogramado.}
+  \label{fig:ex3/diagrama/fcfs_mono}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/tabela/fifo_mono.png}
+  \caption{Tabela com informações de execução do FCFS em um ambiente monoprogramado.}
+  \label{fig:ex3/tabela/fcfs_mono}
+\end{figure}
+
+\subsection{Execução FCFS Multiprogramado}
+\label{subsubsec:fcfs_multi}
+
+A Figura~\ref{fig:ex3/diagrama/fcfs_multi} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo FCFS em um ambiente multiprogramado. A Figura~\ref{fig:ex3/tabela/fcfs_multi} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex3/diagrama/fcfs_multi.png}
+  \caption{Diagrama de Grant do algoritmo FCFS em um ambiente multiprogramado.}
+  \label{fig:ex3/diagrama/fcfs_multi}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/tabela/fifo_multi.png}
+  \caption{Tabela com informações de execução do FCFS em um ambiente multiprogramado.}
+  \label{fig:ex3/tabela/fcfs_multi}
+\end{figure}
+
+\subsection{Execução Prioridade Estática Não Preemptiva}
+\label{subsubsec:prio_sem_preemp}
+
+A Figura~\ref{fig:ex3/diagrama/prio_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de Prioridade Estático Não Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_sem_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex3/diagrama/prio_sem_preemp.png}
+  \caption{Diagrama de Grant do algoritmo Prioridade Estático Não Preemptivo.}
+  \label{fig:ex3/diagrama/prio_sem_preemp}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/tabela/fifo_multi.png}
+  \caption{Tabela com informações de execução do algoritmo Prioridade Estático Não Preemptivo.}
+  \label{fig:ex3/tabela/prio_sem_preemp}
+\end{figure}
+
+\subsection{Execução Prioridade Estática Preemptiva}
+\label{subsubsec:prio_preemp}
+
+A Figura~\ref{fig:ex3/diagrama/prio_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de Prioridade Estático Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex3/diagrama/prio_sem_preemp.png}
+  \caption{Diagrama de Grant do algoritmo Prioridade Estático Preemptivo.}
+  \label{fig:ex3/diagrama/prio_preemp}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/tabela/fifo_multi.png}
+  \caption{Tabela com informações de execução do algoritmo Prioridade Estático Preemptivo.}
+  \label{fig:ex3/tabela/prio_preemp}
+\end{figure}
+
+\subsection{Execução SJF Não Preemptiva}
+\label{subsubsec:sjf_sem_preemp}
+
+A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de SJF Não Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex3/diagrama/sjf_sem_preemp.png}
+  \caption{Diagrama de Grant do algoritmo SJF Não Preemptivo.}
+  \label{fig:ex3/diagrama/sjf_sem_preemp}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/tabela/sjf_sem_preemp.png}
+  \caption{Tabela com informações de execução do algoritmo SJF Não Preemptivo.}
+  \label{fig:ex3/tabela/sjf_sem_preemp}
+\end{figure}
+
+\subsection{Execução SJF Preemptiva}
+\label{subsubsec:sjf_preemp}
+
+A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de SJF Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex3/diagrama/sjf_preemp.png}
+  \caption{Diagrama de Grant do algoritmo SJF Preemptivo.}
+  \label{fig:ex3/diagrama/sjf_sem_preemp}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/tabela/sjf_preemp.png}
+  \caption{Tabela com informações de execução do algoritmo SJF Preemptivo.}
+  \label{fig:ex3/tabela/sjf_preemp}
+\end{figure}
+
+\subsection{Execução \textit{Round-Robin} Preemptiva}
+\label{subsubsec:rr}
+
+A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de \textit{Round-Robin}. A Figura~\ref{fig:ex3/tabela/rr} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex3/diagrama/rr.png}
+  \caption{Diagrama de Grant do algoritmo \textit{Round-Robin}.}
+  \label{fig:ex3/diagrama/rr}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/tabela/round_robin.png}
+  \caption{Tabela com informações de execução do algoritmo \textit{Round-Robin}.}
+  \label{fig:ex3/tabela/rr}
+\end{figure}
 
 \section{Discussão dos Resultados}
 \label{sec:discussao}
@@ -416,41 +576,5 @@ FAZER
 \prebibhook}
 
 \bibliography{abntex2-modelo-references}
-
-
-
-% ----------------------------------------------------------
-% Apêndices
-% ----------------------------------------------------------
-
-% ---
-% Inicia os apêndices
-% ---
-\begin{apendicesenv}
-
-% ----------------------------------------------------------
-\section*{Apêndice A - Nome do Apêndice}
-\addcontentsline{toc}{section}{Apêndice A - Nome do Apêndice}
-% ----------------------------------------------------------
-
-\end{apendicesenv}
-% ---
-
-
-% ----------------------------------------------------------
-% Anexos
-% ----------------------------------------------------------
-
-% ---
-% Inicia os anexos
-% ---
-\begin{anexosenv}
-
-% ---
-\section*{Anexo A - Nome do Anexo}
-\addcontentsline{toc}{section}{Anexo A - Nome do Anexo}
-% ---
-\end{anexosenv}
-
 
 \end{document}
