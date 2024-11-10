@@ -213,11 +213,11 @@
 
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
-FAZER
+Este trabalho visa explorar os conceitos fundamentais sobre escalonamento de processos a partir da compreensão, simulação e análise de diferentes algoritmos de escalonamento. Para realizar esta prática, os diferentes algoritmos de escalonamento foram testados com o simulador OS Sim para a análise de tempos e métricas de execução, permitindo avaliar o impacto de diferentes estratégias no escalonamento de processos. 
  \vspace{\onelineskip}
     
  \noindent
- \textbf{Palavras-chave}: ESCOLHER.
+ \textbf{Palavras-chave}: Processos; Escalonamento; Sistema Operacional.
 \end{resumo}
 % ---
 
@@ -266,12 +266,19 @@ FAZER
 
 \section{Introdução}
 \label{sec:introducao}
+Com a grande quantidade de processos executados em um computador, é válida a preocupação com a gerência do processador, ou seja, com o gerenciamento dos processos que estão sendo realizado pelo processador durante seu tempo de uso. Este gerenciamento é chamado escalonamento de processos, e é extremamente importante em sistemas operacionais multiprogramados, onde diversas aplicações disputam pelo uso do processador ao mesmo tempo. Sempre que mais de um processo estão no estado de pronto, o sistema operacional deve realizar uma escolha sobre o processo que assumirá o processador a seguir. Esta escolha pode ser realizada de diferentes formas, e os algoritmos implementados para isso são chamados algoritmos de escalonamento~\cite{tanenbaum2016}.
 
 \section{Objetivos}
 \label{sec:objetivos}
+Os objetivos deste trabalho são compreender diferentes algoritmos básicos de escalonamento com o auxílio de um simulador, e analisar o comportamento e desempenho dos diferentes algoritmos de escalonamento.
 
 \section{Fundamentação}
 \label{sec:fundamentacao}
+Para compreender o escalonamento de processos, é necessário compreender que processos possuem duas naturezas distintas que definem seu comportamento, existem processos que passam a maior parte do tempo dependendo do processador para sua execução, estes são chamados de processos orientados a processador (\textit{CPU Bound}), e, por outro lado, existem processos que dependem mais de entradas e saídas, dependendo menos do processador, estes são os processos orientados a Entrada/Saída (\textit{I/O Bound})~\cite{tanenbaum2016}.
+
+Outro conceito importante a levar-se em consideração é o conceito de sistemas preemptivos e cooperativos. Sistemas cooperativos são mais simples de controlar, pois cada tarefa que assumir o processador, irá permanecer em execução até o seu término, para que, apenas após ser terminada, outro processo assuma o processador. Em sistemas preemptivos, cada processo que assume o processador corre o risco de ser suspenso de sua execução em algumas situações a variar conforme o algoritmo de escalonamento utilizado, isso pode acontecer quando o processo possui um \textit{quantum} de tempo no processador e seu tempo chega ao fim ou quando um processo que possui uma prioridade maior está no estado de pronto e devido a sua prioridade, assumirá o processador~\cite{maziero2019}.
+
+Os algoritmos de escalonamento utilizam um critério para definir qual processo deve assumir o processador, além de levar em consideração a possível existência de mais de um núcleo de processamento, o que garante a execução simultânea de mais de um processo. A seção 5 detalha e realiza medições sobre diferentes algoritmos de escalonamento.
 
 \section{Materiais}
 \label{sec:materiais}
@@ -281,17 +288,40 @@ Simulador OS Sim na versão 1.2.
 \section{Procedimentos e Resultados}
 \label{sec:procedimentos}
 
-O simulador OS Sim foi utilizado para analisar tempos e métricas de execução, avaliando o impacto de diferentes estratégias no escalonamento de processos. Esse estudo permitiu observar como cada algoritmo lida com a distribuição de tarefas, afetando a eficiência e o desempenho do sistema.
+O simulador OS Sim foi utilizado para analisar tempos de execução e outras métricas, avaliando o impacto de diferentes estratégias de escalonamento de processos. Esse estudo permitiu observar como cada algoritmo distribui as tarefas, influenciando a eficiência e o desempenho do sistema. Vale destacar que alguns valores fornecidos pelo simulador, especialmente os relacionados à porcentagem de uso da CPU, apresentaram inconsistências. Por essa razão, alguns desses dados precisaram ser recalculados.
 
 \subsection{FCFS (\textit{First-Come, First-Served})}
 \label{subsec:fcfs}
 
-O primeiro algoritmo analisado foi o FCFS, um dos algoritmos de escalonamento mais simples, ele funciona da seguinte maneira o processo a chegar e o primeiro a ser atendido, o segundo a chegar e o segundo a ser atendido, o terceiro a chegar e o terceiro a ser atendido e assim sucessivamente~\cite{maziero2019}. 
+O primeiro algoritmo analisado foi o FCFS, um dos algoritmos de escalonamento mais simples, ele funciona da seguinte maneira o processo a chegar ao estado de pronto é o primeiro a ser atendido, o segundo a chegar é o segundo a ser atendido, o terceiro a chegar é o terceiro a ser atendido e assim sucessivamente~\cite{maziero2019}. 
+
+\subsubsection{FCFS \textit{First-Come, First-Served} Monoprogramação}
+\label{subsubsec:mono_fcfs}
+
+A primeira versão simulada deste algoritmo se deu em um ambiente de monoprogramação, na prática, isso significa que apenas um programa pode estar na memória e executando na CPU ao mesmo tempo, dessa forma processos que realizam chamadas de E/S (Entrada/Saída) não podem ser colocados em estado de bloqueado, pois não há como trazer outro processo a memória para executar de maneira concorrente ao processo em execução. Desse modo, neste ambiente o programa que entrar em execução assumirá o processador até o final, mesmo que entre em estado de bloqueado~\cite{tanenbaum2016}.
+
+A Figura~\ref{fig:fcfs_mono} apresenta o diagrama de Grant com o período de execução de cada processo. Os períodos em azul simbolizam a execução na CPU enquanto os amarelos são períodos de execução de E/S.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.20]{figuras/ex1/fcfs_mono.png}
+  \caption{Diagrama de Grant do algoritmo FCFS em um ambiente monoprogramado.}
+  \label{fig:fcfs_mono}
+\end{figure}
+
+A Figura~\ref{fig:table_fcfs_mono} apresenta uma tabela com informações de execução deste algoritmo. O tempo de criação do processo e o seu tempo de execução aumentaram conforme a posição do processo na fila, o fato de alguns processos não estarem utilizando a CPU em  alguns momentos e mesmo assim consumindo seu tempo, acaba degradando bastante a execução dos processos de maneira geral.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex1/table_fcfs_mono.png}
+  \caption{Tabela com informações de execução do FCFS em um ambiente de monoprogramação.}
+  \label{fig:table_fcfs_mono}
+\end{figure}
 
 \subsubsection{FCFS \textit{First-Come, First-Served} Multiprogramação}
 \label{subsubsec:multi_fcfs}
 
-Nesta segunda versão o algoritmo está em maneira multiprogramada, o que significa que mais de um programa pode estar na memória, o que vai permitir uma execução concorrente entre os processos. Desse modo, processos que realizam chamadas de E/S podem ser colocados no estado de bloqueado e passarem sua vez para que outro processo faça uso da CPU. Neste caso, processos que perdem sua vez na CPU, são colocados ao final da fila. 
+Nesta segunda versão o algoritmo está em maneira multiprogramada, o que significa que mais de um programa pode estar na memória, o que vai permitir uma execução concorrente entre os processos. Desse modo, processos que realizam chamadas de E/S podem ser colocados no estado de bloqueado e passam sua vez para que outro processo faça uso da CPU. Neste caso, processos que perdem sua vez na CPU, são colocados ao final da fila. 
 
 A Figura~\ref{fig:fcfs_multi} apresenta o diagrama de Grant que ilustra os períodos de execução de cada processo.
 
@@ -302,12 +332,12 @@ A Figura~\ref{fig:fcfs_multi} apresenta o diagrama de Grant que ilustra os perí
   \label{fig:fcfs_multi}
 \end{figure}
 
-A Figura~\ref{fig:table_fcfs_multi} apresenta uma tabela com informações de execução deste algoritmo. É possível perceber que este algoritmo, diferente de sua versão monoprogramada, faz um uso mais eficiente da CPU, pois em nenhum momento ela fica parada, porém, nesta versão do algoritmo processos que realizam E/S acabam sendo penalizados sendo colocados no final da fila.
+A Figura~\ref{fig:table_fcfs_mono} apresenta uma tabela com informações de execução deste algoritmo. É possível perceber que este algoritmo, diferente da versão anterior~\ref{subsubsec:mono_fcfs}, faz um uso mais eficiente da CPU, pois em nenhum momento ela fica ociosa, porém, nesta versão do algoritmo processos que realizam E/S acabam sendo penalizados, pois são colocados ao final da fila.
 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{figuras/ex1/table_fcfs_multi.png}
-  \caption{Tabela com informações de execução do algoritmo FCFS em um ambiente multiprogramado.}
+  \caption{Tabela com informações de execução do algoritmo FCFS em um ambiente de multiprogramação.}
   \label{fig:table_fcfs_multi}
 \end{figure}
 
@@ -319,7 +349,7 @@ O segundo algoritmo analisado foi o de prioridades, existem diferentes formas de
 \subsubsection{Prioridade Estática Não Preemptiva}
 \label{subsubsec:prio_sem_preemp}
 
-A preempção dentro de Sistemas Operacionais, está relacionada a retirar um processo que está atualmente executando da CPU para dar espaço para que outro processo execute. Quando está se falando de um algoritmo de prioridade não preemptivo, isso significa que a partir do momento que um processo começou a executar, ele não será retirado de lá, ao menos que ele realize uma operação de E/S ou ele finalize sua execução, seja ela uma finalização normal ou devido a um erro~\cite{maziero2019}.
+A preempção dentro de Sistemas Operacionais, está relacionada a retirar um processo que está atualmente executando da CPU para dar espaço para que outro processo execute. Quando se trata de um algoritmo de prioridade não preemptivo, isso significa que a partir do momento que um processo começou a ser executado, ele não perderá o controle da CPU, a menos que ele realize uma operação de E/S ou finalize sua execução, seja ela uma finalização normal ou devido a um erro~\cite{maziero2019}.
 
 Neste algoritmo de prioridade estática não preemptiva, o que ocorre é que o escalonador ao se deparar com dois processos na fila de aptos, irá escolher aquele com maior prioridade. A Figura~\ref{fig:prio_sem_preemp} apresenta um diagrama de Grant que ilustra a execução deste algoritmo.
 
@@ -330,7 +360,7 @@ Neste algoritmo de prioridade estática não preemptiva, o que ocorre é que o e
   \label{fig:prio_sem_preemp}
 \end{figure}
 
-A Figura~\ref{fig:table_prio_sem_preemp} mostra uma tabela com algumas informações relacionadas a execução deste algoritmo. É possível perceber que está execução não teve 100\% eficiência, ficando abaixo do quer foi observado no algoritmo de FCFS Multiprogramada~\ref{subsubsec:multi_fcfs}, e de maneira geral a maneira como os processos foram selecionados se assemelha bastante a este algoritmo. Um dos grandes problemas dessa falta de preempção que pode ser observado é que processos mais prioritários por vezes precisam esperar processos menos prioritários terminarem sua execução, o que acaba sendo problemático se considerarmos que a proposta do algoritmo é o de processos mais prioritários primeiro e terminem antes.
+A Figura~\ref{fig:table_prio_sem_preemp} mostra uma tabela com algumas informações relacionadas a execução deste algoritmo. É possível perceber que está execução não atingiu 100\% de eficiência. Um dos grandes problemas observado dessa falta de preempção é que processos mais prioritários, em dados momentos, precisam esperar processos menos prioritários terminarem sua execução, o que se torna problemático se considerarmos que a proposta do algoritmo é que processos mais prioritários sejam atendidos primeiro.
 
 \begin{figure}[H]
   \centering
@@ -342,7 +372,7 @@ A Figura~\ref{fig:table_prio_sem_preemp} mostra uma tabela com algumas informaç
 \subsubsection{Prioridade Estática Preemptiva}
 \label{subsubsec:prio_preemp}
 
-Nesta versão do algoritmo temos o processo de preempção, isso significa que assim que um processo mais prioritário do que o que está sendo executado atualmente estiver apto, temos que o processo executando será removido da CPU e dará espaço para que este processo mais prioritário passe a executar. Isto ocorre até que um processo mais prioritário chegue na fila de aptos, ou que o processo executando finalize dando lugar a um processo menos prioritário.
+Nesta versão do algoritmo temos o processo de preempção, onde um processo em andamento dá lugar a outro processo de maior prioridade executar. Sempre que um processo de maior prioridade do que o que está atualmente executando chegar na fila de aptos, uma preempção ocorre.
 
  A Figura~\ref{fig:prio_preemp} apresenta um diagrama de Grant que ilustra a execução deste algoritmo.
 
@@ -353,7 +383,7 @@ Nesta versão do algoritmo temos o processo de preempção, isso significa que a
   \label{fig:prio_preemp}
 \end{figure}
 
-A Figura~\ref{fig:table_prio_sem_preemp} mostra uma tabela com algumas informações relacionadas a execução deste algoritmo. Uma das características deste algoritmo está no fato de que o tempo de resposta customa ser menor, desde que o processo a ser executado seja o mais prioritário, na prática, isso significa que assim que um processo mais prioritário chegar na fila de aptos ele já será colocado em execução, o que diminui o tempo de resposta médio dos processos se comparado com sua versão não preemptiva. Uma das desvantagens deste algoritmo está no fato de que, se a todo instante chegar um processo que seja mais prioritário do que os já criados, ele será executado e os outros ficaram em espera, o que pode resultar em inanição.
+A Figura~\ref{fig:table_prio_sem_preemp} apresenta uma tabela com informações sobre a execução desse algoritmo. Uma de suas vantagens é o menor tempo de resposta, pois um processo de alta prioridade é imediatamente colocado em execução assim que chega à fila de aptos. Isso reduz o tempo de resposta médio em comparação com a versão não preemptiva do algoritmo. No entanto, essa abordagem pode causar inanição: se processos mais prioritários continuarem chegando, eles sempre terão preferência, deixando processos de menor prioridade em espera por tempo indeterminado.
 
 \begin{figure}[H]
   \centering
@@ -368,18 +398,18 @@ A Figura~\ref{fig:table_prio_sem_preemp} mostra uma tabela com algumas informaç
 Para realizar a comparação entre os algoritmos foram usados 5 algoritmos diferentes, sendo eles~\cite{maziero2019}:
 
 \begin{itemize}
-  \item FCFS: Neste algoritmo o primeiro processo a chegar e o primeiro a ser atendido. Foi testado sua versão monoprogramada e multiprogamada.
-  \item SJF (\textit{Shortest Job First}): Algoritmo onde o primeiro processo com menos tempo de execução são sempre executados primeiro. Foi testado sua versão com e sem preempção.
+  \item FCFS: Neste algoritmo o primeiro processo a chegar e o primeiro a ser atendido.
+  \item SJF (\textit{Shortest Job First}): Algoritmo onde os processos com menos tempo de execução são executados primeiro. Foi testado sua versão com e sem preempção.
   \item Prioridade: Algoritmo de prioridade estático, onde o processo com maior prioridade na fila de aptos é escolhido para ser executado. Foi testado sua versão com e sem preempção.
   \item \textit{Round-Robin}: Neste algoritmo cada processo recebe uma fatia do tempo de execução, também chamada de \textit{quantum}, ao final deste período o processo dá espaço para que outro execute.
 \end{itemize}
 
-A simulação foi realizada com 4 processos, a configuração de cada processo pode ser observada na Tabela~\ref{tab:processos}.
+A simulação foi realizada com 4 processos, a configuração de cada processo pode ser observada na Tabela~\ref{table:processos}.
 
 \begin{table}[H]
 \centering
 \caption{Informações de execução de cada processo}
-\label{tab:processos}
+\label{table:processos}
 \footnotesize
 \begin{tabular}{l|c|c|l}
 \toprule
@@ -396,7 +426,7 @@ A simulação foi realizada com 4 processos, a configuração de cada processo p
 \subsubsection{Execução FCFS Multiprogramado}
 \label{subsubsec:fcfs_multi}
 
-A Figura~\ref{fig:ex3/diagrama/fcfs_multi} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo FCFS em um ambiente multiprogramado. A Figura~\ref{fig:ex3/tabela/fcfs_multi} apresenta uma tabela com informações detalhadas sobre a execução dos processos. Neste algoritmo de escalonamento 
+A Figura~\ref{fig:ex3/diagrama/fcfs_multi} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo FCFS. A Figura~\ref{fig:ex3/tabela/fcfs_multi} apresenta uma tabela com informações detalhadas sobre a execução dos processos. Os problemas que encontramos neste algoritmo são os mesmos já citados na seção~\ref{subsubsec:fcfs_multi}.
 
 \begin{figure}[H]
   \centering
@@ -412,10 +442,11 @@ A Figura~\ref{fig:ex3/diagrama/fcfs_multi} apresenta um diagrama de Grant que ex
   \label{fig:ex3/tabela/fcfs_multi}
 \end{figure}
 
+
 \subsubsection{Execução Prioridade Estática Não Preemptiva}
 \label{subsubsec:prio_sem_preemp}
 
-A Figura~\ref{fig:ex3/diagrama/prio_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de Prioridade Estático Não Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_sem_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+A Figura~\ref{fig:ex3/diagrama/prio_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de Prioridade Estático Não Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_sem_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos. 
 
 \begin{figure}[H]
   \centering
@@ -434,7 +465,7 @@ A Figura~\ref{fig:ex3/diagrama/prio_sem_preemp} apresenta um diagrama de Grant q
 \subsubsection{Execução Prioridade Estática Preemptiva}
 \label{subsubsec:prio_preemp}
 
-A Figura~\ref{fig:ex3/diagrama/prio_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de Prioridade Estático Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+A Figura~\ref{fig:ex3/diagrama/prio_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de Prioridade Estático Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos. 
 
 \begin{figure}[H]
   \centering
@@ -453,7 +484,7 @@ A Figura~\ref{fig:ex3/diagrama/prio_preemp} apresenta um diagrama de Grant que e
 \subsubsection{Execução SJF Não Preemptiva}
 \label{subsubsec:sjf_sem_preemp}
 
-A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de SJF Não Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de SJF Não Preemptivo. A Figura~\ref{fig:ex3/tabela/prio_preemp} apresenta uma tabela com informações detalhadas sobre a execução dos processos. 
 
 \begin{figure}[H]
   \centering
@@ -491,7 +522,7 @@ A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant qu
 \subsubsection{Execução \textit{Round-Robin} Preemptiva}
 \label{subsubsec:rr}
 
-A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de \textit{Round-Robin}. A Figura~\ref{fig:ex3/tabela/rr} apresenta uma tabela com informações detalhadas sobre a execução dos processos.
+A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant que exemplifica a execução dos processos pelo algoritmo de \textit{Round-Robin}. A Figura~\ref{fig:ex3/tabela/rr} apresenta uma tabela com informações detalhadas sobre a execução dos processos. 
 
 \begin{figure}[H]
   \centering
@@ -507,15 +538,29 @@ A Figura~\ref{fig:ex3/diagrama/sjf_sem_preemp} apresenta um diagrama de Grant qu
   \label{fig:ex3/tabela/rr}
 \end{figure}
 
-\section{Discussão dos Resultados}
-\label{sec:discussao}
+\subsubsection{Gráfico de Comparação}
+\label{subsubsec:grafico}
 
-FAZER
+A Figura~\ref{fig:media_tempo} apresenta um gráfico comparando os tempos médios de execução de cada algoritmo.
+
+Os algoritmos de prioridade, tanto na versão preemptiva quanto na não preemptiva, apresentaram bons resultados em termos de tempo médio de resposta. Isso ocorreu porque processos de maior prioridade foram atendidos imediatamente após serem inseridos na fila. No entanto, se processos de menor prioridade forem adicionados posteriormente, seus tempos de resposta podem aumentar, pois serão preteridos em favor dos mais prioritários. Após os algoritmos de prioridade, o \textit{Round-Robin} obteve o segundo melhor tempo médio de resposta, o que era esperado devido à sua distribuição equitativa do tempo de execução por \textit{quantum}. Por fim, o algoritmo FCFS, que executa os processos na ordem de chegada, teve o pior desempenho, como esperado, já que ele executa os processos até o final, o que pode atrasar o tempo de resposta.
+
+Quanto ao tempo médio de espera, o algoritmo SJF se destacou, pois prioriza processos mais curtos, permitindo que a fila avance mais rapidamente e reduzindo o tempo médio de espera. Em contraste, o FCFS apresentou a maior média de tempo de espera entre os algoritmos avaliados.
+
+No que se refere ao tempo médio de \textit{turnaround}, não houve grandes variações, embora o SJF tenha mostrado um desempenho ligeiramente superior por priorizar processos que requerem menos tempo de CPU, acelerando sua execução.
+
+De forma geral, os algoritmos SJF mantiveram um desempenho consistente, permanecendo próximos à média nas métricas de tempo. A escolha do algoritmo ideal depende das necessidades específicas da aplicação, levando em consideração as vantagens de cada abordagem no contexto de prioridades e requisitos de tempo.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{figuras/ex3/grafico/media_tempo.png}
+  \caption{Gráfico de comparação dos tempos médios de todos algoritmos.}
+  \label{fig:media_tempo}
+\end{figure}
 
 \section{Conclusões}
 \label{sec:conclusoes}
-
-FAZER
+A análise e simulação de diferentes algoritmos de escalonamento de processos permitiram observar de que forma cada abordagem afeta o desempenho e a eficiência do sistema operacional. Cada algoritmo apresenta vantagens e desvantagens específicas, especialmente no que diz respeito a questões como tempo de resposta, utilização da CPU e eficiência. A comparação entre essas abordagens proporcionou uma visão detalhada de seus efeitos no desempenho global, auxiliando na escolha do algoritmo mais adequado conforme as necessidades específicas do sistema e das aplicações em execução.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
