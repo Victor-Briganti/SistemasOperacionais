@@ -10,13 +10,20 @@
 #include "shell/shell.hpp"
 #include "shell/color.hpp"
 
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
+#include <string>
 
 #define is_end(c) ((c) == ' ' || (c) == '\0')
 
-#define path_error(name)                               \
-  std::cout << "[" << RED("ERROR") << "]: '" << (name) \
-            << "' precisa de um caminho valido" << "\n"
+#define arg_empty(name)                                                       \
+  std::cout << "[" << RED("ERROR") << "]: '" << (name) << "' argumento vazio" \
+            << "\n"
+
+#define arg_invalid(name, arg)                                            \
+  std::cout << "[" << RED("ERROR") << "]: '" << (name) << "' argumento '" \
+            << (arg) << "' inválido" << "\n"
 
 //===----------------------------------------------------------------------===//
 // PRIVATE
@@ -41,6 +48,12 @@ bool Shell::cd(const std::vector<std::string> &path)
     std::cout << "/" << str;
   }
   std::cout << "\n";
+  return true;
+}
+
+bool Shell::cluster(uint64_t num)
+{
+  std::cout << "cluster " << num << "\n";
   return true;
 }
 
@@ -210,31 +223,40 @@ bool Shell::execution(const Shell::Command command,
   const std::string arguments = input.substr(pos, input.length());
   std::vector<std::string> path;
   switch (command) {
-  case ATTR:
-    path = parse_path(arguments);
+  case ATTR: {
+    std::vector<std::string> path = parse_path(arguments);
     if (path.empty()) {
-      path_error("attr");
+      arg_empty("attr");
       return false;
     }
 
     return Shell::attr(path);
-  case CD:
-    path = parse_path(arguments);
+  }
+  case CD: {
+    std::vector<std::string> path = parse_path(arguments);
     if (path.empty()) {
-      path_error("cd");
+      arg_empty("cd");
       return false;
     }
 
     return Shell::cd(path);
-  case CLUSTER:
-    path = parse_path(arguments);
-    if (path.empty()) {
-      std::cout << "[" << RED("ERROR")
-                << "]: 'cluster' precisa de um caminho valido" << "\n";
-      break;
+  }
+  case CLUSTER: {
+    if (arguments.empty()) {
+      arg_empty("cluster");
+      return false;
     }
-    std::cout << "CLUSTER\n";
-    return true;
+
+    uint64_t num = 0;
+    try {
+      num = std::stoul(arguments);
+    } catch (...) {
+      arg_invalid("cluster", arguments);
+      return false;
+    }
+
+    return cluster(num);
+  }
   case CP:
     path = parse_path(arguments);
     if (path.empty()) {
@@ -314,7 +336,7 @@ bool Shell::execution(const Shell::Command command,
     std::cout << "TOUCH\n";
     return true;
   case UNKNOW:
-    std::cout << "[" << RED("UNKNOW") << "] :" << input << "\n";
+    std::cout << "[" << YELLOW("UNKNOW") << "] :" << input << "\n";
     break;
   }
   return false;

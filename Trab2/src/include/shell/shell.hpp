@@ -11,6 +11,7 @@
 #define SHELL_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -72,6 +73,15 @@ class Shell
    * @return true se a execução ocorreu, false caso contrário.
    */
   static bool cd(const std::vector<std::string> &path);
+
+  /*
+   * @brief Exibe o conteudo de um bloco no formato texto
+   *
+   * @param num Número do bloco que queremos ler
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool cluster(uint64_t num);
 
   /*
    * @brief Executa o comando especificado pelo usuário
