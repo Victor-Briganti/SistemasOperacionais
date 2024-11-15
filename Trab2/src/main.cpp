@@ -7,8 +7,8 @@
  * Data: 15/11/2024
  */
 
-#include "shell/color.hpp"
 #include "shell/shell.hpp"
+#include "utils/color.hpp"
 #include <fstream>
 #include <iostream>
 

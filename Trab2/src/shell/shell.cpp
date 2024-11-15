@@ -8,7 +8,7 @@
  */
 
 #include "shell/shell.hpp"
-#include "shell/color.hpp"
+#include "utils/color.hpp"
 
 #include <cstddef>
 #include <cstdint>
