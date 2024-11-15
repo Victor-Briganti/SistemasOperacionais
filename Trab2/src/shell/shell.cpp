@@ -18,10 +18,6 @@
 
 #define is_end(c) ((c) == ' ' || (c) == '\0')
 
-#define arg_empty(name)                                                       \
-  std::cout << "[" << RED("ERROR") << "]: '" << (name) << "' argumento vazio" \
-            << "\n"
-
 #define arg_invalid(name, arg)                                            \
   std::cout << "[" << RED("ERROR") << "]: '" << (name) << "' argumento '" \
             << (arg) << "' inválido" << "\n"
@@ -298,15 +294,6 @@ path_fs Shell::parse_path(const std::string &input, size_t &pos)
       break;
     }
 
-    // A posição inicial deve ser começar com um '/'
-    if (pos == 0 && input[0] != '/') {
-      break;
-    } else if (pos == 0) {
-      pos++;
-      slash = true;
-      continue;
-    }
-
     // Se eu encontrar um / seguido de outro / houve um erro.
     // Caso contrário se uma / foi encontrada salva o caminho atual e continua.
     if (slash && input[pos] == '/') {
@@ -349,7 +336,7 @@ bool Shell::execution(const Shell::Command command,
   case ATTR: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      arg_empty("attr");
+      arg_invalid("attr", arguments);
       return false;
     }
 
@@ -358,7 +345,7 @@ bool Shell::execution(const Shell::Command command,
   case CD: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      arg_empty("cd");
+      arg_invalid("cd", arguments);
       return false;
     }
 
@@ -366,7 +353,7 @@ bool Shell::execution(const Shell::Command command,
   }
   case CLUSTER: {
     if (arguments.empty()) {
-      arg_empty("cluster");
+      arg_invalid("cluster", arguments);
       return false;
     }
 
@@ -408,7 +395,7 @@ bool Shell::execution(const Shell::Command command,
   case MKDIR: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      arg_empty("mkdir");
+      arg_invalid("mkdir", arguments);
       return false;
     }
 
@@ -445,7 +432,7 @@ bool Shell::execution(const Shell::Command command,
   case RM: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      arg_empty("rm");
+      arg_invalid("rm", arguments);
       return false;
     }
 
@@ -454,7 +441,7 @@ bool Shell::execution(const Shell::Command command,
   case RMDIR: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      arg_empty("rmdir");
+      arg_invalid("rmdir", arguments);
       return false;
     }
 
@@ -463,7 +450,7 @@ bool Shell::execution(const Shell::Command command,
   case TOUCH: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      arg_empty("touch");
+      arg_invalid("touch", arguments);
       return false;
     }
 
