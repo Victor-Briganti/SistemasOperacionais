@@ -14,9 +14,24 @@
 
 #define is_end(c) ((c) == ' ' || (c) == '\0')
 
+#define path_error(name)                               \
+  std::cout << "[" << RED("ERROR") << "]: '" << (name) \
+            << "' precisa de um caminho valido" << "\n"
+
 //===----------------------------------------------------------------------===//
 // PRIVATE
 //===----------------------------------------------------------------------===//
+
+bool Shell::attr(const std::vector<std::string> &path)
+{
+  std::cout << "attr ";
+
+  for (const auto &str : path) {
+    std::cout << "/" << str;
+  }
+  std::cout << "\n";
+  return true;
+}
 
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
@@ -133,7 +148,9 @@ std::vector<std::string> Shell::parse_path(const std::string &input)
   while (true) {
     // Se a posição for maior do que a string chegamos no fim
     if (input.size() < pos) {
-      if (!curPath.empty()) { fullPath.push_back(curPath); }
+      if (!curPath.empty()) {
+        fullPath.push_back(curPath);
+      }
 
       break;
     }
@@ -155,7 +172,9 @@ std::vector<std::string> Shell::parse_path(const std::string &input)
     } else if (!slash && input[pos] == '/') {
       slash = true;
       pos++;
-      if (curPath.length() > 0) { fullPath.push_back(curPath); }
+      if (curPath.length() > 0) {
+        fullPath.push_back(curPath);
+      }
       curPath.clear();
       continue;
     }
@@ -183,12 +202,11 @@ bool Shell::execution(const Shell::Command command,
   case ATTR:
     path = parse_path(arguments);
     if (path.empty()) {
-      std::cout << "[" << RED("ERROR")
-                << "]: 'attr' precisa de um caminho valido" << "\n";
-      break;
+      path_error("attr");
+      return false;
     }
-    std::cout << "ATTR\n";
-    return true;
+
+    return Shell::attr(path);
   case CD:
     path = parse_path(arguments);
     if (path.empty()) {
@@ -310,7 +328,7 @@ void Shell::interpreter()
     }
 
     size_t pos = 0;
-    Shell::Command command = this->parse_command(input, pos);
-    this->execution(command, input, pos);
+    Shell::Command command = Shell::parse_command(input, pos);
+    Shell::execution(command, input, pos);
   }
 }

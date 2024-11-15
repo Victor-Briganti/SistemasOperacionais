@@ -56,6 +56,15 @@ class Shell
   static std::vector<std::string> parse_path(const std::string &input);
 
   /*
+   * @brief Extrai os atributos de um arquivo/diretório e imprime na tela
+   *
+   * @param path Caminho para o diretório ou arquivo
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool attr(const std::vector<std::string> &path);
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado
@@ -71,7 +80,7 @@ public:
   /*
    * @brief Interface publica para iniciar o shell
    */
-  void interpreter();
+  static void interpreter();
 };
 
 #endif// SHELL_HPP
