@@ -7,6 +7,8 @@
  * Data: 15/11/2024
  */
 
+#include "shell/color.hpp"
+#include "shell/shell.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -19,10 +21,14 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  Shell shell;
+  shell.interpreter();
+
   std::fstream image(argv[1], std::ios::in | std::ios::out | std::ios::binary);
 
   if (!image.is_open()) {
-    std::cout << "Falha ao ler o arquivo: '" << argv[1] << "'.\n";
+    std::cout << RED("ERRO") << ": Falha ao ler o arquivo '" << argv[1]
+              << "'.\n";
     return -1;
   }
 }
