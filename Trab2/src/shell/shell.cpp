@@ -88,6 +88,17 @@ bool Shell::ls()
   return true;
 }
 
+bool Shell::mkdir(const path_fs &path)
+{
+  std::cout << "mkdir ";
+
+  for (const auto &str : path) {
+    std::cout << "/" << str;
+  }
+  std::cout << "\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -320,12 +331,11 @@ bool Shell::execution(const Shell::Command command,
   case MKDIR: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      std::cout << "[" << RED("ERROR")
-                << "]: 'mkdir' precisa de um caminho valido" << "\n";
-      break;
+      arg_empty("mkdir");
+      return false;
     }
-    std::cout << "MKDIR\n";
-    return true;
+
+    return Shell::mkdir(path);
   }
   case MV: {
     path_fs path = parse_path(arguments, posSubstr);
