@@ -99,6 +99,16 @@ class Shell
   static bool mkdir(const path_fs &path);
 
   /*
+   * @brief Move um arquivo ou diretório para outro diretório
+   *
+   * @param src Caminho de origem
+   * @param dest Caminho de destino
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool mv(const path_fs &src, const path_fs &dest);
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado

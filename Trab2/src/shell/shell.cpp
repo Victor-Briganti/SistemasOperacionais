@@ -99,6 +99,25 @@ bool Shell::mkdir(const path_fs &path)
   return true;
 }
 
+
+bool Shell::mv(const path_fs &src, const path_fs &dest)
+{
+  std::cout << "mv ";
+
+  for (const auto &str : src) {
+    std::cout << "/" << str;
+  }
+
+  std::cout << " ";
+
+  for (const auto &str : dest) {
+    std::cout << "/" << str;
+  }
+
+  std::cout << "\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -338,14 +357,14 @@ bool Shell::execution(const Shell::Command command,
     return Shell::mkdir(path);
   }
   case MV: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      std::cout << "[" << RED("ERROR") << "]: 'mv' precisa de um caminho valido"
-                << "\n";
-      break;
+    path_fs src = parse_path(arguments, posSubstr);
+    path_fs dest = parse_path(arguments, posSubstr);
+    if (src.empty() || dest.empty()) {
+      arg_invalid("mv", arguments);
+      return false;
     }
-    std::cout << "MV\n";
-    return true;
+
+    return mv(src, dest);
   }
   case PWD: {
     std::cout << "PWD\n";
