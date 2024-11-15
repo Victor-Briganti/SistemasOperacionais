@@ -55,6 +55,18 @@ class Shell
    */
   static std::vector<std::string> parse_path(const std::string &input);
 
+  /*
+   * @brief Executa o comando especificado pelo usuário
+   *
+   * @param command Comando a ser executado
+   * @param input Argumentos necessários para que o comando execute
+   * @param pos Posição em que os argumentos se iniciam na entrada
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool
+    execution(const Command command, const std::string &input, size_t pos);
+
 public:
   /*
    * @brief Interface publica para iniciar o shell

@@ -173,6 +173,125 @@ std::vector<std::string> Shell::parse_path(const std::string &input)
   return fullPath;
 }
 
+bool Shell::execution(const Shell::Command command,
+  const std::string &input,
+  size_t pos)
+{
+  const std::string arguments = input.substr(pos, input.length());
+  std::vector<std::string> path;
+  switch (command) {
+  case ATTR:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR")
+                << "]: 'attr' precisa de um caminho valido" << "\n";
+      break;
+    }
+    std::cout << "ATTR\n";
+    return true;
+  case CD:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR") << "]: 'cd' precisa de um caminho valido"
+                << "\n";
+      break;
+    }
+    std::cout << "CD\n";
+    return true;
+  case CLUSTER:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR")
+                << "]: 'cluster' precisa de um caminho valido" << "\n";
+      break;
+    }
+    std::cout << "CLUSTER\n";
+    return true;
+  case CP:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR") << "]: 'cp' precisa de um caminho valido"
+                << "\n";
+      break;
+    }
+    std::cout << "CP\n";
+    return true;
+  case INFO:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR")
+                << "]: 'info' precisa de um caminho valido" << "\n";
+      break;
+    }
+    std::cout << "INFO\n";
+    return true;
+  case LS:
+    std::cout << "LS\n";
+    return true;
+  case MKDIR:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR")
+                << "]: 'mkdir' precisa de um caminho valido" << "\n";
+      break;
+    }
+    std::cout << "MKDIR\n";
+    return true;
+  case MV:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR") << "]: 'mv' precisa de um caminho valido"
+                << "\n";
+      break;
+    }
+    std::cout << "MV\n";
+    return true;
+  case PWD:
+    std::cout << "PWD\n";
+    return true;
+  case RENAME:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR")
+                << "]: 'rename' precisa de um caminho valido" << "\n";
+      break;
+    }
+    std::cout << "RENAME\n";
+    return true;
+  case RM:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR") << "]: 'rm' precisa de um caminho valido"
+                << "\n";
+      break;
+    }
+    std::cout << "RM\n";
+    return true;
+  case RMDIR:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR")
+                << "]: 'rmdir' precisa de um caminho valido" << "\n";
+      break;
+    }
+    std::cout << "RMDIR\n";
+    return true;
+  case TOUCH:
+    path = parse_path(arguments);
+    if (path.empty()) {
+      std::cout << "[" << RED("ERROR")
+                << "]: 'touch' precisa de um caminho valido" << "\n";
+      break;
+    }
+    std::cout << "TOUCH\n";
+    return true;
+  case UNKNOW:
+    std::cout << "[" << RED("UNKNOW") << "] :" << input << "\n";
+    break;
+  }
+  return false;
+}
+
 //===----------------------------------------------------------------------===//
 // PUBLIC
 //===----------------------------------------------------------------------===//
@@ -192,56 +311,6 @@ void Shell::interpreter()
 
     size_t pos = 0;
     Shell::Command command = this->parse_command(input, pos);
-    switch (command) {
-    case ATTR: {
-      std::vector<std::string> path =
-        parse_path(input.substr(pos, input.length()));
-      if (path.empty()) {
-        std::cout << "Caminho vazio\n";
-        break;
-      }
-      for (const auto &str : path) { std::cout << str << "\n"; }
-      break;
-    }
-    case CD:
-      std::cout << "CD\n";
-      break;
-    case CLUSTER:
-      std::cout << "CLUSTER\n";
-      break;
-    case CP:
-      std::cout << "CP\n";
-      break;
-    case INFO:
-      std::cout << "INFO\n";
-      break;
-    case LS:
-      std::cout << "LS\n";
-      break;
-    case MKDIR:
-      std::cout << "MKDIR\n";
-      break;
-    case MV:
-      std::cout << "MV\n";
-      break;
-    case PWD:
-      std::cout << "PWD\n";
-      break;
-    case RENAME:
-      std::cout << "RENAME\n";
-      break;
-    case RM:
-      std::cout << "RM\n";
-      break;
-    case RMDIR:
-      std::cout << "RMDIR\n";
-      break;
-    case TOUCH:
-      std::cout << "TOUCH\n";
-      break;
-    case UNKNOW:
-      std::cout << "UNKNOW\n";
-      break;
-    }
+    this->execution(command, input, pos);
   }
 }
