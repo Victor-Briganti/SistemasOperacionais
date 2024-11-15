@@ -33,6 +33,17 @@ bool Shell::attr(const std::vector<std::string> &path)
   return true;
 }
 
+bool Shell::cd(const std::vector<std::string> &path)
+{
+  std::cout << "cd ";
+
+  for (const auto &str : path) {
+    std::cout << "/" << str;
+  }
+  std::cout << "\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -210,12 +221,11 @@ bool Shell::execution(const Shell::Command command,
   case CD:
     path = parse_path(arguments);
     if (path.empty()) {
-      std::cout << "[" << RED("ERROR") << "]: 'cd' precisa de um caminho valido"
-                << "\n";
-      break;
+      path_error("cd");
+      return false;
     }
-    std::cout << "CD\n";
-    return true;
+
+    return Shell::cd(path);
   case CLUSTER:
     path = parse_path(arguments);
     if (path.empty()) {

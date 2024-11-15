@@ -65,6 +65,15 @@ class Shell
   static bool attr(const std::vector<std::string> &path);
 
   /*
+   * @brief Altera o diretório atual
+   *
+   * @param path Caminho para o novo diretório
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool cd(const std::vector<std::string> &path);
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado
