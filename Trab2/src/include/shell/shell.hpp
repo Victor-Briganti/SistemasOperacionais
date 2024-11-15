@@ -109,6 +109,13 @@ class Shell
   static bool mv(const path_fs &src, const path_fs &dest);
 
   /*
+   * @brief Mostra a localização atual como um caminho completo
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool pwd();
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado

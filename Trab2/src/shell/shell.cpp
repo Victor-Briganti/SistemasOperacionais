@@ -118,6 +118,12 @@ bool Shell::mv(const path_fs &src, const path_fs &dest)
   return true;
 }
 
+bool Shell::pwd()
+{
+  std::cout << "pwd\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -367,8 +373,12 @@ bool Shell::execution(const Shell::Command command,
     return mv(src, dest);
   }
   case PWD: {
-    std::cout << "PWD\n";
-    return true;
+    if (!arguments.empty()) {
+      arg_invalid("pwd", arguments);
+      return false;
+    }
+
+    return pwd();
   }
   case RENAME: {
     path_fs path = parse_path(arguments, posSubstr);
