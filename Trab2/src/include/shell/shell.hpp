@@ -134,6 +134,13 @@ class Shell
   static bool rmdir(const path_fs &path);
 
   /*
+   * @brief Cria um arquivo vazio no sistema
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool touch(const path_fs &path);
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado
