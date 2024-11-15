@@ -135,6 +135,17 @@ bool Shell::rm(const path_fs &path)
   return true;
 }
 
+bool Shell::rmdir(const path_fs &path)
+{
+  std::cout << "rmdir ";
+
+  for (const auto &str : path) {
+    std::cout << "/" << str;
+  }
+  std::cout << "\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -413,12 +424,11 @@ bool Shell::execution(const Shell::Command command,
   case RMDIR: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      std::cout << "[" << RED("ERROR")
-                << "]: 'rmdir' precisa de um caminho valido" << "\n";
-      break;
+      arg_empty("rmdir");
+      return false;
     }
-    std::cout << "RMDIR\n";
-    return true;
+
+    return Shell::rmdir(path);
   }
   case TOUCH: {
     path_fs path = parse_path(arguments, posSubstr);

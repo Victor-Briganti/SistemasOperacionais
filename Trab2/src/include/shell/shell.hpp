@@ -125,6 +125,15 @@ class Shell
   static bool rm(const path_fs &path);
 
   /*
+   * @brief Remove diretório vazio do sistema
+   *
+   * @param path Caminho para o diretório a ser removido
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool rmdir(const path_fs &path);
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado
