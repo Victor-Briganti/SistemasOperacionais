@@ -82,6 +82,12 @@ bool Shell::info()
   return true;
 }
 
+bool Shell::ls()
+{
+  std::cout << "ls\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -305,8 +311,12 @@ bool Shell::execution(const Shell::Command command,
     return info();
   }
   case LS:
-    std::cout << "LS\n";
-    return true;
+    if (!arguments.empty()) {
+      arg_invalid("ls", arguments);
+      return false;
+    }
+
+    return ls();
   case MKDIR: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
@@ -371,6 +381,7 @@ bool Shell::execution(const Shell::Command command,
     std::cout << "TOUCH\n";
     return true;
   }
+  default:
   case UNKNOW:
     std::cout << "[" << YELLOW("UNKNOW") << "] :" << input << "\n";
     break;

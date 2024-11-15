@@ -104,6 +104,13 @@ class Shell
   static bool info();
 
   /*
+   * @brief Mostra arquivos e diretórios do diretório atual
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool ls();
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado
