@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+typedef std::vector<std::string> path_fs;
+
 class Shell
 {
   // Enum para todos os comandos que são aceitos pelo shell
@@ -50,11 +52,12 @@ class Shell
    * @brief Realiza o parse do caminho
    *
    * @param input Caminho passado pelo usuário
+   * @param pos Posição da string no argumento
    *
    * @return Retorna um vetor com a lista da hierarquia dos caminhos em ordem.
    * Se o vetor for vazio houve algum erro durante o parser
    */
-  static std::vector<std::string> parse_path(const std::string &input);
+  static path_fs parse_path(const std::string &input, size_t &pos);
 
   /*
    * @brief Extrai os atributos de um arquivo/diretório e imprime na tela
@@ -63,7 +66,7 @@ class Shell
    *
    * @return true se a execução ocorreu, false caso contrário.
    */
-  static bool attr(const std::vector<std::string> &path);
+  static bool attr(const path_fs &path);
 
   /*
    * @brief Altera o diretório atual
@@ -72,7 +75,7 @@ class Shell
    *
    * @return true se a execução ocorreu, false caso contrário.
    */
-  static bool cd(const std::vector<std::string> &path);
+  static bool cd(const path_fs &path);
 
   /*
    * @brief Exibe o conteudo de um bloco no formato texto
@@ -82,6 +85,16 @@ class Shell
    * @return true se a execução ocorreu, false caso contrário.
    */
   static bool cluster(uint64_t num);
+
+  /*
+   * @brief Copia um arquivo de origem para o de destino
+   *
+   * @param src Caminho de origem
+   * @param dest Caminho de destino
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool cp(const path_fs &src, const path_fs &dest);
 
   /*
    * @brief Executa o comando especificado pelo usuário

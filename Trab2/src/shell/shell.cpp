@@ -10,6 +10,7 @@
 #include "shell/shell.hpp"
 #include "shell/color.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -29,7 +30,7 @@
 // PRIVATE
 //===----------------------------------------------------------------------===//
 
-bool Shell::attr(const std::vector<std::string> &path)
+bool Shell::attr(const path_fs &path)
 {
   std::cout << "attr ";
 
@@ -40,7 +41,7 @@ bool Shell::attr(const std::vector<std::string> &path)
   return true;
 }
 
-bool Shell::cd(const std::vector<std::string> &path)
+bool Shell::cd(const path_fs &path)
 {
   std::cout << "cd ";
 
@@ -54,6 +55,24 @@ bool Shell::cd(const std::vector<std::string> &path)
 bool Shell::cluster(uint64_t num)
 {
   std::cout << "cluster " << num << "\n";
+  return true;
+}
+
+bool Shell::cp(const path_fs &src, const path_fs &dest)
+{
+  std::cout << "cp ";
+
+  for (const auto &str : src) {
+    std::cout << "/" << str;
+  }
+
+  std::cout << " ";
+
+  for (const auto &str : dest) {
+    std::cout << "/" << str;
+  }
+
+  std::cout << "\n";
   return true;
 }
 
@@ -162,20 +181,20 @@ Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
   }
 }
 
-std::vector<std::string> Shell::parse_path(const std::string &input)
+path_fs Shell::parse_path(const std::string &input, size_t &pos)
 {
-  std::vector<std::string> fullPath;// Armazena todo o caminho
+  path_fs fullPath;// Armazena todo o caminho
   std::string curPath;// Gerencia o caminho atual
 
-  size_t pos = 0;
   bool slash = false;
   while (true) {
-    // Se a posição for maior do que a string chegamos no fim
-    if (input.size() < pos) {
+    // Se a posição for maior do que a string ou for um espaço chegamos no fim
+    if (input.size() < pos || input[pos] == ' ') {
       if (!curPath.empty()) {
         fullPath.push_back(curPath);
       }
 
+      pos++;
       break;
     }
 
@@ -220,11 +239,15 @@ bool Shell::execution(const Shell::Command command,
   const std::string &input,
   size_t pos)
 {
-  const std::string arguments = input.substr(pos, input.length());
-  std::vector<std::string> path;
+  size_t posSubstr = 0;
+  std::string arguments;
+  if (pos < input.length()) {
+    arguments = input.substr(pos, input.length());
+  }
+
   switch (command) {
   case ATTR: {
-    std::vector<std::string> path = parse_path(arguments);
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       arg_empty("attr");
       return false;
@@ -233,7 +256,7 @@ bool Shell::execution(const Shell::Command command,
     return Shell::attr(path);
   }
   case CD: {
-    std::vector<std::string> path = parse_path(arguments);
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       arg_empty("cd");
       return false;
@@ -257,17 +280,18 @@ bool Shell::execution(const Shell::Command command,
 
     return cluster(num);
   }
-  case CP:
-    path = parse_path(arguments);
-    if (path.empty()) {
-      std::cout << "[" << RED("ERROR") << "]: 'cp' precisa de um caminho valido"
-                << "\n";
-      break;
+  case CP: {
+    path_fs src = parse_path(arguments, posSubstr);
+    path_fs dest = parse_path(arguments, posSubstr);
+    if (src.empty() || dest.empty()) {
+      arg_invalid("cp", arguments);
+      return false;
     }
-    std::cout << "CP\n";
-    return true;
-  case INFO:
-    path = parse_path(arguments);
+
+    return cp(src, dest);
+  }
+  case INFO: {
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       std::cout << "[" << RED("ERROR")
                 << "]: 'info' precisa de um caminho valido" << "\n";
@@ -275,11 +299,12 @@ bool Shell::execution(const Shell::Command command,
     }
     std::cout << "INFO\n";
     return true;
+  }
   case LS:
     std::cout << "LS\n";
     return true;
-  case MKDIR:
-    path = parse_path(arguments);
+  case MKDIR: {
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       std::cout << "[" << RED("ERROR")
                 << "]: 'mkdir' precisa de um caminho valido" << "\n";
@@ -287,8 +312,9 @@ bool Shell::execution(const Shell::Command command,
     }
     std::cout << "MKDIR\n";
     return true;
-  case MV:
-    path = parse_path(arguments);
+  }
+  case MV: {
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       std::cout << "[" << RED("ERROR") << "]: 'mv' precisa de um caminho valido"
                 << "\n";
@@ -296,11 +322,13 @@ bool Shell::execution(const Shell::Command command,
     }
     std::cout << "MV\n";
     return true;
-  case PWD:
+  }
+  case PWD: {
     std::cout << "PWD\n";
     return true;
-  case RENAME:
-    path = parse_path(arguments);
+  }
+  case RENAME: {
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       std::cout << "[" << RED("ERROR")
                 << "]: 'rename' precisa de um caminho valido" << "\n";
@@ -308,8 +336,9 @@ bool Shell::execution(const Shell::Command command,
     }
     std::cout << "RENAME\n";
     return true;
-  case RM:
-    path = parse_path(arguments);
+  }
+  case RM: {
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       std::cout << "[" << RED("ERROR") << "]: 'rm' precisa de um caminho valido"
                 << "\n";
@@ -317,8 +346,9 @@ bool Shell::execution(const Shell::Command command,
     }
     std::cout << "RM\n";
     return true;
-  case RMDIR:
-    path = parse_path(arguments);
+  }
+  case RMDIR: {
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       std::cout << "[" << RED("ERROR")
                 << "]: 'rmdir' precisa de um caminho valido" << "\n";
@@ -326,8 +356,9 @@ bool Shell::execution(const Shell::Command command,
     }
     std::cout << "RMDIR\n";
     return true;
-  case TOUCH:
-    path = parse_path(arguments);
+  }
+  case TOUCH: {
+    path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
       std::cout << "[" << RED("ERROR")
                 << "]: 'touch' precisa de um caminho valido" << "\n";
@@ -335,6 +366,7 @@ bool Shell::execution(const Shell::Command command,
     }
     std::cout << "TOUCH\n";
     return true;
+  }
   case UNKNOW:
     std::cout << "[" << YELLOW("UNKNOW") << "] :" << input << "\n";
     break;
