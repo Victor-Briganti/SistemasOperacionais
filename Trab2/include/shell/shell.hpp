@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-typedef std::vector<std::string> path_fs;
+using path_fs = std::vector<std::string>;
 
 class Shell
 {
@@ -63,7 +63,7 @@ class Shell
    *
    * @return true se a execução ocorreu, false caso contrário.
    */
-  static bool cluster(uint64_t num);
+  static bool cluster(uint32_t num);
 
   /*
    * @brief Copia um arquivo de origem para o de destino

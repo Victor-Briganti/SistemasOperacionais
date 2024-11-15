@@ -48,7 +48,7 @@ bool Shell::cd(const path_fs &path)
   return true;
 }
 
-bool Shell::cluster(uint64_t num)
+bool Shell::cluster(uint32_t num)
 {
   std::cout << "cluster " << num << "\n";
   return true;
@@ -295,11 +295,13 @@ path_fs Shell::parse_path(const std::string &input, size_t &pos)
     }
 
     // Se eu encontrar um / seguido de outro / houve um erro.
-    // Caso contrário se uma / foi encontrada salva o caminho atual e continua.
     if (slash && input[pos] == '/') {
       fullPath.clear();
       break;
-    } else if (!slash && input[pos] == '/') {
+    }
+
+    // Se uma / foi encontrada salva o caminho atual e continua.
+    if (!slash && input[pos] == '/') {
       slash = true;
       pos++;
       if (curPath.length() > 0) {
@@ -357,9 +359,11 @@ bool Shell::execution(const Shell::Command command,
       return false;
     }
 
-    uint64_t num = 0;
+    uint32_t num = 0;
     try {
-      num = std::stoul(arguments);
+      // TODO: Verificar se o tamanho do número no argumento está no tamanho de
+      // um uint32_t
+      num = static_cast<uint32_t>(std::stoi(arguments));
     } catch (...) {
       arg_invalid("cluster", arguments);
       return false;
