@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#define is_end(c) ((c) == ' ' || (c) == '\0')
+
 //===----------------------------------------------------------------------===//
 // PRIVATE
 //===----------------------------------------------------------------------===//
@@ -21,7 +23,7 @@ Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
   switch (input[0]) {
   case 'a':// attr
     if (input[1] == 't' && input[2] == 't' && input[3] == 'r'
-        && input[4] == ' ') {
+        && is_end(input[4])) {
       pos = 5;
       return ATTR;
     }
@@ -29,20 +31,20 @@ Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
   case 'c':// cd, cluster, cp
     switch (input[1]) {
     case 'd':// cd
-      if (input[2] == ' ') {
+      if (is_end(input[2])) {
         pos = 3;
         return CD;
       }
       return UNKNOW;
     case 'l':// cluster
       if (input[2] == 'u' && input[3] == 's' && input[4] == 't'
-          && input[5] == 'e' && input[6] == 'r' && input[7] == ' ') {
+          && input[5] == 'e' && input[6] == 'r' && is_end(input[7])) {
         pos = 8;
         return CLUSTER;
       }
       return UNKNOW;
     case 'p':// cp
-      if (input[2] == ' ') {
+      if (is_end(input[2])) {
         pos = 3;
         return CP;
       }
@@ -52,13 +54,13 @@ Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
     }
   case 'i':// info
     if (input[1] == 'n' && input[2] == 'f' && input[3] == 'o'
-        && input[4] == ' ') {
+        && is_end(input[4])) {
       pos = 5;
       return INFO;
     }
     return UNKNOW;
   case 'l':// ls
-    if (input[1] == 's' && (input[2] == '\0' || input[2] == ' ')) {
+    if (input[1] == 's' && is_end(input[2])) {
       pos = 3;
       return LS;
     }
@@ -67,13 +69,13 @@ Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
     switch (input[1]) {
     case 'k':// mkdir
       if (input[2] == 'd' && input[3] == 'i' && input[4] == 'r'
-          && input[5] == ' ') {
+          && is_end(input[5])) {
         pos = 6;
         return MKDIR;
       }
       return UNKNOW;
     case 'v':// mv
-      if (input[2] == '\0' || input[2] == ' ') {
+      if (is_end(input[2])) {
         pos = 3;
         return MV;
       }
@@ -82,8 +84,7 @@ Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
       return UNKNOW;
     }
   case 'p':// pwd
-    if (input[1] == 'w' && input[2] == 'd'
-        && (input[3] == '\0' || input[3] == ' ')) {
+    if (input[1] == 'w' && input[2] == 'd' && is_end(input[3])) {
       pos = 4;
       return PWD;
     }
@@ -92,25 +93,27 @@ Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
     switch (input[1]) {
     case 'e':// rename
       if (input[2] == 'n' && input[3] == 'a' && input[4] == 'm'
-          && input[5] == 'e' && input[6] == ' ') {
+          && input[5] == 'e' && is_end(input[6])) {
         pos = 7;
         return RENAME;
       }
       return UNKNOW;
     case 'm':// rm, rmdir
-      if (input[2] == ' ') {
+      if (is_end(input[2])) {
         pos = 3;
         return RM;
       } else if (input[2] == 'd' && input[3] == 'i' && input[4] == 'r'
-                 && input[5] == ' ') {
+                 && is_end(input[5])) {
         pos = 6;
         return RMDIR;
       }
       return UNKNOW;
+    default:
+      return UNKNOW;
     }
   case 't':// touch
     if (input[1] == 'o' && input[2] == 'u' && input[3] == 'c' && input[4] == 'h'
-        && input[5] == ' ') {
+        && is_end(input[5])) {
       pos = 6;
       return TOUCH;
     }

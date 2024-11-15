@@ -43,7 +43,7 @@ class Shell
    *
    * @return Retorna o enum que equivale ao comando
    */
-  Command parse_command(const std::string &input, size_t &pos);
+  static Command parse_command(const std::string &input, size_t &pos);
 
   /*
    * @brief Realiza o parse do caminho
@@ -53,7 +53,7 @@ class Shell
    * @return Retorna um vetor com a lista da hierarquia dos caminhos em ordem.
    * Se o vetor for vazio houve algum erro durante o parser
    */
-  std::vector<std::string> parse_path(const std::string &input);
+  static std::vector<std::string> parse_path(const std::string &input);
 
 public:
   /*
