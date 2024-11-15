@@ -124,6 +124,25 @@ bool Shell::pwd()
   return true;
 }
 
+
+bool Shell::rename(const path_fs &src, const path_fs &dest)
+{
+  std::cout << "rename ";
+
+  for (const auto &str : src) {
+    std::cout << "/" << str;
+  }
+
+  std::cout << " ";
+
+  for (const auto &str : dest) {
+    std::cout << "/" << str;
+  }
+
+  std::cout << "\n";
+  return true;
+}
+
 bool Shell::rm(const path_fs &path)
 {
   std::cout << "rm ";
@@ -414,14 +433,14 @@ bool Shell::execution(const Shell::Command command,
     return pwd();
   }
   case RENAME: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      std::cout << "[" << RED("ERROR")
-                << "]: 'rename' precisa de um caminho valido" << "\n";
-      break;
+    path_fs src = parse_path(arguments, posSubstr);
+    path_fs dest = parse_path(arguments, posSubstr);
+    if (src.empty() || dest.empty()) {
+      arg_invalid("rename", arguments);
+      return false;
     }
-    std::cout << "RENAME\n";
-    return true;
+
+    return rename(src, dest);
   }
   case RM: {
     path_fs path = parse_path(arguments, posSubstr);

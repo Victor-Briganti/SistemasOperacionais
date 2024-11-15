@@ -125,6 +125,16 @@ class Shell
   static bool rm(const path_fs &path);
 
   /*
+   * @brief Renomeia um arquivo do sistema
+   *
+   * @param src Antigo nome do arquivo
+   * @param dest Novo nome do arquivo
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool rename(const path_fs &src, const path_fs &dest);
+
+  /*
    * @brief Remove diretório vazio do sistema
    *
    * @param path Caminho para o diretório a ser removido
