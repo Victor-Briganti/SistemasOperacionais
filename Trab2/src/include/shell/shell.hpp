@@ -116,6 +116,15 @@ class Shell
   static bool pwd();
 
   /*
+   * @brief Remove um arquivo do sistema
+   *
+   * @param path Caminho para o arquivo a ser removido
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool rm(const path_fs &path);
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado

@@ -124,6 +124,17 @@ bool Shell::pwd()
   return true;
 }
 
+bool Shell::rm(const path_fs &path)
+{
+  std::cout << "rm ";
+
+  for (const auto &str : path) {
+    std::cout << "/" << str;
+  }
+  std::cout << "\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -393,12 +404,11 @@ bool Shell::execution(const Shell::Command command,
   case RM: {
     path_fs path = parse_path(arguments, posSubstr);
     if (path.empty()) {
-      std::cout << "[" << RED("ERROR") << "]: 'rm' precisa de um caminho valido"
-                << "\n";
-      break;
+      arg_empty("rm");
+      return false;
     }
-    std::cout << "RM\n";
-    return true;
+
+    return Shell::rm(path);
   }
   case RMDIR: {
     path_fs path = parse_path(arguments, posSubstr);
