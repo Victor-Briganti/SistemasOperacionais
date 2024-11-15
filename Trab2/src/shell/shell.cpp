@@ -76,6 +76,12 @@ bool Shell::cp(const path_fs &src, const path_fs &dest)
   return true;
 }
 
+bool Shell::info()
+{
+  std::cout << "info\n";
+  return true;
+}
+
 Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
 {
   switch (input[0]) {
@@ -291,14 +297,12 @@ bool Shell::execution(const Shell::Command command,
     return cp(src, dest);
   }
   case INFO: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      std::cout << "[" << RED("ERROR")
-                << "]: 'info' precisa de um caminho valido" << "\n";
-      break;
+    if (!arguments.empty()) {
+      arg_invalid("info", arguments);
+      return false;
     }
-    std::cout << "INFO\n";
-    return true;
+
+    return info();
   }
   case LS:
     std::cout << "LS\n";

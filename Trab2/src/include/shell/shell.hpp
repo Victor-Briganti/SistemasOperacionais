@@ -97,6 +97,13 @@ class Shell
   static bool cp(const path_fs &src, const path_fs &dest);
 
   /*
+   * @brief Mostra informações sobre o sistema de arquivos
+   *
+   * @return true se a execução ocorreu, false caso contrário.
+   */
+  static bool info();
+
+  /*
    * @brief Executa o comando especificado pelo usuário
    *
    * @param command Comando a ser executado
