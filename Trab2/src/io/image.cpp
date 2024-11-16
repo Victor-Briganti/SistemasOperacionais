@@ -13,7 +13,12 @@
 #include "utils/types.hpp"
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
+
+//===----------------------------------------------------------------------===//
+// PUBLIC
+//===----------------------------------------------------------------------===//
 
 Image::~Image() { this->close(); }
 
@@ -24,8 +29,9 @@ bool Image::open(const std::string &path)
     return false;
   }
 
+  image.close();
   image.open(path, std::ios::in | std::ios::out | std::ios::binary);
-  if (image.is_open()) {
+  if (!image.is_open()) {
     std::cerr << "[" << RED("ERRO") << "]: Não foi possível abrir imagem "
               << path << "\n";
     return false;
@@ -41,7 +47,6 @@ void Image::close()
   }
 }
 
-
 bool Image::read(DWORD offset, void *buffer, size_t size)
 {
   if (!image.is_open()) {
@@ -49,6 +54,7 @@ bool Image::read(DWORD offset, void *buffer, size_t size)
     return false;
   }
 
+  // Retorna o ponteiro para o inicio do arquivo
   image.seekg(offset, std::ios::beg);
   if (image.fail()) {
     std::cerr << "[" << RED("ERRO") << "]: Não foi possível acessar offset("
@@ -73,6 +79,7 @@ bool Image::write(DWORD offset, const void *const buffer, size_t size)
     return false;
   }
 
+  // Retorna o ponteiro para o inicio do arquivo
   image.seekg(offset, std::ios::beg);
   if (image.fail()) {
     std::cerr << "[" << RED("ERRO") << "]: Não foi possível acessar offset("

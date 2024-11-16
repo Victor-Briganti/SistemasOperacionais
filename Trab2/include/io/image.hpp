@@ -18,8 +18,8 @@ class Image
 {
   std::fstream image;
 
-private:
-  Image();
+public:
+  Image() = default;
   ~Image();
 
   /**

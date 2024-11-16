@@ -7,9 +7,9 @@
  * Data: 15/11/2024
  */
 
-#include "shell/shell.hpp"
+#include "fat/fat32.hpp"
 #include "utils/color.hpp"
-#include <fstream>
+
 #include <iostream>
 
 int main(int argc, char **argv)
@@ -21,14 +21,13 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  Shell shell;
-  shell.interpreter();
-
-  std::fstream image(argv[1], std::ios::in | std::ios::out | std::ios::binary);
-
-  if (!image.is_open()) {
-    std::cout << RED("ERRO") << ": Falha ao ler o arquivo '" << argv[1]
-              << "'.\n";
+  try {
+    Fat32 fat32((std::string(argv[1])));
+    fat32.bpb_print();
+  } catch (const std::runtime_error &error) {
+    std::cerr << "[" << RED("ERROR") << "]: " << error.what() << "\n";
     return -1;
   }
+
+  return 0;
 }
