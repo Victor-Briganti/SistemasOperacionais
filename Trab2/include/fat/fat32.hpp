@@ -16,6 +16,10 @@
 
 class Fat32
 {
+  //===--------------------------------------------------------------------===//
+  // BIOS
+  //===--------------------------------------------------------------------===//
+
   // Estrutura do BIOS Parameter Block
   struct __attribute__((packed)) BPB
   {
@@ -58,9 +62,6 @@ class Fat32
 
   /** @brief Classe para leitura do arquivo image */
   Image image;
-
-  /** @brief Definição do EOF do FAT 32 */
-  DWORD const FAT_EOF = 0x0FFFFFF8;
 
   /** @brief Quantidade de setores ocupado por um FAT */
   DWORD FATSz = 0;
@@ -122,20 +123,51 @@ class Fat32
   inline DWORD first_sector_cluster(DWORD cluster) const;
 
   /**
-   * @brief Determina qual a entrada do FAT que o cluster esta
-   *
-   * @param cluster Número do cluster
-   *
-   * @return Determina o offset no qual este cluster se encontra no FAT
-   */
-  inline DWORD fat_cluster_offset(DWORD cluster) const;
-
-  /**
    * @brief Determina o tipo do FAT na imagem
    *
    * @return FAT12, FAT16 ou FAT32. Somente o FAT32 é suportado.
    */
   inline FatType determine_fat_type() const;
+
+  //===--------------------------------------------------------------------===//
+  // FAT
+  //===--------------------------------------------------------------------===//
+
+  /** @brief Definição do EOF do FAT 32 */
+  DWORD const FAT_EOF = 0x0FFFFFF8;
+
+  /** @brief Mascará para acessar dados dos FAT */
+  DWORD const FAT_MASK = 0x0FFFFFFF;
+
+  /**
+   * @brief Determina onde no FAT está a entrada do cluster
+   *
+   * Este valor varia conforme o tipo de FAT sendo utilizado.
+   *
+   * @param cluster Número do cluster sendo procurado
+   *
+   * @return O offset de entrada do cluster no FAT
+   */
+  inline DWORD fat_offset(DWORD cluster) const;
+
+  /**
+   * @brief Determina o setor que contém a entrada FAT do cluster
+   *
+   * @param cluster Número do cluster sendo procurado
+   *
+   * @return O setor no FAT do cluster sendo buscado
+   */
+  inline DWORD fat_sec_num(DWORD cluster) const;
+
+  /**
+   * @brief Determina o offset do setor no qual o FAT do cluster pode ser
+   * encontrado
+   *
+   * @param cluster Número do cluster sendo procurado
+   *
+   * @return O offset de entrada do cluster no setor
+   */
+  inline DWORD fat_entry_offset(DWORD cluster) const;
 
 public:
   /**

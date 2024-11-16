@@ -14,6 +14,8 @@ Checks: "*,
         -bugprone-easily-swappable-parameters,
         -fuchsia-default-arguments-calls,
         -google-readability-todo,
+        -fuchsia-default-arguments-declarations,
+        -cppcoreguidelines-pro-bounds-pointer-arithmetic,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''

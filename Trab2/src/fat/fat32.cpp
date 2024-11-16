@@ -59,13 +59,22 @@ inline DWORD Fat32::first_sector_cluster(DWORD cluster) const
   return (cluster - 2) * bios.SecPerClus + this->FirstDataSector;
 }
 
-inline DWORD Fat32::fat_cluster_offset(DWORD cluster) const
+inline DWORD Fat32::fat_offset(DWORD cluster) const
 {
   // No FAT 32 o calculo do offset se dá apenas múltiplicando o cluster por 4.
   // Isso varia de FAT para FAT.
-  DWORD FATOffset = cluster * 4;
-  DWORD FATSecNum = bios.RsvdSecCnt + (FATOffset / bios.BytsPerSec);
-  return FATOffset % bios.BytsPerSec;
+  return cluster * 4;
+}
+
+inline DWORD Fat32::fat_sec_num(DWORD cluster) const
+{
+  DWORD FATOffset = fat_offset(cluster);
+  return bios.RsvdSecCnt + (FATOffset / bios.BytsPerSec);
+}
+
+inline DWORD Fat32::fat_entry_offset(DWORD cluster) const
+{
+  return fat_sec_num(cluster) % bios.BytsPerSec;
 }
 
 inline Fat32::FatType Fat32::determine_fat_type() const
