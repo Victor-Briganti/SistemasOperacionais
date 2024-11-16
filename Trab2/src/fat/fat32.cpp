@@ -48,6 +48,26 @@ inline void Fat32::init_count_of_clusters()
   this->CountOfClusters = DataSec / bios.SecPerClus;
 }
 
+inline void Fat32::init_first_data_sector()
+{
+  DWORD TotFatSz = bios.NumFATs * this->FATSz;
+  this->FirstDataSector = bios.RsvdSecCnt + TotFatSz + this->RootDirSec;
+}
+
+inline DWORD Fat32::first_sector_cluster(DWORD cluster) const
+{
+  return (cluster - 2) * bios.SecPerClus + this->FirstDataSector;
+}
+
+inline DWORD Fat32::fat_cluster_offset(DWORD cluster) const
+{
+  // No FAT 32 o calculo do offset se dá apenas múltiplicando o cluster por 4.
+  // Isso varia de FAT para FAT.
+  DWORD FATOffset = cluster * 4;
+  DWORD FATSecNum = bios.RsvdSecCnt + (FATOffset / bios.BytsPerSec);
+  return FATOffset % bios.BytsPerSec;
+}
+
 inline Fat32::FatType Fat32::determine_fat_type() const
 {
   if (this->CountOfClusters < 4085) {
@@ -73,6 +93,7 @@ Fat32::Fat32(const std::string &path)
   init_fat_size();
   init_total_sectors();
   init_count_of_clusters();
+  init_first_data_sector();
 
   if (determine_fat_type() != FAT32) {
     throw std::runtime_error("Somente o sistema de arquivo FAT 32 é suportado");

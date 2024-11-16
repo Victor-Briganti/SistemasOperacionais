@@ -77,6 +77,9 @@ class Fat32
   /** @brief Contagem de clusters no sistema */
   DWORD CountOfClusters = 0;
 
+  /** @brief Determine o primeiro setor de dados */
+  DWORD FirstDataSector = 0;
+
   /**
    * @brief Lê o BPB na variável bios
    *
@@ -103,6 +106,29 @@ class Fat32
    * @brief Determina a quantidade de clusters e salva em CountOfClusters
    */
   inline void init_count_of_clusters();
+
+  /**
+   * @brief Determina o primeiro setor de dados e salva FirstDataSector
+   */
+  inline void init_first_data_sector();
+
+  /**
+   * @brief Determina o número do setor a partir de um cluster
+   *
+   * @param cluster Número do cluster para o setor ser calculado
+   *
+   * @return Retorna o primeiro setor do cluster
+   */
+  inline DWORD first_sector_cluster(DWORD cluster) const;
+
+  /**
+   * @brief Determina qual a entrada do FAT que o cluster esta
+   *
+   * @param cluster Número do cluster
+   *
+   * @return Determina o offset no qual este cluster se encontra no FAT
+   */
+  inline DWORD fat_cluster_offset(DWORD cluster) const;
 
   /**
    * @brief Determina o tipo do FAT na imagem
