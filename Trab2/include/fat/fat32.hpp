@@ -16,6 +16,9 @@
 
 class Fat32
 {
+  /** @brief Classe para leitura do arquivo image */
+  Image image;
+
   //===--------------------------------------------------------------------===//
   // BIOS
   //===--------------------------------------------------------------------===//
@@ -59,9 +62,6 @@ class Fat32
 
   /** @brief Estrutura do BPB */
   BPB bios;
-
-  /** @brief Classe para leitura do arquivo image */
-  Image image;
 
   /** @brief Quantidade de setores ocupado por um FAT */
   DWORD FATSz = 0;
@@ -136,8 +136,9 @@ class Fat32
   /** @brief Definição do EOF do FAT 32 */
   DWORD const FAT_EOF = 0x0FFFFFF8;
 
-  /** @brief Mascará para acessar dados dos FAT */
-  DWORD const FAT_MASK = 0x0FFFFFFF;
+  /** @brief Mascaras para acessar dados dos FAT */
+  DWORD const FAT32_LOWER_MASK = 0x0FFFFFFF;
+  DWORD const FAT32_UPPER_MASK = 0xF0000000;
 
   /**
    * @brief Determina onde no FAT está a entrada do cluster
@@ -169,12 +170,33 @@ class Fat32
    */
   inline DWORD fat_entry_offset(DWORD cluster) const;
 
+  /**
+   * @brief Lê o cluster do FAT em um buffer
+   *
+   * @param cluster O número do cluster que precisa ser lido
+   * @param fat O número do FAT que precisa ser lido
+   *
+   * @return O novo buffer alocado ou um nullptr.
+   */
+  void *fat_buffer_read(DWORD cluster, DWORD fat);
+
+  /**
+   * @brief Escreve no setor do FAT especificado
+   *
+   * @param buffer Dados que serão escritos
+   * @param cluster Número do cluster que será escrito
+   * @param fat Número do FAT que será escrito
+   *
+   * @return true se foi possível escrever ou false caso contrário.
+   */
+  bool fat_buffer_write(void *buffer, DWORD cluster, DWORD fat);
+
 public:
   /**
    * @brief Construtor para inicializar a estrutura do FAT
    *
-   * @throw Caso não seja possível abrir arquivo ou o arquivo aberto não esteja
-   * no formato FAT 32 válido, realiza o throw de um erro.
+   * @throw Caso não seja possível abrir arquivo ou o arquivo aberto não
+   * esteja no formato FAT 32 válido, realiza o throw de um erro.
    */
   explicit Fat32(const std::string &path) noexcept(false);
 
@@ -182,6 +204,27 @@ public:
    * @brief Mostra a estrutura do BPB
    */
   void bpb_print();
+
+  /**
+   * @brief Lê um cluster do FAT
+   *
+   * @param cluster O cluster que será lido
+   * @param dest Buffer de destino no qual o cluster será lido
+   * @param fat Número da estrutura FAT que será lida. Por padrão usamos 1.
+   *
+   * @return true se ele foi lido ou false caso contrário
+   */
+  bool fat_read(DWORD cluster, DWORD *dest, BYTE fat = 1);
+
+  /**
+   * @brief Escreve um cluster no FAT
+   *
+   * @param cluster O número do cluster onde será escrito
+   * @param entry Valor que será escrito no cluster especificado
+   *
+   * @return true se ele foi lido ou false caso contrário
+   */
+  bool fat_write(DWORD cluster, DWORD entry);
 };
 
 #endif// FAT32_HPP

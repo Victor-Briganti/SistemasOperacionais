@@ -8,7 +8,9 @@
  */
 
 #include "fat/fat32.hpp"
+#include "utils/types.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <stdexcept>
 
@@ -111,6 +113,32 @@ Fat32::Fat32(const std::string &path)
 
 bool Fat32::bpb_open() { return image.read(0, &bios, sizeof(bios)); }
 
+void *Fat32::fat_buffer_read(DWORD cluster, DWORD fat)
+{
+  void *buffer = std::malloc(bios.BytsPerSec);
+  if (buffer == nullptr) {
+    return nullptr;
+  }
+
+  DWORD offset = this->fat_sec_num(cluster) * bios.BytsPerSec;
+  offset += (fat - 1) * this->FATSz;
+
+  if (!image.read(offset, buffer, bios.BytsPerSec)) {
+    std::free(buffer);
+    return nullptr;
+  }
+
+  return buffer;
+}
+
+bool Fat32::fat_buffer_write(void *buffer, DWORD cluster, DWORD fat)
+{
+  DWORD offset = fat_sec_num(cluster) * bios.BytsPerSec;
+  offset += fat * this->FATSz;
+
+  return image.write(offset, buffer, bios.BytsPerSec);
+}
+
 //===----------------------------------------------------------------------===//
 // PUBLIC
 //===----------------------------------------------------------------------===//
@@ -140,4 +168,53 @@ void Fat32::bpb_print()
   std::cout << "Reserved: " << bios.Reserved << "\n";
   std::cout << "DrvNum: " << bios.DrvNum << "\n";
   std::cout << "Reserved1: " << bios.Reserved1 << "\n";
+}
+
+bool Fat32::fat_read(DWORD cluster, DWORD *dest, BYTE fat)
+{
+  assert(fat <= bios.NumFATs);
+  assert(cluster <= this->CountOfClusters);
+
+  DWORD fatEntryOffset = fat_entry_offset(cluster);
+
+  void *SecBuffer = fat_buffer_read(cluster, fat);
+  if (SecBuffer == nullptr) {
+    return false;
+  }
+
+  DWORD fat12ClusEntryVal = *(&static_cast<DWORD *>(SecBuffer)[fatEntryOffset]);
+  fat12ClusEntryVal &= this->FAT32_LOWER_MASK;
+
+  *dest = fat12ClusEntryVal;
+  std::free(SecBuffer);
+  return true;
+}
+
+bool Fat32::fat_write(DWORD cluster, DWORD entry)
+{
+  assert(cluster <= this->CountOfClusters);
+
+  for (DWORD i = 1; i <= bios.NumFATs; i++) {
+    void *SecBuffer = fat_buffer_read(cluster, i);
+    if (SecBuffer == nullptr) {
+      return false;
+    }
+
+    DWORD fatEntryOffset = fat_entry_offset(cluster);
+
+    DWORD fat32ClusEntryVal = entry & this->FAT32_LOWER_MASK;
+
+    *(&static_cast<DWORD *>(SecBuffer)[fatEntryOffset]) &=
+      this->FAT32_UPPER_MASK;
+    *(&static_cast<DWORD *>(SecBuffer)[fatEntryOffset]) |= fat32ClusEntryVal;
+
+    if (!fat_buffer_write(SecBuffer, cluster, i)) {
+      std::free(SecBuffer);
+      return false;
+    }
+
+    std::free(SecBuffer);
+  }
+
+  return true;
 }
