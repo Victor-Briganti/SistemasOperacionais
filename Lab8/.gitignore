@@ -1,0 +1,7 @@
+# Ignore tudo
+*
+
+# Menos isso aqui
+!birthday.c
+!.gitignore
+!Makefile
