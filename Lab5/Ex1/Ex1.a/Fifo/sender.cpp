@@ -1,20 +1,18 @@
 /*
  * Programa de manipulação de FIFOs
- * Descrição: Realiza a manipulação de FIFOs para receber strings e passar
- * informações entre programas em execução.
+ * Descrição: Servidor que envia as informações do FIFO e mostra na tela.
  *
- * Author: Victor Briganti, Luiz Takeda
- * License: BSD 2
+ * Autores: Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 23/11/2024
  */
-#include <cctype>
-#include <csignal>
-#include <cstring>
-#include <fcntl.h>
-#include <iostream>
-#include <string>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <cctype>     // isalpha(), isspace()
+#include <fcntl.h>    // open(), close(), O_WRONLY
+#include <iostream>   // cout, cerr
+#include <string>     // string
+#include <sys/stat.h> // mkfifo()
+#include <unistd.h>   // read(), write()
 
 /** @brief Define o arquivo que será usado como FIFO. */
 #define FIFO "ffifo"
@@ -84,17 +82,21 @@ int count_white_spaces(std::string &str) {
 }
 
 int main() {
+  // Cria um FIFO com todas as permissões
   if (mkfifo(FIFO, 0777) < 0) {
     std::cerr << "Error creating the FIFO\n";
     return 1;
   }
 
+  // Abre o FIFO como leitura
   int fd = open(FIFO, O_WRONLY);
   if (fd < 0) {
     std::cerr << "Error opening the FIFO for writing\n";
     return 1;
   }
 
+  // Recebe uma entrada do usuário, mostra informações da string de entrada e
+  // envia as informações para a outra ponta do FIFO.
   while (true) {
     std::string input;
     std::cout << "Escreva uma frase: \n";
@@ -125,6 +127,7 @@ int main() {
     write(fd, output.c_str(), output.length() + 1);
   }
 
+  // Fecha o descritor do FIFO
   close(fd);
   return 0;
 }

@@ -1,130 +1,160 @@
-/*
+/**
  * Descrição:
  *
  * Este programa realiza a soma entre dois vetores,
  * utilizando processos filhos que utilizando de memoria compartilhada e pipe,
  * para realizar a tarefa
  *
- * Author: Victor Briganti, Luiz Takeda, Hendrick 
+ * Author: Victor Briganti, Luiz Takeda, Hendrick
  * License: BSD 2
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/wait.h>
+#include <cstdio>     // printf(), perror()
+#include <cstdlib>    // atoi(), exit()
+#include <sys/ipc.h>  // IPC_CREAT, IPC_RMID
+#include <sys/shm.h>  // shmat(), shmctl(), shmdt(), shmget()
+#include <sys/wait.h> // wait()
+#include <unistd.h>   // fork(), pipe(), read(), write(), sysconf()
 
-// Estrutura que representa fração que o filho operará 
+#define ELEM_LIMIT 5000000
+
+// Estrutura que representa fração que o filho operará
 struct Section {
   int start, end;
 };
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
-    printf("Usage: %s <num_elements> <num_processes>\n", argv[0]);
+    printf("%s <num_elements> <num_processes>\n", argv[0]);
     return 1;
   }
-  
+
   int numElements = atoi(argv[1]);
-  int numProcesses = atoi(argv[2]);  
-  
-  if(numProcesses > numElements){
-    printf("The Number of processes is less than the number of elements !\n");
+  int numProcesses = atoi(argv[2]);
+
+  if (numElements <= 0) {
+    printf("O número de elementos precisa ser um número positivo maior que "
+           "zero\n");
     return 1;
   }
-  
-  // Criando memoria compartilhada
+
+  if (numProcesses <= 0) {
+    printf("O número de processos precisa ser um número positivo maior que "
+           "zero\n");
+    return 1;
+  }
+
+  if (numElements > ELEM_LIMIT) {
+    printf("Tamanho máximo de elementos: %d\n", numElements);
+    return 1;
+  }
+
+  if (static_cast<long double>(sysconf(_SC_CHILD_MAX)) < numProcesses) {
+    printf("%d é um número inválido de processos\n", numProcesses);
+    return 1;
+  }
+
+  if (numProcesses > numElements) {
+    printf("O número de processos não deve ser maior do que o de elementos\n");
+    return 1;
+  }
+
+  // Criando memória compartilhada
   key_t key = 1;
-  int shmid = shmget(1, sizeof(int) * numElements * 3, IPC_CREAT | 0666);
-  
-  // Falha ao criar memoria compartilhada
+  int shmid = shmget(key, sizeof(int) * numElements * 3, IPC_CREAT | 0666);
   if (shmid < 0) {
-    printf("Error in shmget !\n");
+    perror("shmget");
     return 1;
   }
-  
-  // Criando pipes para comunicação entre processo pai e filhos
-  int pipes[numProcesses][2];
-  for (int i = 0; i < numProcesses; i++)
+
+  // Alocando dinamicamente os pipes
+  int **pipes = new int *[numProcesses];
+  for (int i = 0; i < numProcesses; i++) {
+    pipes[i] = new int[2];
     if (pipe(pipes[i]) == -1) {
-      printf("Error in pipe[%d] !\n", i);
+      perror("pipe");
       return 1;
     }
+  }
 
   // Criando processos filhos
-  for(int i = 0; i < numProcesses; i++){
-    auto pid = fork(); 
-    
-    if(pid < 0){
-      printf("Error in fork[%d] !\n", i);
+  for (int i = 0; i < numProcesses; i++) {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+      perror("fork");
       continue;
     }
-    
-    if(pid == 0){
+
+    if (pid == 0) { // Processo filho
       Section section;
-      read(pipes[i][0], &section , sizeof(Section));
-      
-      // Anexando memoria compartilhada no processo
-      int *data = (int *)shmat(shmid, NULL, 0);
-      
+      close(pipes[i][1]); // Fecha escrita no filho
+      read(pipes[i][0], &section, sizeof(Section));
+
+      int *data = (int *)shmat(shmid, nullptr, 0);
       if (data == (int *)(-1)) {
-        printf("Error in shmat[%d] !\n", i);
+        perror("shmat");
         exit(1);
       }
-      
-      // Realizando a soma da fração dada ao processo filho
-      for(int i = section.start; i < section.end; i++)
-        data[(numElements*2) + i] = data[i] + data[i + numElements];
-      
-      // Desanexando memoria compartilhada do processo filho
-      shmdt(data); 
+
+      // Realiza a soma na seção atribuída
+      for (int j = section.start; j < section.end; j++) {
+        data[(numElements * 2) + j] = data[j] + data[j + numElements];
+      }
+
+      shmdt(data);        // Desanexa memória compartilhada
+      close(pipes[i][0]); // Fecha leitura
       exit(0);
     }
   }
 
-  int sectionSize = numElements / numProcesses; 
-  int remainder  = numElements % numProcesses; 
-  
-  // Anexando memoria compartilhada no processo
-  int *data = (int *)shmat(shmid, NULL, 0);
-      
+  int sectionSize = numElements / numProcesses;
+  int remainder = numElements % numProcesses;
+
+  int *data = (int *)shmat(shmid, nullptr, 0);
   if (data == (int *)(-1)) {
-    printf("Error in shmat !\n");
+    perror("shmat");
     exit(1);
   }
-  
-  // Gravando o V1, V2 e zerando V3
-  for(int i = 0; i  < numElements; i++){
+
+  // Inicializa vetores
+  for (int i = 0; i < numElements; i++) {
     data[i] = i;
     data[i + numElements] = i;
     data[i + (numElements * 2)] = 0;
   }
-  
-  // Enviando as frações para os processos filhos
-  for(int i = 0; i < numProcesses; i++){
-     Section section = {
-      sectionSize * i,
-      (sectionSize * i) + sectionSize + (i == numProcesses-1 ? remainder : 0)
-     };
-     
-     // Enviando fração atravez do pipe     
-     write(pipes[i][1], &section, sizeof(Section));
+
+  // Envia as seções para os processos filhos
+  for (int i = 0; i < numProcesses; i++) {
+    Section section = {sectionSize * i,
+                       (sectionSize * i) + sectionSize +
+                           (i == numProcesses - 1 ? remainder : 0)};
+    close(pipes[i][0]); // Fecha leitura no pai
+    write(pipes[i][1], &section, sizeof(Section));
+    close(pipes[i][1]); // Fecha escrita após o envio
   }
-  
-  // Aguardando todos os processos filhos finalizarem
-  while(wait(NULL) > 0);
-  
-  // Imprimindo V3
+
+  // Aguarda os processos filhos terminarem
+  while (wait(nullptr) > 0)
+    ;
+
+  // Imprime o vetor resultado
   printf("[");
-  for(int  i = 0; i < numElements; i++)
-    printf("%d%s", data[(numElements*2)+i], i == numElements-1 ? "]\n" : ", ");
-    
-  // Desanexando memoria compartilhada
+  for (int i = 0; i < numElements; i++) {
+    printf("%d%s", data[(numElements * 2) + i],
+           i == numElements - 1 ? "]\n" : ", ");
+  }
+
+  // Desanexa memória compartilhada
   shmdt(data);
-  
-  // Removendo segmento
-  shmctl(shmid, IPC_RMID, NULL);
-  
+
+  // Remove segmento
+  shmctl(shmid, IPC_RMID, 0);
+
+  // Libera memória dos pipes
+  for (int i = 0; i < numProcesses; i++) {
+    delete[] pipes[i];
+  }
+  delete[] pipes;
+
   return 0;
 }

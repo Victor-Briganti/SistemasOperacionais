@@ -20,6 +20,7 @@ Bibliotecas utilizadas:
     Fornece funções para entrada e saída padrão, como:
       printf() para imprimir mensagens no terminal.
       scanf() (não usado neste código) para entrada de dados.
+      perror() imprimi o erro retornado em errno na chamada de sistema.
 
     Neste programa, printf() é usado extensivamente para mensagens de erro, mensagens de uso e para exibir os resultados.
 
@@ -33,6 +34,7 @@ Bibliotecas utilizadas:
       fork(): Cria um novo processo (usado para gerar processos filhos).
       pipe(): Cria um pipe para comunicação entre processos.
       read() e write(): Lê e escreve dados nos pipes.
+      sysconf(): permite configurar e obter certos valores de configuração do sistema. 
         
     É essencial para manipular processos e comunicação interprocessos (IPC) no Linux.
 
