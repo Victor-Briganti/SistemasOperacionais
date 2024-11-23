@@ -1,23 +1,23 @@
-.PHONY: client client-debug server server-debug valgrind clear
+.PHONY: receiver receiver-debug sender sender-debug valgrind clear
 
 FLAGS = -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-sign-conversion -Wconversion
 
-all: client server
+all: receiver sender
 
-client:
-	g++ -o client $(FLAGS) client.cpp 
+receiver:
+	g++ -o receiver $(FLAGS) receiver.cpp 
 
-server:
-	g++ -o server $(FLAGS) server.cpp 
+sender:
+	g++ -o sender $(FLAGS) sender.cpp 
 
-client-debug:
-	g++ -o client $(FLAGS) client.cpp 
+receiver-debug:
+	g++ -o receiver $(FLAGS) receiver.cpp 
 
-server-debug:
-	g++ -o server $(FLAGS) server.cpp 
+sender-debug:
+	g++ -o sender $(FLAGS) sender.cpp 
 
 # valgrind:
 # 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./main
 
-clear:
-	rm -rf client server ffifo
+clean:
+	rm -rf receiver sender ffifo

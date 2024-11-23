@@ -1,7 +1,15 @@
-#include <fcntl.h>
-#include <iostream>
-#include <sys/stat.h>
-#include <unistd.h>
+/*
+ * Programa de manipulação de FIFOs
+ * Descrição: Cliente que recebe as informações do FIFO e mostra na tela.
+ *
+ * Autores: Victor Briganti, Luiz Takeda
+ * Licença: BSD 2
+ *
+ * Data: 23/11/2024
+ */
+#include <fcntl.h>  // O_RDONLY, open(), close()
+#include <iostream> // cerr, cout
+#include <unistd.h> // read()
 
 /** @brief Define o tamanho máximo da string usada como buffer. */
 #define MAX_STRING_SIZE 4096
@@ -17,8 +25,9 @@ int main() {
     return 1;
   }
 
+  // Enquanto a mensagem enviada tiver mais que 0 bytes imprime, caso contrário
+  // termina o loop
   while (true) {
-
     std::string receiveBuffer;
     receiveBuffer.resize(MAX_STRING_SIZE);
 
@@ -32,6 +41,7 @@ int main() {
     }
   }
 
+  // Fecha o pipe
   close(fd);
   return 0;
 }
