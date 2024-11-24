@@ -8,7 +8,6 @@
 
 #include "util.hpp"
 
-#include <cstring>
 #include <semaphore.h>
 #include <string>
 #include <sys/mman.h>

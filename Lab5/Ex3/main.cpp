@@ -2,7 +2,7 @@
  * Processo principal que irá manejar o produtor e consumidor
  * Descrição:
  *
- * Author: Victor Briganti, Luiz Takeda
+ * Author: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
  * License: BSD 2
  */
 #include "util.hpp"

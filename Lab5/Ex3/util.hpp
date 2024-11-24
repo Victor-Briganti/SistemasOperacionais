@@ -1,8 +1,8 @@
 /*
  * Utilitário para uso na comunicação entre cliente e servidor
- * Descrição:
+ * Descrição: Armazena a estrutura livro que será usada por todos os processos
  *
- * Author: Victor Briganti, Luiz Takeda
+ * Author: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
  * License: BSD 2
  */
 

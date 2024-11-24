@@ -2,17 +2,6 @@
 
 Este programa tem como objetivo realizar a comunicação entre processos por meio de FIFO
 
-## Bibliotecas
-
-As bibliotecas utilizadas foram:
-
-- cctype, desta bibliotca foi utilizado as funções isalpha() e isspace para verificar o tipo do caracter da mensagem.
-- fcntl.h, está biblioteca possui funções para controle de um arquivo. Daqui foram usados macros para definição de permissão O_WRONLY (apenas escrita) e O_RDONLY (apenas leitura). Além das macros também foram utilizadas as funções open() para abrir um descritor e o close() para fecha-lo.
-- iostream, biblioteca padrão de C++ usada para mostrar informações na tela. 
-- string, biblioteca padrão de C++ para manipulação de strings.
-- sys/stat.h, biblioteca usada para a criação do fifo com a função mkfifo().
-- unistd.h, desta biblioteca foi utilizado a função read() e write(), usadas para ler e escrever no descritor (neste caso o FIFO).
-
 ## Compilação
 
 Para compilar está biblioteca o seguinte comando pode ser utilizado:
@@ -29,3 +18,37 @@ Para executar este basta realizar o seguinte:
 ./sender
 ./receiver
 ```
+
+## Bibliotecas
+
+As bibliotecas utilizadas foram:
+
+  - <cctype>: 
+    Biblioteca usada para classificar caracteres.
+    isalpha() verifica se é um caracter alfabetico ou númerico
+    isspace() verifica se é um espaço
+
+  - <fcntl.h>: 
+    Contém definições para manipulação de arquivos e descritores de arquivos.
+    O_RDONLY, usado para abrir os arquivos como somente leitura
+    O_WRONLY, usado para abrir os arquivos como somente escrita
+    open(), abre os descritores de arquivos
+    close(), fecha os descritores de arquivos
+
+  - <iostream>: biblioteca padrão de C++ usada para mostrar informações na tela. 
+    Biblioteca padrão C++ para entrada e saída.
+    cout e cerr, classes usadas para imprimir mensagens no console (saída padrão e saída de erros)
+    cin, classe padrão para ler entradas de usuário.
+
+  - <string>, 
+    Biblioteca padrão de C++ para manipulação de strings.
+    string, classe padrão string de C++
+
+  - <sys/stat.h>: 
+    Biblioteca usada para os diferentes tipos de arquivos no sistema.
+    mkfifo(), cria o FIFO
+
+  - <unistd.h>:
+    Biblioteca de chamada de sistema para sistemas do tipo UNIX: 
+    read(), leitura de arquivos(inclui o FIFO)
+    write(), escrita em arquivos(inclui o FIFO)

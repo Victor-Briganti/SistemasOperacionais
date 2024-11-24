@@ -2,7 +2,7 @@
  * Programa de manipulação de FIFOs
  * Descrição: Cliente que recebe as informações do FIFO e mostra na tela.
  *
- * Autores: Victor Briganti, Luiz Takeda
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  *
  * Data: 23/11/2024

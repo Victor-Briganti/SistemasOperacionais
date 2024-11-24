@@ -1,11 +1,9 @@
 /**
- * Descrição:
- *
  * Este programa realiza a soma entre dois vetores,
- * utilizando processos filhos que utilizando de memoria compartilhada e pipe,
- * para realizar a tarefa
+ * Descrição: Utilizando processos filhos que utilizam de memoria
+ * compartilhada e pipe, é realizado a soma entre dois vetores
  *
- * Author: Victor Briganti, Luiz Takeda, Hendrick
+ * Author: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
  * License: BSD 2
  */
 #include <cstdio>     // printf(), perror()

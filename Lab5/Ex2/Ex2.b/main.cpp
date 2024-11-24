@@ -4,7 +4,7 @@
  * receber um SIGINT ou SIGTERM termina de armazenar as informações e fecha o
  * arquivo.
  *
- * Autores: Victor Briganti, Luiz Takeda
+ * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  *
  * Data: 23/11/2024
