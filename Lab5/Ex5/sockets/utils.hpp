@@ -2,7 +2,7 @@
  * Programa de manipulação de Sockets
  * Descrição: Arquivo utilitário que é dividido entre o cliente e o servidor
  *
- * Autores: Victor Briganti, Luiz Takeda
+ * Autores: Victor Briganti, Luiz Takeda, Hendrick Felipe Scheifer
  * Licença: BSD 2
  *
  * Data: 23/11/2024
