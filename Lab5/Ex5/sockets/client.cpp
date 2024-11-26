@@ -2,7 +2,7 @@
  * Programa de manipulação de Sockets
  * Descrição: Cliente que se conecta ao servidor e requisita uma tradução.
  *
- * Autores: Victor Briganti, Luiz Takeda
+ * Autores: Victor Briganti, Luiz Takeda, Hendrick Felipe Scheifer
  * Licença: BSD 2
  *
  * Data: 23/11/2024

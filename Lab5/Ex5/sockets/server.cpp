@@ -3,7 +3,7 @@
  * Descrição: Servidor que recebe uma conexão do cliente e que realiza as
  * traduções requeridas pelo mesmo.
  *
- * Autores: Victor Briganti, Luiz Takeda
+ * Autores: Victor Briganti, Luiz Takeda, Hendrick Felipe Scheifer
  * Licença: BSD 2
  *
  * Data: 23/11/2024
