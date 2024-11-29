@@ -3,12 +3,12 @@
  * Descrição: Usando threads imprime ping e pong alternadamente na tela. A
  * quantidade de threads ping e pong podem ser variaveis.
  *
- * Author: Victor Briganti, Luiz Takeda
+ * Author: Hendrick Felipe Scheifer, Victor Briganti, Luiz Takeda
  * License: BSD 2
  */
-#include <iostream>
-#include <pthread.h>
-#include <vector>
+#include <iostream>  // cout
+#include <pthread.h> // pthread_mutex_t, pthread_cond_t, pthread_cond_destroy(), pthread_cond_init(), pthread_cond_signal(), pthread_cond_wait(), pthread_create(), pthread_join(), pthread_init(), pthread_destroy()
+#include <vector>    // vector
 
 /**
  * @brief Estrutura para armazenar uma pool de threads
@@ -17,6 +17,12 @@
  * respectivas funções.
  */
 struct ThreadPool {
+  /**
+   * @brief Inicializa a pool de threads
+   *
+   * @param numThreads Quantidade de threads da pool
+   * @param func Função que será executada por cada uma das threads
+   */
   ThreadPool(int numThreads, void *(*func)(void *)) : func(func) {
     this->threads.resize(numThreads);
   }
@@ -45,8 +51,10 @@ bool pingTurn = true;
  * @return Sempre um nullptr
  */
 void *printPing(void *_arg) {
+  // Realiza o lock da região
   pthread_mutex_lock(&mutex);
 
+  // Se não for a vez do ping entra em estado de espera
   while (!pingTurn) {
     pthread_cond_wait(&pingCond, &mutex);
   }
@@ -54,6 +62,7 @@ void *printPing(void *_arg) {
   std::cout << "ping" << std::endl;
   pingTurn = false;
 
+  // Realiza o unlock da região sinaliza as threads pongs
   pthread_cond_signal(&pongCond);
   pthread_mutex_unlock(&mutex);
 
@@ -71,8 +80,10 @@ void *printPing(void *_arg) {
  * @return Sempre um nullptr
  */
 void *printPong(void *_arg) {
+  // Realiza o lock da região
   pthread_mutex_lock(&mutex);
 
+  // Se não for a vez do pong entra em estado de espera
   while (pingTurn) {
     pthread_cond_wait(&pongCond, &mutex);
   }
@@ -80,6 +91,7 @@ void *printPong(void *_arg) {
   std::cout << "        pong" << std::endl;
   pingTurn = true;
 
+  // Realiza o unlock da região sinaliza as threads pongs
   pthread_cond_signal(&pingCond);
   pthread_mutex_unlock(&mutex);
 
@@ -95,6 +107,7 @@ void *printPong(void *_arg) {
  * @param pool2 Segunda pool de threads (usualmente pong)
  */
 void equalSpawn(ThreadPool pool1, ThreadPool pool2) {
+  // Cria a primeira pool
   for (size_t i = 0; i < pool1.threads.size(); i++) {
     int res = pthread_create(&(pool1.threads[i]), nullptr, pool1.func, nullptr);
     if (res < 0) {
@@ -102,6 +115,7 @@ void equalSpawn(ThreadPool pool1, ThreadPool pool2) {
     }
   }
 
+  // Cria a segunda pool
   for (size_t i = 0; i < pool2.threads.size(); i++) {
     int res = pthread_create(&(pool2.threads[i]), nullptr, pool2.func, nullptr);
     if (res < 0) {
@@ -109,10 +123,12 @@ void equalSpawn(ThreadPool pool1, ThreadPool pool2) {
     }
   }
 
+  // Espera a primeira pool terminar
   for (size_t i = 0; i < pool1.threads.size(); i++) {
     pthread_join(pool1.threads[i], nullptr);
   }
 
+  // Espera a segunda pool terminar
   for (size_t i = 0; i < pool2.threads.size(); i++) {
     pthread_join(pool2.threads[i], nullptr);
   }
@@ -130,6 +146,7 @@ void equalSpawn(ThreadPool pool1, ThreadPool pool2) {
 void balanceSpawn(ThreadPool bigPool, ThreadPool smallPool) {
   int size = static_cast<int>(bigPool.threads.size());
 
+  // Inicializa a maior pool de threads
   for (size_t i = 0; i < bigPool.threads.size(); i++) {
     int res =
         pthread_create(&(bigPool.threads[i]), nullptr, bigPool.func, nullptr);
@@ -138,6 +155,8 @@ void balanceSpawn(ThreadPool bigPool, ThreadPool smallPool) {
     }
   }
 
+  // Realiza um loop para criação das threads da pool menor até finalizar o
+  // serviço com todas as menores
   do {
     int numThreads = 0;
 
@@ -150,6 +169,7 @@ void balanceSpawn(ThreadPool bigPool, ThreadPool smallPool) {
       numThreads = static_cast<int>(smallPool.threads.size());
     }
 
+    // Inicializa a menor pool de threads
     for (int i = 0; i < numThreads; i++) {
       int res = pthread_create(&(smallPool.threads[i]), nullptr, smallPool.func,
                                nullptr);
@@ -180,6 +200,8 @@ void loadBalance(int pings, int pongs) {
   ThreadPool ping = ThreadPool(pings, printPing);
   ThreadPool pong = ThreadPool(pongs, printPong);
 
+  // Verifica a quantidade de threads que deve ser gerado de cada tipo e realiza
+  // o balanceamento confrome
   if (pings == pongs) {
     equalSpawn(ping, pong);
   } else if (pings > pongs) {

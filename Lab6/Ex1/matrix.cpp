@@ -4,12 +4,11 @@
  * Cada thread lê uma linha realiza a soma e armazena o resultado em uma
  * váriavel global
  *
- * Author: Victor Briganti, Luiz Takeda
+ * Author: Hendrick Felipe Scheifer, Victor Briganti, Luiz Takeda
  * License: BSD 2
  */
-#include "matrix.hpp"
-#include <pthread.h>
-#include <vector>
+#include "matrix.hpp" // Matrix
+#include <pthread.h> // pthread_create(), pthread_join(), pthread_mutex_init(), pthread_mutex_lock(), pthread_mutex_unlock()
 
 #define THREAD_NUM 5
 
@@ -57,6 +56,7 @@ void initIndexes() {
 std::vector<int> getRow() {
   pthread_mutex_lock(&rowMutex);
 
+  // Caminha pela matriz procurando uma linha que ainda não foi calculada
   std::vector<int> res = {};
   for (int i = 0; i < ROWS; i++) {
     if (!indexes[i]) {
@@ -79,6 +79,7 @@ std::vector<int> getRow() {
  */
 void *accumulator(void *_arg) {
   while (true) {
+    // Busca as linhas vazias
     std::vector<int> vec = getRow();
     if (vec.empty()) {
       break;
@@ -86,10 +87,12 @@ void *accumulator(void *_arg) {
 
     int acc = 0;
 
+    // Realiza a soma dos valores na variável local
     for (int value : vec) {
       acc += value;
     }
 
+    // Realiza a soma dos valores na variável global
     pthread_mutex_lock(&countMutex);
     count += acc;
     pthread_mutex_unlock(&countMutex);
@@ -102,11 +105,15 @@ int main() {
   std::vector<pthread_t> tid;
   tid.resize(THREAD_NUM);
 
+  // Inicializa o vetor que define o acesso a matriz
   initIndexes();
 
+  // Inicializa o mutex para contagem
   pthread_mutex_init(&countMutex, nullptr);
+  // Inicializa o mutex das linhas
   pthread_mutex_init(&rowMutex, nullptr);
 
+  // Cria as threads para realizar a conta
   for (int i = 0; i < THREAD_NUM; i++) {
     int res = pthread_create(&(tid[i]), nullptr, accumulator, nullptr);
     if (res < 0) {
@@ -114,6 +121,7 @@ int main() {
     }
   }
 
+  // Aguarda as threads terminarem
   for (int i = 0; i < THREAD_NUM; i++) {
     pthread_join(tid[i], nullptr);
   }
