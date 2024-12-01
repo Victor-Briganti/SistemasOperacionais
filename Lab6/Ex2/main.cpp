@@ -7,7 +7,7 @@
  * License: BSD 2
  */
 #include <iostream>  // cout
-#include <pthread.h> // pthread_mutex_t, pthread_cond_t, pthread_cond_destroy(), pthread_cond_init(), pthread_cond_signal(), pthread_cond_wait(), pthread_create(), pthread_join(), pthread_init(), pthread_destroy()
+#include <pthread.h> // pthread_mutex_t, pthread_cond_t, pthread_cond_destroy(), pthread_cond_init(), pthread_cond_signal(), pthread_cond_wait(), pthread_create(), pthread_join()
 #include <vector>    // vector
 
 /**
