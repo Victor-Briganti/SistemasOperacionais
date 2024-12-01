@@ -9,6 +9,7 @@
  */
 #include "matrix.hpp" // Matrix
 #include <pthread.h> // pthread_create(), pthread_join(), pthread_mutex_init(), pthread_mutex_lock(), pthread_mutex_unlock()
+#include <unistd.h>  // gettid()
 
 #define THREAD_NUM 5
 
@@ -38,6 +39,19 @@ pthread_mutex_t countMutex;
 
 /** @brief Mutex para acesso das linhas da matrix */
 pthread_mutex_t rowMutex;
+
+/**
+ * @brief Imprime um vetor.
+ *
+ * @param vec Vetor que será imprimido
+ */
+void printVector(std::vector<int> vec) {
+  std::cout << "[ ";
+  for (auto value : vec) {
+    std::cout << value << " ";
+  }
+  std::cout << "]\n";
+}
 
 /**
  * @brief Inicializa vetor para acesso das linhas da matriz
@@ -78,6 +92,8 @@ std::vector<int> getRow() {
  * @return Retorna sempre um nullptr
  */
 void *accumulator(void *_arg) {
+  pid_t tid = gettid();
+
   while (true) {
     // Busca as linhas vazias
     std::vector<int> vec = getRow();
@@ -94,6 +110,14 @@ void *accumulator(void *_arg) {
 
     // Realiza a soma dos valores na variável global
     pthread_mutex_lock(&countMutex);
+
+    // Mostra a thread e o vetor a ser somado
+    // std::cout << "[" << tid << "]Vetor: ";
+    // printVector(vec);
+
+    // Mostra a thread e o resultado da soma
+    std::cout << "[" << tid << "]Soma: " << acc << "\n";
+
     count += acc;
     pthread_mutex_unlock(&countMutex);
   }
@@ -107,6 +131,10 @@ int main() {
 
   // Inicializa o vetor que define o acesso a matriz
   initIndexes();
+
+  // Mostra a matriz que será usada.
+  std::cout << "Matriz\n";
+  matrix.print();
 
   // Inicializa o mutex para contagem
   pthread_mutex_init(&countMutex, nullptr);

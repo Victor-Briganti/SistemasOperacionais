@@ -26,6 +26,11 @@ Para executar este basta realizar o seguinte:
 
 As bibliotecas utilizadas foram:
 
+  - <unistd.h>: 
+    Biblioteca utilizada para acesso das APIs do sistema operacional.
+    Função utilizada:
+      gettid(): // Retorna o ID da thread atual.
+
   - <pthread.h>: 
     Biblioteca utilizada para utilizar e manipular threads e mutex.
     Funções utilizadas:
