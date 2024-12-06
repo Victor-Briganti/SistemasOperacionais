@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <vector>
 
-#define NUM_READERS (5)
+#define NUM_READERS (50)
 #define NUM_WRITERS (35)
 
 /** Mutex para controle de operações */
@@ -22,54 +22,69 @@ pthread_cond_t conditional;
 /** Quantidade de threads na fila para ler */
 int readers = 0;
 
+/** Define se os readers devem ou não parar de acessar a região critica */
+bool readerCrit = true;
+
 /** Quantidade de threads na fila pra escrever */
 int writers = 0;
 
 void *reader(void *arg) {
-  pthread_mutex_lock(&mutex);
+  while (true) {
+    pthread_mutex_lock(&mutex);
 
-  while (writers) {
-    pthread_cond_wait(&conditional, &mutex);
+    while (writers || !readerCrit) {
+      pthread_cond_wait(&conditional, &mutex);
+    }
+
+    readers++;
+    pthread_mutex_unlock(&mutex);
+
+    std::cout << "Lendo\n";
+    sleep(2);
+
+    pthread_mutex_lock(&mutex);
+    readers--;
+
+    // Se a quantidade de leitores está mais do que a metade para de aceitar
+    // leitores
+    if (readers >= NUM_READERS / 2) {
+      readerCrit = false;
+    }
+
+    if (!readers) {
+      pthread_cond_broadcast(&conditional);
+    }
+
+    pthread_mutex_unlock(&mutex);
   }
-
-  readers++;
-  pthread_mutex_unlock(&mutex);
-
-  std::cout << "Lendo\n";
-  sleep(2);
-
-  pthread_mutex_lock(&mutex);
-  readers--;
-
-  if (!readers) {
-    pthread_cond_signal(&conditional);
-  }
-
-  pthread_mutex_unlock(&mutex);
 
   return nullptr;
 }
 
 void *writer(void *arg) {
-  pthread_mutex_lock(&mutex);
+  while (true) {
+    pthread_mutex_lock(&mutex);
+    while (readers || writers) {
+      pthread_cond_wait(&conditional, &mutex);
+    }
 
-  while (readers || writers) {
-    pthread_cond_wait(&conditional, &mutex);
+    writers++;
+
+    pthread_mutex_unlock(&mutex);
+
+    std::cout << "Escrevendo\n";
+    sleep(1);
+
+    pthread_mutex_lock(&mutex);
+
+    writers--;
+
+    // Ao escrever ao menos uma vez volta a aceitar leitores
+    readerCrit = true;
+
+    pthread_cond_broadcast(&conditional);
+    pthread_mutex_unlock(&mutex);
   }
-
-  writers++;
-
-  pthread_mutex_unlock(&mutex);
-
-  std::cout << "Escrevendo\n";
-  sleep(1);
-
-  pthread_mutex_lock(&mutex);
-
-  writers--;
-
-  pthread_cond_broadcast(&conditional);
-  pthread_mutex_unlock(&mutex);
 
   return nullptr;
 }
