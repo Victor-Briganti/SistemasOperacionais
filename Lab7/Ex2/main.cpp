@@ -2,7 +2,7 @@
  * Leitores/Escritores
  * Descrição:
  *
- * Autores: Victor Briganti, Luiz Takeda
+ * Autores: Hendrick Felipe Scheifer, Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  */
 #include <iostream>

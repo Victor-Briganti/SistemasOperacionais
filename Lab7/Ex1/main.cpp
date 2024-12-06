@@ -1,8 +1,9 @@
 /*
  * Jantar dos Filosófos
  * Descrição:
- *
- * Autores: Victor Briganti, Luiz Takeda
+ * Este programa tem como objetivo resolver o problema do jantar dos filosófos.
+ * 
+ * Autores: Hendrick Felipe Scheifer, Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  */
 #include <ctime>
