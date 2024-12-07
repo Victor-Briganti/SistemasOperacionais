@@ -46,8 +46,3 @@ As bibliotecas utilizadas foram:
     Fornece vetores dinâmicos da biblioteca padrão do C++.
     Armazena os identificadores de threads dos leitores (readersTid) e escritores (writersTid), permitindo gerenciamento dinâmico.
 
-
-
-
-
-

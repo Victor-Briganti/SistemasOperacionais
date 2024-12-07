@@ -2,16 +2,16 @@
  * Jantar dos Filosófos
  * Descrição:
  * Este programa tem como objetivo resolver o problema do jantar dos filosófos.
- * 
+ *
  * Autores: Hendrick Felipe Scheifer, Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  */
-#include <ctime>
-#include <iostream>
-#include <pthread.h>
-#include <semaphore.h>
-#include <unistd.h>
-#include <vector>
+#include <ctime>     // time()
+#include <iostream>  // out
+#include <pthread.h> // pthread_t, pthread_create(), pthread_join(), pthread_mutex_destroy(), pthread_mutex_init(), pthread_mutex_lock()
+#include <semaphore.h> // sem_t, sem_destroy(), sem_init(), sem_post(), sem_wait()
+#include <unistd.h>    // sleep()
+#include <vector>      // vector
 
 /** Número de filosófos */
 #define N 1000
@@ -42,6 +42,9 @@ pthread_mutex_t mutex;
 /**
  * @brief Testa se o filosófo pode começar a comer
  *
+ * O filosófo só pode estar no estado comendo, se ele estiver com fome e os
+ * filófosos ao seu lado não estiverem comendo.
+ *
  * @param id Filosófo que irá pegar os talheres
  */
 void test(int id) {
@@ -55,6 +58,8 @@ void test(int id) {
 /**
  * @brief Filosófo pega os talheres
  *
+ * Altera o estado do filósofo para com fome e realiza um wait nos talheres
+ *
  * @param id Filosófo que irá pegar os talheres
  */
 void take_forks(int id) {
@@ -66,7 +71,10 @@ void take_forks(int id) {
 }
 
 /**
- * @brief Função que coloca o filosófo no jantar
+ * @brief Função que libera os talheres
+ *
+ * Coloca o filósofo no estado de pensando e verifica se os filósofos a esquerda
+ * ou a direita querem comer.
  *
  * @param id Filosófo que irá liberar os talheres
  */
@@ -122,21 +130,26 @@ void *philosopher(void *arg) {
 int main() {
   srand(time(nullptr));
 
+  // Inicializa o mutex
   pthread_mutex_init(&mutex, nullptr);
 
+  // Inicializa os semáforos de cada filósofo
   for (int i = 0; i < N; i++) {
     sem_init(&semaphores[i], 0, 0);
   }
 
+  // Cria cada filósofo
   for (int i = 0; i < N; i++) {
     int *arg = new int(i);
     pthread_create(&tid[i], nullptr, philosopher, arg);
   }
 
+  // Termina os filósofos
   for (int i = 0; i < N; i++) {
     pthread_join(tid[i], nullptr);
   }
 
+  // Destrói as primitivas de sincronização
   pthread_mutex_destroy(&mutex);
   for (int i = 0; i < N; i++) {
     sem_destroy(&semaphores[i]);

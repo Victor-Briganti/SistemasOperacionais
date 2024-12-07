@@ -1,6 +1,7 @@
-# Jantar dos Filosófos
+# Jantar dos Filósofos
 
-Este programa tem como objetivo resolver o problema do jantar dos filosófos.
+Este programa tem como objetivo resolver o problema do jantar dos filósofos.
+A solução utilizada para este problema foi a de que um dos filófosos pega os garfos em uma ordem diferente das dos demais, dessa forma a espera circular é quebrada impedindo que o deadlock ocorra.
 
 ## Compilação
 
