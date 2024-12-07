@@ -1,8 +1,9 @@
 /*
  * Leitores/Escritores
  * Descrição:
- *
- * Autores: Victor Briganti, Luiz Takeda
+ * Este programa tem como objetivo, resolver o problema Leitores/Escritores.
+ * 
+ * Autores: Hendrick Felipe Scheifer, Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  */
 #include <iostream>

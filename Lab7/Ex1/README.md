@@ -1,1 +1,0 @@
-# Jantar dos Filosófos
