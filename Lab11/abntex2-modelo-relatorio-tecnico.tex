@@ -32,22 +32,22 @@
 
 
 \documentclass[
-	% -- opções da classe memoir --
-	12pt,				% tamanho da fonte
-	%openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
-	oneside,   	        % para impressão em verso e anverso use twoside. Oposto a oneside
-	a4paper,			% tamanho do papel. 
-	% -- opções da classe abntex2 --
-	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
-	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
-	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
-	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
-	% -- opções do pacote babel --
-	english,			% idioma adicional para hifenização
-	french,				% idioma adicional para hifenização
-	spanish,			% idioma adicional para hifenização
-	brazil,				% o último idioma é o principal do documento
-	]{pacotes/abntex2}
+  % -- opções da classe memoir --
+  12pt,				% tamanho da fonte
+  %openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+  oneside,   	        % para impressão em verso e anverso use twoside. Oposto a oneside
+  a4paper,			% tamanho do papel. 
+  % -- opções da classe abntex2 --
+  %chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+  %section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+  %subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+  %subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+  % -- opções do pacote babel --
+  english,			% idioma adicional para hifenização
+  french,				% idioma adicional para hifenização
+  spanish,			% idioma adicional para hifenização
+  brazil,				% o último idioma é o principal do documento
+  ]{pacotes/abntex2}
 
 
 % ---
@@ -72,7 +72,7 @@
 \usepackage{multicol}
 \usepackage{multirow}
 % ---
-	
+  
 % ---
 % Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
 % ---
@@ -105,19 +105,19 @@
 \renewcommand{\backref}{}
 % Define os textos da citação
 \renewcommand*{\backrefalt}[4]{
-	\ifcase #1 %
-		Nenhuma citação no texto.%
-	\or
-		Citado na página #2.%
-	\else
-		Citado #1 vezes nas páginas #2.%
-	\fi}%
+  \ifcase #1 %
+    Nenhuma citação no texto.%
+  \or
+    Citado na página #2.%
+  \else
+    Citado #1 vezes nas páginas #2.%
+  \fi}%
 % ---
 
 % ---
 % Informações de dados para CAPA e FOLHA DE ROSTO
 % ---
-\titulo{Segurança em Sistemas Operacionais Linux}
+\titulo{Segurança em Sistemas Operacionais GNU/Linux}
 \autor{Hendrick Felipe Scheifer\\João Victor Briganti\\Luiz Gustavo Takeda}
 \local{Campo Mourão}
 \data{Dezembro / 2024}
@@ -143,18 +143,18 @@
 % informações do PDF
 \makeatletter
 \hypersetup{
-     	%pagebackref=true,
-		pdftitle={\@title}, 
-		pdfauthor={\@author},
-    	pdfsubject={\imprimirpreambulo},
-	    pdfcreator={LaTeX with abnTeX2},
-		pdfkeywords={abnt}{latex}{abntex}{abntex2}{relatório técnico}, 
-		colorlinks=true,       		% false: boxed links; true: colored links
-    	linkcolor=blue,          	% color of internal links
-    	citecolor=blue,        		% color of links to bibliography
-    	filecolor=magenta,      		% color of file links
-		urlcolor=blue,
-		bookmarksdepth=4
+      %pagebackref=true,
+    pdftitle={\@title}, 
+    pdfauthor={\@author},
+      pdfsubject={\imprimirpreambulo},
+      pdfcreator={LaTeX with abnTeX2},
+    pdfkeywords={abnt}{latex}{abntex}{abntex2}{relatório técnico}, 
+    colorlinks=true,       		% false: boxed links; true: colored links
+      linkcolor=blue,          	% color of internal links
+      citecolor=blue,        		% color of links to bibliography
+      filecolor=magenta,      		% color of file links
+    urlcolor=blue,
+    bookmarksdepth=4
 }
 \makeatother
 % --- 
@@ -213,12 +213,12 @@
 
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
-Os objetivos deste trabalho são compreender e aplicar conceitos e recursos de segurança em sistemas operacionais Linux. Para tal atividade foi utilizado um sistema operacional Linux executado em uma máquina virtual através do hipoervisor VirtualBox, neste sistema o procedimento realizado foi a configuração de recursos importantes para a segurança no sistema operacional, além de observação de arquivos importantes para o gerenciamento dos recursos de segurança. Este trabalho atingiu seu objetivo com sucesso, permitindo a compreensão clara e aplicação de recursos básicos de segurança em sistemas operacionais Linux, sem apresentar grandes dificuldades. Os resultados provam a importância da aplicação de recursos para prover segurança as informações e recursos do sistema operacional, consolidando o conhecimento teórico.
+Os objetivos deste trabalho são compreender e aplicar conceitos e recursos de segurança em sistemas operacionais GNU/Linux. Para tal atividade foi utilizado um sistema operacional GNU/Linux executado em uma máquina virtual através do hipervisor VirtualBox, neste sistema o procedimento realizado foi a configuração de recursos importantes para a segurança no sistema operacional, além de observação de arquivos importantes para o gerenciamento dos recursos de segurança. Este trabalho atingiu seu objetivo com sucesso, permitindo a compreensão clara e aplicação de recursos básicos de segurança em sistemas operacionais GNU/Linux, sem apresentar grandes dificuldades. Os resultados provam a importância da aplicação de recursos para prover segurança as informações e recursos do sistema operacional, consolidando o conhecimento teórico.
 
- \vspace{\onelineskip}
+  \vspace{\onelineskip}
     
- \noindent
- \textbf{Palavras-chave}: segurança; sistemas operacionais; linux.
+  \noindent
+  \textbf{Palavras-chave}: segurança; virtualização; linux.
 \end{resumo}
 % ---
 
@@ -268,33 +268,36 @@ Os objetivos deste trabalho são compreender e aplicar conceitos e recursos de s
 \section{Introdução}
 \label{sec:introducao}
 
-A segurança é um aspecto indispensável em um sistema operacional, o qual diz respeito a proteção dos recursos do computador contra ameaças externas, como acesso não autorizado, destruição ou aletração maliciosa e introdução acidental de inconsistências. Os recursos citados anteriormente como foco da segurança se referem às informações armazenadas, processador, memória, discos e redes, os quais constituem o computador~\cite{silberschatz2015}.
+A segurança é um aspecto indispensável em um sistema operacional, o qual diz respeito a proteção dos recursos do computador contra ameaças externas, como acesso não autorizado, destruição ou alteração maliciosa e introdução acidental de inconsistências~\cite{silberschatz2015}.
 
-O estudo e aplicação da segurança em sistemas operacionais resulta em melhor consistência no funcionamento, assim como garante a devida privacidade ao usuário. Este trabalho tem como foco aspectos de segurança em sistemas operacionais Linux, as próximas seções falarão sobre os objetivos da atividade, fundamentação essencial para a compreensão, procedimentos realizados e resultados obtidos.
+O estudo e aplicação da segurança em sistemas operacionais resulta em melhor consistência no funcionamento, assim como garante a devida privacidade ao usuário. Este trabalho tem como foco aspectos de segurança em sistemas operacionais GNU/Linux, as próximas seções falarão sobre os objetivos da atividade, fundamentação essencial para a compreensão, procedimentos realizados e resultados obtidos.
 
 \section{Objetivos}
 \label{sec:objetivos}
 
-Os objetivos deste trabalho são a compreensão de princípios básicos da segurança em sistemas operacionais, identificar arquivos relevantes para a configuração da segurança em sistemas operacionais Linux e aprender comandos básicos utilizados em configurações de segurança em sistemas operacionais Linux.
+Os objetivos deste trabalho são a compreensão de princípios básicos da segurança de Sistemas Operacionais, sendo eles a identificação e análise dos arquivos críticos para configuração de segurança, e comandos essenciais para implementação das configurações de segurança no sistema.
 
 \section{Fundamentação}
 \label{sec:fundamentacao}
 
-Sistemas operacionais são inicialmente projetados visando a segurança interna, ou seja, os recursos são utilizados e acessados como esperado em qualquer circunstância. Mas estas circunstâncias observadas anteriormente não incluem atividades mal-intencionadas, as quais são atribuídas o nome ''ataques", que podem violar a segurança do sistema~\cite{silberschatz2015}.
+A segurança da informação possui três princípios fundamentais~\cite{maziero2019}:
+\begin{enumerate}
+    \item \textbf{Confidencialidade}: Princípio que estabelece que os recursos do sistema podem ser acessados exclusivamente por usuários devidamente autorizados, restringindo o acesso a informações sensíveis.
+    \item \textbf{Integridade}: Determina que os recursos do sistema podem apenas ser alterados ou destruídos por usuários autorizados.
+    \item \textbf{Disponibilidade}: Garante que os recursos computacionais estejam permanentemente acessíveis aos usuários autorizados, assegurando o funcionamento contínuo dos sistemas.
+\end{enumerate}
 
-A segurança da informação possui três princípios fundamentais, sendo eles a confidencialidade, o qual determina que os recursos do sistema podem apenas ser utilizados por devidamente autorizados, a integridade, que determina que os recursos do sistema podem apenas ser alterados ou destruídos por usuários autorizados, e por fim a disponibilidade, que determina que os recursos devem estar sempre disponíveis para usuários autorizados que desejam utilizá-los~\cite{maziero2019}.
-
-Qualquer possibilidade de violação da segurança do sistema é considerada uma ameaça, como a existência de vulnerabilidades, enquanto qualquer tentativa de violar a segurança do sistema é considerada um ataque utilizando por exemplos as vulnerabilidades existentes. Os ataques possuem diferentes objetivos e violam de diferentes formas a segurança do sistema, estas violações podem ser de diferentes tipos~\cite{silberschatz2015}:
+Toda potencial vulnerabilidade em um sistema computacional representa uma ameaça, enquanto as tentativas efetivas de explorar essas vulnerabilidades configuram ataques. Os ataques podem exploram as vulnerabilidades do sistema de maneira diferente, e, portanto podem ser classificados da seguinte maneira~\cite{silberschatz2015}:
 
 \begin{itemize}
-    \item \textbf{Brecha de sigilo}: violação de segurança que visa acesso não autorizado de dados, este ataque está geralmente associado a um invasor, que ao obter dados do usuário pode se beneficiar de alguma forma.
-    \item \textbf{Brecha de integridade}: violação que visa alterar dados sem autorização para tal ação, ataque que também visa beneficiar algum invasor ou prejudicar outro usuário.
-    \item \textbf{Brecha de disponibilidade}: violação que visa a destruição não autorizada de dados, este ataque visa explorar benefícios prejudicando o usuário proprietário dos dados.
-    \item \textbf{Roubo de serviço}: violação que se baseia no uso não autorizado de recursos, ataque que visa se beneficiar a partir dos recursos alheios, o que pode ser feito, por exemplo, a partir da instalação de um \textit{daemon} no sistema para fins de uso de recursos como disco ou processador sem a autorização do proprietário do sistema.
-    \item \textbf{Recusa de serviço}: violação que explora o impedimento do uso correto do sistema, visando prejudicar o proprietário do sistema ou terceiros que necessitem destes serviços, ataques deste tipo são chamados de DOS (\textit{denial-of-service}, e podem surgir acidentalmente em alguns casos, a partir de \textit{bugs} no sistema, mas podem ser associados a invasores que criam \textit{daemons} para isto.
+    \item \textbf{Brecha de sigilo}: Acesso não autorizado a dados confidenciais, permitindo que invasores obtenham informações sigilosas para benefício próprio, violando a privacidade dos usuários.
+    \item \textbf{Brecha de integridade}:  Modificação não autorizada de dados, visando alterar informações para beneficiar o atacante ou prejudicar o proprietário, comprometendo a confiabilidade.
+    \item \textbf{Brecha de disponibilidade}: Destruição não autorizada de dados que impede o acesso legítimo aos recursos, restringindo a utilização normal do sistema.
+    \item \textbf{Roubo de serviço}: Utilização não autorizada de recursos computacionais, como instalação de um\textit{daemon} para consumo de processamento ou armazenamento sem consentimento.
+    \item \textbf{Recusa de serviço}: Impedimento do funcionamento adequado do sistema, prejudicando proprietários ou usuários, podendo ocorrer por falhas no sistema ou pela ação de invasores.
 \end{itemize}
 
-Conforme as vulnerabilidades que trazem ameaças ao sistema se tornaram conhecidas, soluções foram desenvolvidas e aplicadas em sistemas operacionais, a seção \ref{sec:procedimentos} apresenta a discussão de alguns recursos básicos de segurança implementados para sistemas operacionais Linux e demonstra o uso destes recursos em uma máquina virtual.
+Conforme as vulnerabilidades que trazem ameaças ao sistema se tornam conhecidas, soluções foram desenvolvidas e aplicadas em sistemas operacionais, a seção~\ref{sec:procedimentos} apresenta a discussão de alguns recursos básicos de segurança implementados para o sistema GNU/Linux e demonstra o uso destes recursos em uma máquina virtual.
 
 \section{Materiais}
 \label{sec:materiais}
@@ -316,16 +319,18 @@ Conforme as vulnerabilidades que trazem ameaças ao sistema se tornaram conhecid
 \section{Procedimentos e Resultados}
 \label{sec:procedimentos}
 
-Nesta seção, serão abordados diversos conceitos e recursos básicos de segurança aplicados em um sistema operacional Linux em ambiente virtual, utilizando o hipervisor VirtualBox. Serão abordados e detalhados arquivos e comandos essenciais para prover segurança a sistemas operacionais Linux. Após a instalação da distribuição Linux fornecida pelo professor, o usuário ''\textit{root}`` foi utilizado para a realização das configurações, pois possui privilégios adminstrativos.
+Este estudo apresenta a implementação de recursos básicos de segurança em um sistema operacional GNU/Linux, utilizando o ambiente de virtualização VirtualBox. O trabalho concentra-se na análise detalhada de arquivos e comandos críticos para a proteção de sistemas GNU/Linux, visando estabelecer práticas fundamentais de segurança da informação.
+
+Após a instalação da distribuição fornecida pelo professor, o usuário ``\textit{root}'' foi utilizado para a realização das configurações, pois possui privilégios administrativos~\ref{negus2012}.
 
 \subsection{Configuração do nível de segurança das senhas}
 \label{subsec:senhas}
 
-Senhas são um recurso de segurança extremamente comum e utilizado, devido a sua facilidade de compreensão e utilização, porém, ainda há a possibilidade de um invasor obter de alguma forma a senha, seja através da engenharia social, onde o invasor conhece o alvo e através da obtenção de informações sobre ele consegue adivinhar a senha, ou até mesmo por métodos de força bruta, no qual milhares de possíveis combinações são testadas até que se obtenha a combinação correta que forma a senha~\cite{silberschatz2015}.
+Senhas são recursos de segurança comumente utilizados, devido a sua facilidade de compreensão e utilização. Porém, há a possibilidade de um invasor obter essa senha, por meio processo como engenharia social ou até mesmo métodos de força bruta e utilizado~\cite{silberschatz2015}.
 
-Uma solução comumente utilizada para dificultar o ataque e reduzir os riscos de invasão é a utilização de padrões mais complexos de senha, que envolve a exigência de caracteres de diferentes classes para a criação da senha, além de um número mínimo de caracteres. Para a implementação deste recurso em sistemas operacionais Linux, pode-se utilizar como ferramenta a biblioteca \textit{libpam-quality}, que proporciona recursos de segurança, incluindo a verificação de senhas de acordo com a solução apresentada anteriormente, com a instalação desta biblioteca, com o comando \textit{apt install libpam-quality}, um arquivo de configuração da qualidade de senhas será criado em \textit{/etc/security/pwquality.conf} ~\cite{libpam-pwquality}.
+Uma solução comumente utilizada para dificultar o ataque e reduzir os riscos de invasão é a utilização de padrões mais complexos de senha, que envolve a exigência de caracteres de diferentes classes para a criação da mesma, além de um número mínimo de caracteres. Para a implementação deste recurso em Sistemas Operacionais GNU/Linux, pode-se utilizar como ferramenta a biblioteca \textit{libpam-quality}, que proporciona recursos de segurança, incluindo a verificação de senhas, esta biblioteca pode ser instalada com o comando \textit{apt install libpam-quality}, após a instalação o arquivo de configuração da qualidade de senhas será criado em \textit{/etc/security/pwquality.conf}~\cite{libpam-pwquality}.
 
-O arquivo citado anteriormente contém as configuração da qualidade de senha, como a quantidade mínima de caracteres total, de dígitos numéricos, caracteres especiais e de letras minúsculas e maiúsculas. O exemplo de configuração proposto pela atividade diz que a senha deve conter as seguintes exigências:
+O arquivo citado anteriormente contém as configurações da qualidade da senha, como a quantidade mínima de caracteres, de dígitos numéricos, caracteres especiais e de letras minúsculas e maiúsculas. O exemplo de configuração proposto pela atividade diz que a senha deve conter as seguintes exigências:
 
 \begin{itemize}
     \item Mínimo de 10 caracteres ao todo;
@@ -335,18 +340,20 @@ O arquivo citado anteriormente contém as configuração da qualidade de senha, 
     \item Mínimo de 1 caractere especial.
 \end{itemize}
 
-Para a adicionar os requisitos basta modificar o arquivo \textit{/etc/security/pwquality.conf}, para realizar alterações como essa durante a prática, foi utilizado o editor de texto \textit{Nano}, a partir do comando \textit{nano /etc/security/pwquality.conf}. O arquivo possui algumas variáveis que controlam os requisitos de senhas, para a implementação proposta anteriormente foram alteradas as seguintes variáveis:
+Para a adicionar os requisitos basta modificar o arquivo \textit{/etc/security/pwquality.conf}, o editor de texto \textit{Nano}, a partir do comando \textit{nano /etc/security/pwquality.conf}. O arquivo possui algumas variáveis que controlam os requisitos de senhas, para a implementação proposta anteriormente foram alteradas as seguintes variáveis:
+
+Para modificar os requisitos de senhas, utilizou-se o comando nano \textit{/etc/security/pwquality.conf}, onde o \textit{nano} é um editor de texto e o arquivo \textit{/etc/security/pwquality.conf} permite ajustar os requisitos das senhas do sistema. Para atender os requisitos os seguintes parâmetros foram alterados:
 
 \begin{itemize}
     \item \textit{minlen} = 10: para especificar que toda senha deve possuir no mínimo 10 caracteres ao todo;
-    \item \textit{dcredit} = -2: exige que a sejam escrito ao menos dois dígitos numéricos na senha;
-    \item \textit{ucredit} = -1: exige que seja escrito ao menos uma letra maiúscula na senha;
-    \item \textit{lcredit} = -1: exige que seja escrito ao menos uma letra minúscula na senha;
-    \item \textit{ocredit} = -1: exige que seja escrito ao menos um caractere especial na senha;
+    \item \textit{dcredit} = -2: exige que senha tenha ao menos dois dígitos numéricos na senha;
+    \item \textit{ucredit} = -1: exige que a senha seja escrita com ao menos uma letra maiúscula;
+    \item \textit{lcredit} = -1: exige que a senha seja escrita com ao menos uma letra minúscula;
+    \item \textit{ocredit} = -1: exige que a senha seja escrito ao menos com um caractere especial;
     \item \textit{minclass} = 4: determina que o número de classes diferentes que compõe a senha é 4 (dígitos, maiúsculas, minúsculas e caracteres especiais).
 \end{itemize}
 
-A figura \ref{fig:pwquality} mostra as alterações realizadas no arquivo \textit{/etc/security/pwquality.conf}, citadas anteriormente.
+A Figura~\ref{fig:pwquality} mostra as alterações realizadas no arquivo \textit{/etc/security/pwquality.conf}, citadas anteriormente.
 
 \begin{figure}[H]
   \centering
@@ -360,12 +367,12 @@ Após salvar as alterações, a criação de senhas só será bem sucedida caso 
 \subsection{Criação de grupos e usuários}
 \label{subsec:grupos_usuarios}
 
-A próxima etapa envolve a criação de grupos e usuários para o sistema. Grupos são comumente criados em sistemas para que usuários com diferentes privilégios ou funções no sistema possam ser gerenciados de forma conjunta. A seguir serão descritos alguns passos essenciais para que esta criação aconteça de forma correta e que não comprometa a segurança do sistema
+A próxima etapa envolve a criação de grupos e usuários para o sistema. Grupos são comumente criados em sistemas para que usuários com diferentes privilégios ou funções no sistema possam ser gerenciados de forma conjunta. A seguir serão descritos alguns passos essenciais para que esta criação aconteça de forma correta e que não comprometa a segurança do sistema.
 
 \subsubsection{Configuração \textit{GROUPHOMES}}
-O parâmetro \textit{GROUPHOMES} encontrado no arquivo de configuração \textit{/etc/adduser.conf}, é utilizado para definir o comportamento padrão na criação de diretórios ''\textit{home}`` de novos usuários em sistemas operacionais Linux ao utilizar o comando \textit{adduser}. Quando este parâmetro está ativado, os diretórios pessoais dos usuários serão organizados em subdiretórios de um diretório geral do grupo, por exemplo, o usuário ''Aluno`` do grupo ''alunos`` terá seu diretório pessoal em \textit{/home/alunos/Aluno/} ao invés de apenas \textit{/home/Aluno/}. Esta configuração auxilia na segurança de modo geral, pois permite um maior controle e proteção dos dados armazenados em um sistema multiusuário.
+O parâmetro \textit{GROUPHOMES} encontrado no arquivo de configuração \textit{/etc/adduser.conf}, é utilizado para definir o comportamento padrão na criação de diretórios ``\textit{home}'' de novos usuários, por meio do comando \textit{adduser}. Quando este parâmetro está ativado, os diretórios pessoais dos usuários serão organizados em subdiretórios de um diretório geral do grupo. Por exemplo, o usuário ``Aluno'' do grupo ``alunos'' terá seu diretório pessoal em \textit{/home/alunos/Aluno/} ao invés de apenas \textit{/home/Aluno/}. Esta configuração auxilia na segurança de modo geral, pois permite um maior controle e proteção dos dados armazenados em um sistema multiusuário.
 
-A figura \ref{fig:adduser} demonstra a alteração realizada no arquivo de configuração citado anteriormente, esta alteração foi realizada através do editor de texto \textit{Nano}. Para a ativação do parâmetro, basta alterar o valor associado à variável \textit{GROUPHOME} para \textit{yes}
+A figura \ref{fig:adduser} demonstra a alteração realizada no arquivo de configuração citado anteriormente, esta alteração foi realizada através do editor de texto \textit{nano}. Para a ativação do parâmetro, basta alterar o valor associado à variável \textit{GROUPHOME} para \textit{yes}.
 
 \begin{figure}[H]
   \centering
@@ -375,7 +382,7 @@ A figura \ref{fig:adduser} demonstra a alteração realizada no arquivo de confi
 \end{figure}
 
 \subsubsection{Criação de grupos}
-Como exemplo para a utilização do sistema, a pratica propõe a criação de dois grupos: ''alunos`` e ''professores". Para criar os grupos, o comando \textit{addgroup} foi utilizado, sua utilização é simples, basta adicionar o nome desejado para o grupo após o comando, por exemplo, \textit{addgroup alunos}, conforme apresentado na figura \ref{fig:addgroup}. O retorno \textit{Done} após a execução do comando indica que o grupo foi criado com sucesso.
+Como exemplo para a utilização do sistema, a prática propõe a criação de dois grupos: ``alunos'' e ``professores''. Para criar os grupos, o comando \textit{addgroup} foi utilizado, conforme apresentado na Figura~\ref{fig:addgroup}. O retorno \textit{Done} após a execução do comando indica que o grupo foi criado com sucesso.
 
 \begin{figure}[H]
   \centering
@@ -385,7 +392,7 @@ Como exemplo para a utilização do sistema, a pratica propõe a criação de do
 \end{figure}
 
 \subsubsection{Cadastro de usuários}
-A atividade propõe o cadastro de um usuário para cada grupo, esta etapa pode ser dividida em dois passos: cadastrar os usuários e adicioná-los aos seus grupos. Para o cadastro do usuário foi utilizado o comando \textit{adduser}, sua utilização também é simples, pois basta adicionar o nome do usuário após o comando, por exemplo, \textit{adduser usuário}, a figura \ref{fig:add_aluno} demonstra o uso do comando com o cadastro do usuário ''aluno`` no sistema.
+A atividade propõe o cadastro de um usuário para cada grupo, esta etapa pode ser dividida em dois passos: cadastrar os usuários e adicioná-los aos seus grupos. Para o cadastro do usuário foi utilizado o comando \textit{adduser}, a Figura~\ref{fig:add_aluno} demonstra o uso do comando com o cadastro do usuário ``aluno'' no sistema.
 
 \begin{figure}[H]
   \centering
@@ -394,7 +401,7 @@ A atividade propõe o cadastro de um usuário para cada grupo, esta etapa pode s
   \label{fig:add_aluno}
 \end{figure}
 
-De forma semelhante ao cadastro anterior, a figura \ref{fig:add_prof} apresenta o cadastro do usuário ''professor".
+De forma semelhante ao cadastro anterior, a figura \ref{fig:add_prof} apresenta o cadastro do usuário ``professor''.
 
 \begin{figure}[H]
   \centering
@@ -403,7 +410,7 @@ De forma semelhante ao cadastro anterior, a figura \ref{fig:add_prof} apresenta 
   \label{fig:add_prof}
 \end{figure}
 
-Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para isso foi utilizado o comando para modificação de usuários \textit{usermod} com a opção ''-aG`` que significa ''\textit{append group} (acrescentar grupo)`` seguido do grupo que desejamos acrescentar e o usuário em questão. A figura \ref{fig:usermod} demonstra o uso deste comando para adicionar os usuários ''aluno`` ao grupo ''alunos`` e ''professor`` ao grupo ''professores". 
+Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para isso foi utilizado o comando para modificação de usuários \textit{usermod} com a opção \textit{-aG} que significa ``\textit{append group} (acrescentar grupo)'' seguido do grupo que desejamos acrescentar e o usuário em questão. A Figura~\ref{fig:usermod} demonstra o uso deste comando para adicionar os usuários ``aluno'' ao grupo ``alunos'' e ``professor'' ao grupo ``professores''. 
 
 \begin{figure}[H]
   \centering
@@ -412,8 +419,8 @@ Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para
   \label{fig:usermod}
 \end{figure}
 
-\subsubsection{Remoção dos usuários do grupo \textit{alunos} do grupo \textit{sudo}}
-É de grande importância que apenas usuários devidamente autorizados tenham acesso a funções administrativas, as quais são proporcionadas para usuários pertencentes ao grupo ''\textit{sudo}``, portanto, por motivos de segurança, a atividade propõe que os usuários do grupo aluno sejam removidos do grupo \textit{sudo}. Para isso, inicialmente identificamos os usuários pertencentes ao grupo alunos, utilizando o comando \textit{getent group alunos}, que serve para consultar dados de um grupo específico, no caso, \textit{alunos}. Após isso, removemos os usuários identificados no passo anterior com o comando \textit{gpasswd}, utilizada para gerenciar usuários e senhas de grupos, com a opção ''-d`` para remover um usuário no caso \textit{aluno} do grupo \textit{sudo}, resultando no seguinte comando \textit{gpasswd -d aluno sudo}. Esta etapa é apresentada na figura \ref{fig:gpasswd}.
+\subsubsection{Remoção dos usuários do grupo \textit{alunos} e do grupo \textit{sudo}}
+É importante que apenas usuários devidamente autorizados tenham acesso a funções administrativas, as quais são proporcionadas para usuários pertencentes ao grupo ''\textit{sudo}``, portanto, por motivos de segurança, a atividade propõe que os usuários do grupo aluno sejam removidos do grupo \textit{sudo}. Para isso, inicialmente identificamos os usuários pertencentes ao grupo alunos, utilizando o comando \textit{getent group alunos}, que serve para consultar dados de um grupo específico, no caso, \textit{alunos}. Após isso, removemos os usuários identificados no passo anterior com o comando \textit{gpasswd}, utilizada para gerenciar usuários e senhas de grupos, com a opção ''-d`` para remover um usuário no caso \textit{aluno} do grupo \textit{sudo}, resultando no seguinte comando \textit{gpasswd -d aluno sudo}. Esta etapa é apresentada na figura \ref{fig:gpasswd}.
 
 \begin{figure}[H]
   \centering
@@ -423,17 +430,19 @@ Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para
 \end{figure}
 
 \subsection{Configuração de permissões para arquivos}
-Para manter os princípios da segurança de sistemas, abordados na seção \ref{sec:fundamentacao}, devemos garantir que um arquivo seja acessado de forma devidamente autorizada. Permissões de arquivos servem para determinar o que cada usuário ou grupo pode ou não acessar no sistema, existem três permissões diferentes para arquivos em um sistema operacional:
+Permissões de arquivos servem para determinar o que cada usuário ou grupo pode ou não acessar no sistema, existem três permissões diferentes para arquivos no sistema operacional GNU/Linux:
+
 \begin{itemize}
-    \item \textbf{Leitura}: permissão para acessar o arquivo;
-    \item \textbf{Escrita}: permissão para alterar um arquivo;
-    \item \textbf{Execução}: permissão para executar um arquivo.
+    \item \textbf{Leitura}: Permissão para acessar o arquivo;
+    \item \textbf{Escrita}: Permissão para alterar um arquivo;
+    \item \textbf{Execução}: Permissão para executar um arquivo.
 \end{itemize}
 
 Essas três permissões são atribuídas a três níveis de autorização em relação ao arquivo: dono, grupo ao qual o dono pertence e outros, que se refere aos demais usuários. Nesta subseção será abordado a manipulação destas permissões.
 
 \subsubsection{Criação de arquivo e alteração de permissões}
-Para este procedimento, é necessário um arquivo, o qual terá suas permissões manipuladas, este arquivo será chamado ''\textit{meuarquivo.txt}``, e será criado pelo usuário ''\textit{aluno}``. Portanto, para a criação do arquivo foi inicialmente iniciado uma nova sessão, com o usuário correto, e em seguida o comando \textit{touch} foi utilizado para criar o arquivo, conforme a figura \ref{fig:touch} apresenta.
+Para a manipulação de permissões o arquivo ``\textit{meuarquivo.txt}'' criado pelo usuário ``\textit{aluno}'' será utilizado. O arquivo foi criado com a utilização do comando \textit{touch}, conforme a Figura~\ref{fig:touch} apresenta.
+
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.7]{figuras/touch.png}
@@ -442,14 +451,15 @@ Para este procedimento, é necessário um arquivo, o qual terá suas permissões
 \end{figure}
 
 Para manipular permissões é utilizado o comando \textit{chmod}, que deve ser acompanhado de dois dados: as permissões e o arquivo ou diretório em questão. As permissões podem ser escritas de duas formas:
+
 \begin{itemize}
     \item \textbf{Numérica}: as permissões dos três níveis são especificadas em três valores que vão de 0 a 7 e representam a soma das permissões desejadas, cada permissão possui um valor, execução vale 1, escrita vale 2, e leitura vale 4. Esta forma é apresentada na figura \ref{fig:chmod_num}.
-    \item \textbf{Com opções}: outra forma é especificar as permissões de cada nível que se deseja alterar de atribuindo os símbolos desejados, os níveis são \textit{u} para o dono do arquivo, \textit{g} para o grupo do arquivo e \textit{o} para outros. Os símbolos equivalentes as permissões são \textit{r} para leitura, \textit{w} para escrita e \textit{x} para execução. Esta forma é apresentada na figura \ref{fig:chmod_ugoa}.
+    \item \textbf{Com opções}: outra forma é especificar as permissões de cada nível que se deseja alterar de atribuindo os símbolos desejados, os níveis são \textit{u} para o dono do arquivo, \textit{g} para o grupo do arquivo e \textit{o} para outros. Os símbolos equivalentes às permissões são \textit{r} para leitura, \textit{w} para escrita e \textit{x} para execução. Esta forma é apresentada na figura \ref{fig:chmod_ugoa}.
 \end{itemize}
 
-Para verificar as permissões dos arquivos foi utilizado o comando \textit{ls} de listagem com a opção ''-l``, que apresenta informações detalhadas dos arquivos e diretórios, incluindo as permissões. A saída do comando apresenta as permissões da seguinte forma: do segundo ao décimo caractere da linha são agrupados em 3 trios que representam as permissões para os níveis de dono, grupo e outros, respectivamente, dentro do trio de caracteres são representadas as permissões de leitura, escrita e execução, respectivamente, caso haja um traço no lugar da permissão, esta permissão não foi concedida a este nível. Este comando pode ser observados nas figuras \ref{fig:chmod_num} e \ref{fig:chmod_ugoa}.
+Para verificar as permissões dos arquivos foi utilizado o comando \textit{ls} de listagem com a opção ``-l'', que apresenta informações detalhadas dos arquivos e diretórios, incluindo suas permissões. A saída do comando apresenta as permissões da seguinte forma: do segundo ao décimo caractere da linha são agrupados em 3 trios que representam as permissões para os níveis de dono, grupo e outros, respectivamente, dentro do trio de caracteres são representadas as permissões de leitura, escrita e execução, respectivamente, caso haja um traço no lugar da permissão, esta permissão não foi concedida a este nível. Este comando pode ser observados na Figura~\ref{fig:chmod_num} e na Figura~\ref{fig:chmod_ugoa}.
 
-A atividade propõe que as permissões do arquivo criado sejam: leitura e escrita para o dono, leitura para o grupo e nenhuma permissão para outros. Esta configuração foi realizada pelas duas formas de escritas que o comando \textit{chmod} permite, a forma numérica pode ser observada na figura \ref{fig:chmod_num} e a forma por opções na figura \ref{fig:chmod_ugoa}.
+A atividade propõe que as permissões do arquivo criado sejam: leitura e escrita para o dono, leitura para o grupo e nenhuma permissão para outros. Esta configuração foi realizada pelas duas formas de escritas que o comando \textit{chmod} permite, a forma numérica pode ser observada na Figura~\ref{fig:chmod_num} e a por opções na Figura~\ref{fig:chmod_ugoa}.
 
 \begin{figure}[H]
   \centering
