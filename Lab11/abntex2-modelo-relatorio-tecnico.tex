@@ -32,22 +32,22 @@
 
 
 \documentclass[
-  % -- opções da classe memoir --
-  12pt,				% tamanho da fonte
-  %openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
-  oneside,   	        % para impressão em verso e anverso use twoside. Oposto a oneside
-  a4paper,			% tamanho do papel. 
-  % -- opções da classe abntex2 --
-  %chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
-  %section=TITLE,		% títulos de seções convertidos em letras maiúsculas
-  %subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
-  %subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
-  % -- opções do pacote babel --
-  english,			% idioma adicional para hifenização
-  french,				% idioma adicional para hifenização
-  spanish,			% idioma adicional para hifenização
-  brazil,				% o último idioma é o principal do documento
-  ]{pacotes/abntex2}
+    % -- opções da classe memoir --
+    12pt,				% tamanho da fonte
+    %openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+    oneside,   	        % para impressão em verso e anverso use twoside. Oposto a oneside
+    a4paper,			% tamanho do papel. 
+    % -- opções da classe abntex2 --
+    %chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+    %section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+    %subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+    %subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+    % -- opções do pacote babel --
+    english,			% idioma adicional para hifenização
+    french,				% idioma adicional para hifenização
+    spanish,			% idioma adicional para hifenização
+    brazil,				% o último idioma é o principal do documento
+    ]{pacotes/abntex2}
 
 
 % ---
@@ -72,7 +72,7 @@
 \usepackage{multicol}
 \usepackage{multirow}
 % ---
-  
+    
 % ---
 % Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
 % ---
@@ -105,13 +105,13 @@
 \renewcommand{\backref}{}
 % Define os textos da citação
 \renewcommand*{\backrefalt}[4]{
-  \ifcase #1 %
-    Nenhuma citação no texto.%
-  \or
-    Citado na página #2.%
-  \else
-    Citado #1 vezes nas páginas #2.%
-  \fi}%
+    \ifcase #1 %
+        Nenhuma citação no texto.%
+    \or
+        Citado na página #2.%
+    \else
+        Citado #1 vezes nas páginas #2.%
+    \fi}%
 % ---
 
 % ---
@@ -143,18 +143,18 @@
 % informações do PDF
 \makeatletter
 \hypersetup{
-      %pagebackref=true,
-    pdftitle={\@title}, 
-    pdfauthor={\@author},
-      pdfsubject={\imprimirpreambulo},
-      pdfcreator={LaTeX with abnTeX2},
-    pdfkeywords={abnt}{latex}{abntex}{abntex2}{relatório técnico}, 
-    colorlinks=true,       		% false: boxed links; true: colored links
-      linkcolor=blue,          	% color of internal links
-      citecolor=blue,        		% color of links to bibliography
-      filecolor=magenta,      		% color of file links
-    urlcolor=blue,
-    bookmarksdepth=4
+        %pagebackref=true,
+        pdftitle={\@title}, 
+        pdfauthor={\@author},
+        pdfsubject={\imprimirpreambulo},
+        pdfcreator={LaTeX with abnTeX2},
+        pdfkeywords={abnt}{latex}{abntex}{abntex2}{relatório técnico}, 
+        colorlinks=true,       		% false: boxed links; true: colored links
+        linkcolor=blue,          	% color of internal links
+        citecolor=blue,        		% color of links to bibliography
+        filecolor=magenta,      		% color of file links
+        urlcolor=blue,
+        bookmarksdepth=4
 }
 \makeatother
 % --- 
@@ -213,12 +213,12 @@
 
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
-Os objetivos deste trabalho são compreender e aplicar conceitos e recursos de segurança em sistemas operacionais GNU/Linux. Para tal atividade foi utilizado um sistema operacional GNU/Linux executado em uma máquina virtual através do hipervisor VirtualBox, neste sistema o procedimento realizado foi a configuração de recursos importantes para a segurança no sistema operacional, além de observação de arquivos importantes para o gerenciamento dos recursos de segurança. Este trabalho atingiu seu objetivo com sucesso, permitindo a compreensão clara e aplicação de recursos básicos de segurança em sistemas operacionais GNU/Linux, sem apresentar grandes dificuldades. Os resultados provam a importância da aplicação de recursos para prover segurança as informações e recursos do sistema operacional, consolidando o conhecimento teórico.
+Este trabalho teve como objetivo compreender e aplicar conceitos e recursos de segurança em Sistemas Operacionais GNU/Linux. Para isso, foi utilizado um sistema operacional GNU/Linux em uma máquina virtual executada no hipervisor VirtualBox. As atividades incluíram a configuração de mecanismos fundamentais de segurança no sistema operacional, a análise de arquivos essenciais para o gerenciamento desses recursos e a proteção de dados sensíveis. O trabalho foi concluído com êxito, resultando em uma compreensão prática e teórica sólida sobre segurança básica em um sistema GNU/Linux. Os resultados destacam a relevância da aplicação de medidas de segurança para proteger informações e recursos do sistema operacional, especialmente dados sensíveis, reforçando a importância de uma abordagem estruturada e prática.
 
-  \vspace{\onelineskip}
+ \vspace{\onelineskip}
     
-  \noindent
-  \textbf{Palavras-chave}: segurança; virtualização; linux.
+ \noindent
+ \textbf{Palavras-chave}: virtualização; gerenciamento de segurança; proteção de dados.
 \end{resumo}
 % ---
 
@@ -312,7 +312,7 @@ Conforme as vulnerabilidades que trazem ameaças ao sistema se tornam conhecidas
     \item Sistema Operacional: Windows $10$
   \end{itemize}
   \item Hipervisor: VirtualBox $7.1.2$
-  \item Sistema Operacional utilizado no Hipervisor: GNU/Linux Debian $12.7$
+  \item Sistema Operacional utilizado no Hipervisor: Debian \textit{based}
   \item Núcleo: Linux $4.9.0$ 
 \end{itemize}
 
@@ -321,7 +321,7 @@ Conforme as vulnerabilidades que trazem ameaças ao sistema se tornam conhecidas
 
 Este estudo apresenta a implementação de recursos básicos de segurança em um sistema operacional GNU/Linux, utilizando o ambiente de virtualização VirtualBox. O trabalho concentra-se na análise detalhada de arquivos e comandos críticos para a proteção de sistemas GNU/Linux, visando estabelecer práticas fundamentais de segurança da informação.
 
-Após a instalação da distribuição fornecida pelo professor, o usuário ``\textit{root}'' foi utilizado para a realização das configurações, pois possui privilégios administrativos~\ref{negus2012}.
+Após a instalação da distribuição fornecida pelo professor, o usuário ``\textit{root}'' foi utilizado para a realização das configurações, pois possui privilégios administrativos~\cite{negus2012}.
 
 \subsection{Configuração do nível de segurança das senhas}
 \label{subsec:senhas}
@@ -340,7 +340,7 @@ O arquivo citado anteriormente contém as configurações da qualidade da senha,
     \item Mínimo de 1 caractere especial.
 \end{itemize}
 
-Para a adicionar os requisitos basta modificar o arquivo \textit{/etc/security/pwquality.conf}, o editor de texto \textit{Nano}, a partir do comando \textit{nano /etc/security/pwquality.conf}. O arquivo possui algumas variáveis que controlam os requisitos de senhas, para a implementação proposta anteriormente foram alteradas as seguintes variáveis:
+Para a adicionar os requisitos basta modificar o arquivo \textit{/etc/security/pwquality.conf}, o editor de texto \textit{nano}, a partir do comando \textit{nano /etc/security/pwquality.conf}. O arquivo possui algumas variáveis que controlam os requisitos de senhas, para a implementação proposta anteriormente foram alteradas as seguintes variáveis:
 
 Para modificar os requisitos de senhas, utilizou-se o comando nano \textit{/etc/security/pwquality.conf}, onde o \textit{nano} é um editor de texto e o arquivo \textit{/etc/security/pwquality.conf} permite ajustar os requisitos das senhas do sistema. Para atender os requisitos os seguintes parâmetros foram alterados:
 
@@ -370,7 +370,7 @@ Após salvar as alterações, a criação de senhas só será bem sucedida caso 
 A próxima etapa envolve a criação de grupos e usuários para o sistema. Grupos são comumente criados em sistemas para que usuários com diferentes privilégios ou funções no sistema possam ser gerenciados de forma conjunta. A seguir serão descritos alguns passos essenciais para que esta criação aconteça de forma correta e que não comprometa a segurança do sistema.
 
 \subsubsection{Configuração \textit{GROUPHOMES}}
-O parâmetro \textit{GROUPHOMES} encontrado no arquivo de configuração \textit{/etc/adduser.conf}, é utilizado para definir o comportamento padrão na criação de diretórios ``\textit{home}'' de novos usuários, por meio do comando \textit{adduser}. Quando este parâmetro está ativado, os diretórios pessoais dos usuários serão organizados em subdiretórios de um diretório geral do grupo. Por exemplo, o usuário ``Aluno'' do grupo ``alunos'' terá seu diretório pessoal em \textit{/home/alunos/Aluno/} ao invés de apenas \textit{/home/Aluno/}. Esta configuração auxilia na segurança de modo geral, pois permite um maior controle e proteção dos dados armazenados em um sistema multiusuário.
+O parâmetro \textit{GROUPHOMES} encontrado no arquivo de configuração \textit{/etc/adduser.conf}, é utilizado para definir o comportamento padrão na criação de diretórios ``\textit{home}'' de novos usuários, por meio do comando \textit{adduser}. Quando este parâmetro está ativado, os diretórios pessoais dos usuários serão organizados em subdiretórios de um diretório geral do grupo. Por exemplo, o usuário ``Aluno'' do grupo ``alunos'' terá seu diretório pessoal em \textit{/home/alunos/Aluno/} ao invés de apenas \textit{/home/Aluno/}. Esta configuração auxilia na segurança de modo geral, pois permite um maior controle e proteção dos dados armazenados em um sistema multiusuário~\cite{guiafocaSegurança}.
 
 A figura \ref{fig:adduser} demonstra a alteração realizada no arquivo de configuração citado anteriormente, esta alteração foi realizada através do editor de texto \textit{nano}. Para a ativação do parâmetro, basta alterar o valor associado à variável \textit{GROUPHOME} para \textit{yes}.
 
@@ -382,7 +382,7 @@ A figura \ref{fig:adduser} demonstra a alteração realizada no arquivo de confi
 \end{figure}
 
 \subsubsection{Criação de grupos}
-Como exemplo para a utilização do sistema, a prática propõe a criação de dois grupos: ``alunos'' e ``professores''. Para criar os grupos, o comando \textit{addgroup} foi utilizado, conforme apresentado na Figura~\ref{fig:addgroup}. O retorno \textit{Done} após a execução do comando indica que o grupo foi criado com sucesso.
+Como exemplo para a utilização do sistema, a prática propõe a criação de dois grupos: ``alunos'' e ``professores''. Para criar os grupos, o comando \textit{addgroup} foi utilizado, conforme apresentado na Figura~\ref{fig:addgroup}. O retorno \textit{Done} após a execução do comando indica que o grupo foi criado com sucesso~\cite{guiafocaSegurança}.
 
 \begin{figure}[H]
   \centering
@@ -392,7 +392,7 @@ Como exemplo para a utilização do sistema, a prática propõe a criação de d
 \end{figure}
 
 \subsubsection{Cadastro de usuários}
-A atividade propõe o cadastro de um usuário para cada grupo, esta etapa pode ser dividida em dois passos: cadastrar os usuários e adicioná-los aos seus grupos. Para o cadastro do usuário foi utilizado o comando \textit{adduser}, a Figura~\ref{fig:add_aluno} demonstra o uso do comando com o cadastro do usuário ``aluno'' no sistema.
+A atividade propõe o cadastro de um usuário para cada grupo, esta etapa pode ser dividida em dois passos: cadastrar os usuários e adicioná-los aos seus grupos. Para o cadastro do usuário foi utilizado o comando \textit{adduser}, a Figura~\ref{fig:add_aluno} demonstra o uso do comando com o cadastro do usuário ``aluno'' no sistema~\cite{guiafocaSegurança}.
 
 \begin{figure}[H]
   \centering
@@ -410,7 +410,7 @@ De forma semelhante ao cadastro anterior, a figura \ref{fig:add_prof} apresenta 
   \label{fig:add_prof}
 \end{figure}
 
-Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para isso foi utilizado o comando para modificação de usuários \textit{usermod} com a opção \textit{-aG} que significa ``\textit{append group} (acrescentar grupo)'' seguido do grupo que desejamos acrescentar e o usuário em questão. A Figura~\ref{fig:usermod} demonstra o uso deste comando para adicionar os usuários ``aluno'' ao grupo ``alunos'' e ``professor'' ao grupo ``professores''. 
+Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para isso foi utilizado o comando para modificação de usuários \textit{usermod} com a opção \textit{-aG} que significa ``\textit{append group} (acrescentar grupo)'' seguido do grupo que desejamos acrescentar e o usuário em questão~\cite{negus2012}. A Figura~\ref{fig:usermod} demonstra o uso deste comando para adicionar os usuários ``aluno'' ao grupo ``alunos'' e ``professor'' ao grupo ``professores''. 
 
 \begin{figure}[H]
   \centering
@@ -420,7 +420,7 @@ Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para
 \end{figure}
 
 \subsubsection{Remoção dos usuários do grupo \textit{alunos} e do grupo \textit{sudo}}
-É importante que apenas usuários devidamente autorizados tenham acesso a funções administrativas, as quais são proporcionadas para usuários pertencentes ao grupo ''\textit{sudo}``, portanto, por motivos de segurança, a atividade propõe que os usuários do grupo aluno sejam removidos do grupo \textit{sudo}. Para isso, inicialmente identificamos os usuários pertencentes ao grupo alunos, utilizando o comando \textit{getent group alunos}, que serve para consultar dados de um grupo específico, no caso, \textit{alunos}. Após isso, removemos os usuários identificados no passo anterior com o comando \textit{gpasswd}, utilizada para gerenciar usuários e senhas de grupos, com a opção ''-d`` para remover um usuário no caso \textit{aluno} do grupo \textit{sudo}, resultando no seguinte comando \textit{gpasswd -d aluno sudo}. Esta etapa é apresentada na figura \ref{fig:gpasswd}.
+É importante que apenas usuários devidamente autorizados tenham acesso a funções administrativas, as quais são proporcionadas para usuários pertencentes ao grupo ``\textit{sudo}'', portanto, por motivos de segurança, a atividade propõe que os usuários do grupo aluno sejam removidos deste grupo. Para isso, inicialmente identificamos os usuários pertencentes ao grupo alunos, utilizando o comando \textit{getent group alunos}, que serve para consultar dados de um grupo específico, no caso, \textit{alunos}. Após isso, removemos os usuários identificados no passo anterior com o comando \textit{gpasswd}, utilizada para gerenciar usuários e senhas de grupos, com a opção ``-d'' para remover o usuário \textit{aluno} do grupo \textit{sudo}, resultando no seguinte comando \textit{gpasswd -d aluno sudo}. Esta etapa é apresentada na Figura~\ref{fig:gpasswd}.
 
 \begin{figure}[H]
   \centering
@@ -430,7 +430,7 @@ Após o cadastro dos usuários, devemos associá-los a seus devidos grupos, para
 \end{figure}
 
 \subsection{Configuração de permissões para arquivos}
-Permissões de arquivos servem para determinar o que cada usuário ou grupo pode ou não acessar no sistema, existem três permissões diferentes para arquivos no sistema operacional GNU/Linux:
+Permissões de arquivos servem para determinar o que cada usuário ou grupo pode, ou não, acessar no sistema, existem três permissões diferentes para arquivos no sistema operacional GNU/Linux:
 
 \begin{itemize}
     \item \textbf{Leitura}: Permissão para acessar o arquivo;
@@ -441,7 +441,7 @@ Permissões de arquivos servem para determinar o que cada usuário ou grupo pode
 Essas três permissões são atribuídas a três níveis de autorização em relação ao arquivo: dono, grupo ao qual o dono pertence e outros, que se refere aos demais usuários. Nesta subseção será abordado a manipulação destas permissões.
 
 \subsubsection{Criação de arquivo e alteração de permissões}
-Para a manipulação de permissões o arquivo ``\textit{meuarquivo.txt}'' criado pelo usuário ``\textit{aluno}'' será utilizado. O arquivo foi criado com a utilização do comando \textit{touch}, conforme a Figura~\ref{fig:touch} apresenta.
+Para a manipulação de permissões, o arquivo ``\textit{meuarquivo.txt}'' criado pelo usuário ``\textit{aluno}'' será utilizado. O arquivo foi criado com a utilização do comando \textit{touch}, conforme a Figura~\ref{fig:touch} apresenta.
 
 \begin{figure}[H]
   \centering
@@ -450,14 +450,14 @@ Para a manipulação de permissões o arquivo ``\textit{meuarquivo.txt}'' criado
   \label{fig:touch}
 \end{figure}
 
-Para manipular permissões é utilizado o comando \textit{chmod}, que deve ser acompanhado de dois dados: as permissões e o arquivo ou diretório em questão. As permissões podem ser escritas de duas formas:
+Para manipular permissões é utilizado o comando \textit{chmod}, que deve ser acompanhado de dois dados: as permissões e o arquivo ou diretório em questão~\cite{negus2012}. As permissões podem ser escritas de duas formas:
 
 \begin{itemize}
     \item \textbf{Numérica}: as permissões dos três níveis são especificadas em três valores que vão de 0 a 7 e representam a soma das permissões desejadas, cada permissão possui um valor, execução vale 1, escrita vale 2, e leitura vale 4. Esta forma é apresentada na figura \ref{fig:chmod_num}.
     \item \textbf{Com opções}: outra forma é especificar as permissões de cada nível que se deseja alterar de atribuindo os símbolos desejados, os níveis são \textit{u} para o dono do arquivo, \textit{g} para o grupo do arquivo e \textit{o} para outros. Os símbolos equivalentes às permissões são \textit{r} para leitura, \textit{w} para escrita e \textit{x} para execução. Esta forma é apresentada na figura \ref{fig:chmod_ugoa}.
 \end{itemize}
 
-Para verificar as permissões dos arquivos foi utilizado o comando \textit{ls} de listagem com a opção ``-l'', que apresenta informações detalhadas dos arquivos e diretórios, incluindo suas permissões. A saída do comando apresenta as permissões da seguinte forma: do segundo ao décimo caractere da linha são agrupados em 3 trios que representam as permissões para os níveis de dono, grupo e outros, respectivamente, dentro do trio de caracteres são representadas as permissões de leitura, escrita e execução, respectivamente, caso haja um traço no lugar da permissão, esta permissão não foi concedida a este nível. Este comando pode ser observados na Figura~\ref{fig:chmod_num} e na Figura~\ref{fig:chmod_ugoa}.
+Para verificar as permissões dos arquivos foi utilizado o comando \textit{ls} de listagem com a opção ``-l'', que apresenta informações detalhadas dos arquivos e diretórios, incluindo suas permissões~\cite{negus2012}. A saída do comando apresenta as permissões da seguinte forma: do segundo ao décimo caractere da linha são agrupados em 3 trios que representam as permissões para os níveis de dono, grupo e outros, respectivamente, dentro do trio de caracteres são representadas as permissões de leitura, escrita e execução, respectivamente, caso haja um traço no lugar da permissão, esta permissão não foi concedida a este nível. Este comando pode ser observados na Figura~\ref{fig:chmod_num} e na Figura~\ref{fig:chmod_ugoa}.
 
 A atividade propõe que as permissões do arquivo criado sejam: leitura e escrita para o dono, leitura para o grupo e nenhuma permissão para outros. Esta configuração foi realizada pelas duas formas de escritas que o comando \textit{chmod} permite, a forma numérica pode ser observada na Figura~\ref{fig:chmod_num} e a por opções na Figura~\ref{fig:chmod_ugoa}.
 
@@ -476,9 +476,10 @@ A atividade propõe que as permissões do arquivo criado sejam: leitura e escrit
 \end{figure}
 
 \subsubsection{Alteração de dono e grupo do arquivo}
-Em muitas situações a posse de um arquivo pode ser alterada, e para manter a segurança do sistema, deve-se alterar o dono e, caso necessário, o grupo do arquivo. Para tal operação pode-se utilizar o comando \textit{chown}, que deve receber como dados o nome do novo usuário ou grupo e o nome do arquivo ou diretório, para especificar se a alteração é de dono ou usuário é simples, para alterar o dono, basta adicionar o nome do usuário que irá receber a posse do arquivo, para grupo há a necessidade de adicionar '':`` antes do nome do grupo que assumirá a posse, por exemplo, '':professores``. O uso deste comando pode ser observado na figura \ref{fig:chown}.
+Em muitas situações a posse de um arquivo pode ser alterada, e para manter a segurança do sistema, deve-se alterar o dono e, caso necessário, o grupo do arquivo. O comando \textit{chown} pode ser usado para tal operação, que deve receber como dados o nome do novo usuário ou grupo e o nome do arquivo ou diretório, a especificação pelo dono pode ser feita simplesmente utilizando o nome do usuário, já no caso do grupo o ``:'' precisa ser utilizado antes do nome grupo~\cite{negus2012}. O uso deste comando pode é apresentado na Figura~\ref{fig:chown}.
 
-Para a verificação do dono e grupo do arquivo foi utilizado o mesmo comando \textit{ls -l} apresentado na etapa anterior. A atividade propõe que o arquivo tenha sua posse transferida para o usuário ''professor`` e o grupo ''professores``. A execução desta etapa é apresentada na figura \ref{fig:chown}.
+Para a verificação do dono e grupo do arquivo foi utilizado o comando \textit{ls -l}. A atividade propõe que o arquivo tenha sua posse transferida para o usuário ``professor'' e o grupo ``professores''. A execução desta etapa é apresentada na Figura~\ref{fig:chown}.
+
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.7]{figuras/chown.png}
@@ -490,7 +491,7 @@ Para a verificação do dono e grupo do arquivo foi utilizado o mesmo comando \t
 A autenticação de usuários é a principal forma de acesso ao sistema, devendo ocorrer de forma devidamente autorizada, portanto há a necessidade de gerenciar a autenticação do sistema. Nesta subseção será abordado a observação de autenticações recentes, configuração da obrigatoriedade de autenticação e arquivos importantes referente à autenticação.
 
 \subsubsection{Observação de autenticações}
-Para observar os usuários que se autenticaram no sistema recentemente podemos utilizar o comando \textit{lastlog}, que apresenta a lista de usuários do sistema e em caso de autenticação apresenta a data e a porta na qual aconteceu sua última autenticação, conforme pode ser visto na figura \ref{fig:lastlogs}.
+Para observar os usuários que se autenticaram no sistema recentemente podemos utilizar o comando \textit{lastlog}, que apresenta a lista de usuários do sistema e em caso de autenticação apresenta a data e a porta na qual aconteceu sua última autenticação, conforme pode ser visto na Figura~\ref{fig:lastlogs}~\cite{negus2012}.
 
 \begin{figure}[H]
   \centering
@@ -501,19 +502,18 @@ Para observar os usuários que se autenticaram no sistema recentemente podemos u
 
 \subsubsection{Obrigatoriedade de autenticação}
 \label{subsubsec:passwd_root}
-É possível em sistemas operacionais permitir que usuário não seja obrigado a autenticar-se para realizar o \textit{login}, claro que não é recomendado por motivos de segurança, mas em alguns casos pode ser necessário.
+É possível em Sistemas Operacionais permitir que usuário não seja obrigado a autenticar-se para realizar o \textit{login}, porém isso não é recomendado por motivos de segurança.
 
-Em sistemas Linux essa configuração pode ser realizada da seguinte forma: no arquivo \textit{/etc/passwd} encontre o usuário desejado, o segundo item da linha do usuário é um ''x``, que indica que a senha do usuário está criptografada e armazenada no arquivo \textit{/etc/passwd}, remova este ''x`` e o usuário não irá possuir uma senha vinculada, logo, não há a obrigatoriedade de autenticação.
+Em sistemas GNU/Linux essa configuração pode ser realizada da seguinte forma: no arquivo \textit{/etc/passwd} encontre o usuário desejado, o segundo item da linha do usuário é um ``x'' que indica que a senha do usuário está criptografada e armazenada no arquivo \textit{/etc/passwd}, remova este ``x'' e o usuário não irá possuir uma senha vinculada, o que, na prática, retira a obrigatoriedade de autenticação~\cite{guiafocaSegurança}.
 
-Para exemplo deste recurso, foi alterar o arquivo para o usuário \textit{root} não precise mais se autenticar. Esta alteração pode ser observada na figura \ref{fig:passwd_root}, na primeira linha.
+A Figura~\ref{fig:passwd_root} mostra a remoção da obrigatoriedade de senha para o usuário \textit{root}. A Figura~\ref{fig:login_sem_senha} mostra o usuário \textit{root} realizando \textit{login} sem a necessidade de uma senha. 
+
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.7]{figuras/passwd_root.png}
   \caption{Alteração no arquivo \textit{/etc/passwd}.}
   \label{fig:passwd_root}
 \end{figure}
-
-Como resultado desta alteração, o usuário \textit{root} não precisa mais digitar sua senha para realizar o \textit{login}, observe o teste na figura \ref{fig:login_sem_senha}.
 
 \begin{figure}[H]
   \centering
@@ -522,10 +522,8 @@ Como resultado desta alteração, o usuário \textit{root} não precisa mais dig
   \label{fig:login_sem_senha}
 \end{figure}
 
-Por razões de segurança, a autenticação do usuário \textit{root} foi ativada novamente desfazendo o passo anterior.
-
 \subsubsection{Arquivo \textit{/etc/shadow}}
-O arquivo \textit{/etc/shadow} armazena dados importantes relacionados às senhas dos usuários do sistema, os quais podem ser alterados conforme a necessidade para razões de segurança, uma representação textual do arquivo pode ser observada na figura \ref{fig:shadow}. 
+O arquivo \textit{/etc/shadow} armazena dados importantes relacionados às senhas dos usuários do sistema, os quais podem ser alterados conforme a necessidade para razões de segurança, uma representação textual do arquivo pode ser observada na Figura~\ref{fig:shadow}~\cite{guiafocaSegurança}. 
 
 \begin{figure}[H]
   \centering
@@ -536,18 +534,18 @@ O arquivo \textit{/etc/shadow} armazena dados importantes relacionados às senha
 
 Para apresentar os campos de dados presentes no arquivo, utilizaremos como exemplo o usuário \textit{student}, os dados presentes no arquivo são:
 \begin{itemize}
-    \item \textbf{Nome do usuário}: primeiro campo de cada linha, identifica o usuário em questão pelo seu nome de usuário no sistema;
+    \item \textbf{Nome do usuário}: identifica o usuário em questão pelo seu nome de usuário no sistema;
     \item \textbf{Senha}: a senha é armazenada no segundo campo de forma criptografada, visando manter a senha segura mesmo que um invasor obtenha acesso ao arquivo \textit{/etc/shadow};
-    \item \textbf{Última modificação}: o terceiro campo apresenta a data da última modificação realizada na senha deste usuário, a data é dada em um formato específico, sendo a quantidade de dias decorridos após 01/01/1970, data selecionada para servir de referência para sistemas UNIX;
-    \item \textbf{Tempo mínimo para alteração}: o quarto campo representa a quantidade mínima de dias que o usuário deve esperar para poder alterar sua senha;
-    \item \textbf{Tempo máximo para alteração}: o quinto campo representa a quantidade máxima de dias que o usuário pode manter a mesma senha, antes de ser obrigado a alterá-la;
+    \item \textbf{Última modificação}: data da última modificação realizada na senha deste usuário, a data é dada em um formato específico, sendo a quantidade de dias decorridos após 01/01/1970, data selecionada para servir de referência para sistemas UNIX;
+    \item \textbf{Tempo mínimo para alteração}: quantidade mínima de dias que o usuário deve esperar para poder alterar sua senha;
+    \item \textbf{Tempo máximo para alteração}: representa a quantidade máxima de dias que o usuário pode manter a mesma senha, antes de ser obrigado a alterá-la;
     \item \textbf{Tempo para aviso prévio}: o sistema operacional pode alertar o usuário sobre a obrigatoriedade da troca de senha, o sexto campo representa com quantos dias antes da data limite o sistema emitirá este aviso;
-    \item \textbf{Tempo de inatividade para desativação}: o sétimo campo, não adicionado ao usuário \textit{student}, representaria a quantidade de dias que o usuário pode permanecer inativo sem ter sua conta bloqueada;
-    \item \textbf{Data de expiração da conta}: o oitavo campo, não adicionado ao usuário \textit{student}, representaria a data de expiração da conta do usuário, a data é dada em dias após 01/01/1970.
+    \item \textbf{Tempo de inatividade para desativação}: campo não adicionado ao usuário \textit{student}, representaria a quantidade de dias que o usuário pode permanecer inativo sem ter sua conta bloqueada;
+    \item \textbf{Data de expiração da conta}: não adicionado ao usuário \textit{student}, representaria a data de expiração da conta do usuário, a data é dada com base no \textit{Unix Epoch}.
 \end{itemize}
 
 \subsubsection{Arquivo \textit{/etc/passwd}}
-O arquivo \textit{/etc/passwd} armazena dados importantes relacionados aos usuários do sistema, estes dados auxiliam no gerenciamento do sistema operacional e podem ser alterados conforme a necessidade, uma representação textual do arquivo pode ser observada na figura \ref{fig:passwd}. 
+O arquivo \textit{/etc/passwd} armazena dados importantes relacionados aos usuários do sistema, estes dados auxiliam no gerenciamento do sistema operacional e podem ser alterados conforme a necessidade, uma representação textual do arquivo pode ser observada na Figura~\ref{fig:passwd}~\cite{guiafocaSegurança}. 
 
 \begin{figure}[H]
   \centering
@@ -559,20 +557,20 @@ O arquivo \textit{/etc/passwd} armazena dados importantes relacionados aos usuá
 Para apresentar os campos de dados presentes no arquivo, utilizaremos como exemplo o usuário \textit{student}, os dados presentes no arquivo são:
 
 \begin{itemize}
-    \item \textbf{Nome de usuário}: primeiro campo de cada linha, identifica o usuário em questão pelo seu nome de usuário no sistema;
-    \item \textbf{Marcador de autenticação}: o segundo campo possui apenas uma marcação ''x`` que significa que a senha do usuário está armazenada no arquivo \textit{/etc/shadow}, caso não haja esta marcação, não será necessário a autenticação para este usuário, a subseção \ref{subsubsec:passwd_root} demonstra melhor o uso deste campo;
-    \item \textbf{UID}: o terceiro campo armazena o número de identificação do usuário;
-    \item \textbf{GID}: o quarto campo armazena o número de identificação do grupo ao qual o usuário pertence;
-    \item \textbf{Informações adicionais}: o quinto campo armazena informações adicionais do usuário, no caso do usuário \textit{student} está armazenado o nome completo do usuário, ''Aluno SO``;
-    \item \textbf{Diretório pessoal}: o sexto campo armazena o caminho para o diretório pessoal do usuário, onde ficam seus arquivos no sistema;
-    \item \textbf{\textit{shell} padrão}: o sétimo e último campo apresenta o caminho para o executável do \textit{shell} padrão do usuário.
+    \item \textbf{Nome de usuário}: identifica o usuário em questão pelo seu nome de usuário no sistema;
+    \item \textbf{Marcador de autenticação}: quando marcado com ``x'' significa que a senha do usuário está armazenada no arquivo \textit{/etc/shadow}, caso não haja esta marcação, não será necessário a autenticação para este usuário, a Subseção~\ref{subsubsec:passwd_root} apresenta o uso deste campo;
+    \item \textbf{UID}: armazena o número de identificação do usuário;
+    \item \textbf{GID}: armazena o número de identificação do grupo ao qual o usuário pertence;
+    \item \textbf{Informações adicionais}: armazena informações adicionais do usuário, no caso do usuário \textit{student} está armazenado o nome completo do usuário, ``Aluno SO'';
+    \item \textbf{Diretório pessoal}: armazena o caminho para o diretório pessoal do usuário, onde ficam seus arquivos no sistema;
+    \item \textbf{\textit{shell} padrão}: caminho para o executável do \textit{shell} padrão do usuário.
 \end{itemize}
 
 \subsection{Gerenciamento de registros}
-Um mecanismo presente em sistemas operacionais é a capacidade de realizar registros de atividades realizadas no sistema, chamamos estes registros de registros em \textit{log}. Diversas ações podem ser armazenadas em \textit{logs}, como, por exemplo, cada chamada de sistema realizada, cada usuário autenticado, ou outros comportamentos que podem se tornar suspeitos e serem submetidos a uma futura análise. Estes \textit{logs} são extremamente relevantes, pois auxiliam na detecção de atividades suspeitas que possam indicar uma tentativa de invasão, como falhas de autenticação ou de autorização~\cite{silberschatz2015}.
+Um mecanismo presente em Sistemas Operacionais é a capacidade de realizar registros de atividades realizadas no sistema, chamamos estes registros de registros em \textit{log}. Diversas ações podem ser armazenadas em \textit{logs}, como, por exemplo, cada chamada de sistema realizada, cada usuário autenticado, ou outros comportamentos que podem se tornar suspeitos e serem submetidos a uma futura análise. Estes \textit{logs} são extremamente relevantes, pois auxiliam na detecção de atividades suspeitas que possam indicar uma tentativa de invasão, como falhas de autenticação ou de autorização~\cite{silberschatz2015}.
 
 \subsubsection{Arquivos do diretório \textit{/var/log/}}
-O diretório \textit{/var/log/} armazena arquivos de \textit{logs} para prover um melhor controle sobre a segurança do sistema operacional, este diretório armazena diferentes categorias, separadas em diferentes arquivos, como os arquivos:
+O diretório \textit{/var/log/} armazena arquivos de \textit{logs} para prover um melhor controle sobre a segurança do sistema operacional, este diretório armazena diferentes categorias, separadas em diferentes arquivos, como os arquivos~\cite{negus2012}:
 
 \begin{itemize}
     \item \textbf{\textit{syslog}}: este arquivo armazena \textit{logs} gerais do sistema, que registra diversos eventos relevantes de categorias que não possuem um arquivo específico para registro;
@@ -582,9 +580,9 @@ O diretório \textit{/var/log/} armazena arquivos de \textit{logs} para prover u
 \end{itemize}
 
 \subsubsection{Configuração do arquivo \textit{/etc/logrotate.conf}}
-Sistemas operacionais Linux possuem uma ferramenta chamada \textit{logrotate}, que automatiza algumas atividades referentes aos \textit{logs}, como a rotação e gerenciamento de histórico de \textit{logs}. Esta ferramenta pode ser configurada alterando o arquivo \textit{/etc/logrotate.conf} conforme a necessidade, a atividade propõe a duas configurações importantes, a rotação diária de \textit{logs}, e o armazenamento de três meses de histórico. Na prática, isso implica na criação de um novo arquivo de \textit{log} todo dia, e o armazenamento dos últimos 90 arquivos (3 meses).
+Sistemas Operacionais GNU/Linux possuem uma ferramenta chamada \textit{logrotate}, que automatiza algumas atividades referentes aos \textit{logs}, como a rotação e gerenciamento de histórico de \textit{logs}. Esta ferramenta pode ser configurada alterando o arquivo \textit{/etc/logrotate.conf} conforme a necessidade, a atividade propõe a duas configurações importantes, a rotação diária de \textit{logs}, e o armazenamento de três meses de histórico. Na prática, isso implica na criação de um novo arquivo de \textit{log} todo dia, e o armazenamento dos últimos 90 arquivos (3 meses)~\cite{guiafocaSegurança}.
 
-Para aplicar a configuração proposta, o arquivo \textit{/etc/logrotate.conf} foi alterado, utilizando o editor de texto \textit{Nano}, e a rotação foi alterada para ''\textit{daily}`` (diária) e o armazenamento foi alterado para ''\textit{rotate} 90``, para armazenar 90 rotações. Este arquivo alterado pode ser observado na figura \ref{fig:logrotate}.
+Para aplicar a configuração proposta, o arquivo \textit{/etc/logrotate.conf} foi alterado, utilizando o editor de texto \textit{nano}, e a rotação foi alterada para ``\textit{daily}'' (diária) e o armazenamento foi alterado para ``\textit{rotate} 90'', para armazenar 90 rotações. O arquivo alterado pode ser observado na Figura~\ref{fig:logrotate}.
 
 \begin{figure}[H]
   \centering
@@ -595,9 +593,9 @@ Para aplicar a configuração proposta, o arquivo \textit{/etc/logrotate.conf} f
 
 \subsubsection{Identificação de serviços ativos}
 
-Outra atividade importante no âmbito na segurança em sistemas operacionais é a observação dos serviços ativos no sistema, pois permite a identificação de serviços suspeitos, que poderiam acarretar falhas de segurança como roubo de serviço ou recusa de serviço, citadas na seção \ref{sec:fundamentacao}.
+Outra atividade importante no âmbito na segurança em Sistemas Operacionais é a observação dos serviços ativos no sistema, pois permite a identificação de serviços suspeitos, que poderiam acarretar falhas de segurança como roubo de serviço ou recusa de serviço, citadas na Seção~\ref{sec:fundamentacao}.
 
-A verificação dos serviços de um sistema operacional Linux pode ser realizada com o auxílio do comando \textit{service}, acompanhado da opção ''\textit{--status-all}``, e para filtrar os serviços ativos podemos redirecionar a saída do comando anterior para o comando \textit{grep}, responsável por filtrar as linhas que contenham um determinado texto, como todo serviço ativo possui o marcador ''[ + ]`` em sua linha, vamos utilizar este termo para filtrar, o resultado desta operação pode ser visualizado na figura \ref{fig:service}.
+A verificação dos serviços de um sistema operacional Linux pode ser realizada com o auxílio do comando \textit{service}, acompanhado da opção ``\textit{--status-all}'', e para filtrar os serviços ativos podemos redirecionar a saída do comando anterior para o comando \textit{grep}, responsável por filtrar as linhas que contenham um determinado texto, como todo serviço ativo possui o marcador ``[ + ]'' em sua linha, vamos utilizar este termo para filtrar, o resultado desta operação pode ser visualizado na Figura~\ref{fig:service}.
 
 \begin{figure}[H]
   \centering
@@ -606,26 +604,26 @@ A verificação dos serviços de um sistema operacional Linux pode ser realizada
   \label{fig:service}
 \end{figure}
 
-Devido à forma que o \textit{grep} interpreta caracteres especiais, os serviços com status indefinidos, demarcados com ''[ ? ]`` também são retornados, mas pode-se ignorá-los.
+Devido à forma que o \textit{grep} interpreta caracteres especiais, os serviços com status indefinidos, demarcados com ``[ ? ]'' também são retornados, mas podem ser ignorados.
 
 \subsection{Outros mecanismos de segurança}
-O problema da segurança em sistemas operacionais é amplamente discutido e a comunidade busca constantemente soluções nesta área, algumas soluções importantes que visam serão apresentadas a seguir.
+O problema da segurança em Sistemas Operacionais é amplamente discutido e a comunidade busca constantemente soluções nesta área, algumas soluções importantes que visam serão apresentadas a seguir.
 
 \subsubsection{SELinux}
-O SELinux é um mecanismo de controle de acesso multipolíticas, que constitui uma infraestrutura de segurança para o núcleo Linux, permitindo a aplicação de políticas diversas aos recursos do sistema operacional. Uma desvantagem desta infraestrutura é sua alta complexidade, que torna sua compreensão e configuração difícil, devido a este fator, outros sistemas que visam o mesmo objetivo vem sendo desenvolvidos buscando uma complexidade menor para se tornarem mais simples de se aplicar ao núcleo Linux~\cite{maziero2019}.
+O SELinux é um mecanismo de controle de acesso com multipolíticas, que constitui uma infraestrutura de segurança para o núcleo Linux, permitindo a aplicação de políticas diversas aos recursos do sistema operacional. Uma desvantagem desta infraestrutura é sua alta complexidade, que torna sua compreensão e configuração difícil, devido a este fator, outros sistemas que visam o mesmo objetivo vem sendo desenvolvidos buscando uma complexidade menor para se tornarem mais simples de se aplicar ao núcleo Linux~\cite{maziero2019}.
 
 \subsubsection{\textit{Pluggable Authentication Modules}}
-Outro recurso disponível no Linux é o PAM (\textit{Pluggable Authentication Modules}) é um mecanismo baseado em uma biblioteca compartilhada que pode ser utilizada por qualquer componente do sistema operacional que precise realizar a autenticação de usuários para a realização de alguma atividade. O funcionamento do PAM permite o carregamento de módulos de autenticação conforme especificado no arquivo de configurações, esta modularização permite que novos módulos sejam adicionados na configuração e em seguida já esteva, disponíveis para qualquer componente do sistema~\cite{silberschatz2015}.
+Outro recurso disponível no Linux é o PAM (\textit{Pluggable Authentication Modules}), um mecanismo baseado em uma biblioteca compartilhada que pode ser utilizado por qualquer componente do sistema operacional que precise autenticar usuários para realizar alguma atividade. O funcionamento do PAM permite o carregamento de módulos de autenticação conforme especificado no arquivo de configurações. Essa modularização possibilita que novos módulos sejam adicionados à configuração e, em seguida, fiquem imediatamente disponíveis para qualquer componente do sistema~\cite{silberschatz2015}.
 
 \section{Discussão dos Resultados}
 \label{sec:discussao}
 
-Os resultados obtidos foram satisfatórios, alcançando o objetivo de compreender e aplicar conceitos e recursos de segurança em sistemas operacionais Linux com sucesso. O processo não proporcionou grandes dificuldades, apenas uma curva de aprendizado um pouco acima do esperado, que foi superada com o auxílio da bibliografia. Foi possível realizar com êxito configurações importantes relacionadas a segurança, como a implementação de requisitos para as senhas, atribuição de permissões a arquivos e remoção de usuários do grupo \textit{sudo}. Além disso, foi possível identificar e conhecer arquivos importantes para a segurança do sistema operacional.
+Os resultados obtidos foram satisfatórios, alcançando o objetivo de compreender e aplicar conceitos e recursos de segurança em um sistema GNU/Linux com sucesso. O processo não proporcionou grandes dificuldades, apenas uma curva de aprendizado um pouco acima do esperado, que foi superada com o auxílio da bibliografia. Foi possível realizar com êxito configurações importantes relacionadas a segurança, como a implementação de requisitos para as senhas, atribuição de permissões a arquivos e remoção de usuários do grupo \textit{sudo}. Além disso, foi possível identificar e conhecer arquivos importantes para a segurança do sistema operacional.
 
 \section{Conclusões}
 \label{sec:conclusoes}
 
-O objeto do trabalho de compreender e aplicar conceitos e recursos de segurança em sistemas operacionais foi atingido com sucesso e sua importância para a segurança da informação ficou clara ao longo do processo. Durante os procedimentos foram realizadas configuração e verificação de arquivos importantes para a segurança em sistemas operacionais Linux. O aprendizado obtido durante o trabalho é de fundamental importância para a formação de um cientista da computação, visto que sistemas operacionais são amplamente utilizados e podem se tornar alvos de invasores, comprometendo a segurança da informação. Além de todos os procedimentos realizados, ainda há diversos recursos de segurança não explorados durante a atividade e que podem prover meios eficazes de proteger dados e recursos.
+O objeto do trabalho de compreender e aplicar conceitos e recursos de segurança em Sistemas Operacionais foi atingido com sucesso e sua importância para a segurança da informação ficou clara ao longo do processo. Durante os procedimentos foram realizadas configuração e verificação de arquivos importantes para a segurança em sistemas operacionais Linux. O aprendizado obtido durante o trabalho é de fundamental importância para a formação de um cientista da computação, visto que Sistemas Operacionais são amplamente utilizados e podem se tornar alvos de invasores, comprometendo a segurança da informação. Além de todos os procedimentos realizados, ainda há diversos recursos de segurança não explorados durante a atividade, que podem prover meios eficazes de proteger dados e recursos.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
