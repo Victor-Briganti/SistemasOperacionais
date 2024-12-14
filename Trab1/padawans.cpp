@@ -1,80 +1,98 @@
 #include "padawans.hpp"
+#include "common.hpp"
 #include <cstdio>
 #include <cstdlib>
+#include <pthread.h>
 #include <unistd.h>
 
 namespace {
 
-void sai_salao(Padawan *padawan) {
-  pthread_mutex_lock(padawan->mutexFinishPadawan);
-  std::printf("[Padawan %d] Saindo\n", padawan->id);
-  (*padawan->finishPadawan)++;
-  pthread_mutex_unlock(padawan->mutexFinishPadawan);
-
-  sem_wait(padawan->semFinishPadawans);
+void sai_salao(int idPadawan) {
+  std::printf("[Padawan %d] sai do salão\n", idPadawan);
 }
 
 void cumprimenta_Yoda(int idPadawan) {
-  std::printf("[Padawan %d] Cumprimentou Yoda\n", idPadawan);
+  std::printf("[Padawan %d] cumprimenta Yoda\n", idPadawan);
 }
 
-void aguarda_corte_tranca(int idPadawan) {
-  std::printf("[Yoda] Cortou a trança de %d\n", idPadawan);
-  std::printf("[Padawan %d] Teve a trança cortada\n", idPadawan);
+void aguarda_corte_tranca(Padawan *padawan) {
+  std::printf("[Padawan %d] aguarda corte na trança\n", padawan->id);
+
+  while (true) {
+    pthread_mutex_lock(padawan->mutexCutPadawan);
+    if (padawan->cutPadawanQueue->front() != padawan->id) {
+      pthread_mutex_unlock(padawan->mutexCutPadawan);
+      sem_wait(padawan->semCutPadawans);
+    } else {
+      std::printf("[Yoda] cortou trança de %d\n", padawan->id);
+      pthread_mutex_unlock(padawan->mutexCutPadawan);
+      break;
+    }
+  }
 }
 
-void realiza_avaliacao(int idPadawan) {
-  std::printf("[Padawan %d] Realizando avaliação\n", idPadawan);
-  if (std::rand() % 2) {
-    std::printf("[Yoda] %d aprovado\n", idPadawan);
-    aguarda_corte_tranca(idPadawan);
-  } else {
-    std::printf("[Yoda] %d rejeitado\n", idPadawan);
-    cumprimenta_Yoda(idPadawan);
+void realiza_avaliacao(Padawan *padawan) {
+  std::printf("[Padawan %d] realiza avaliação\n", padawan->id);
+  sleep(1);
+
+  while (true) {
+    pthread_mutex_lock(padawan->mutexResultPadawan);
+    if (padawan->resultPadawanQueue->front().idPadawan != padawan->id) {
+      pthread_mutex_unlock(padawan->mutexResultPadawan);
+      sem_wait(padawan->semResultPadawans);
+    } else {
+      int result = padawan->resultPadawanQueue->front().result;
+
+      if (result == APPROVED) {
+        std::printf("[Yoda] aprovou %d\n", padawan->id);
+        pthread_mutex_unlock(padawan->mutexResultPadawan);
+        aguarda_corte_tranca(padawan);
+      } else {
+        std::printf("[Yoda] reprovou %d\n", padawan->id);
+        pthread_mutex_unlock(padawan->mutexResultPadawan);
+        cumprimenta_Yoda(padawan->id);
+      }
+
+      break;
+    }
   }
 }
 
 void aguarda_avaliacao(Padawan *padawan) {
-  // Aumenta o número de padawans esperando para realizar um teste
-  pthread_mutex_lock(padawan->mutexTestPadawan);
-  std::printf("[Padawan %d] Aguarda avaliação\n", padawan->id);
-  (*padawan->testPadawan)++;
-  pthread_mutex_unlock(padawan->mutexTestPadawan);
-
-  sem_wait(padawan->semTestPadawans);
-  realiza_avaliacao(padawan->id);
+  std::printf("[Padawan %d] aguardando avaliação\n", padawan->id);
+  while (true) {
+    pthread_mutex_lock(padawan->mutexTestPadawan);
+    if (padawan->testPadawanQueue->front() != padawan->id) {
+      pthread_mutex_unlock(padawan->mutexTestPadawan);
+      sem_wait(padawan->semTestPadawans);
+    } else {
+      pthread_mutex_unlock(padawan->mutexTestPadawan);
+      break;
+    }
+  }
 }
 
 void cumprimenta_mestres_avaliadores(int idPadawan) {
-  std::printf("[Padawan %d] Cumprimenta mestres\n", idPadawan);
-  sleep(1);
+  std::printf("[Padawan %d] cumprimenta mestres\n", idPadawan);
 }
 
 void entra_salao(Padawan *padawan) {
-  // Aumenta o número de padawans esperando na fila
   pthread_mutex_lock(padawan->mutexWaitPadawan);
-  std::printf("[Padawan %d] Esperando na fila\n", padawan->id);
-  (*padawan->waitPadawan)++;
+  std::printf("[Padawan %d] aguardando na fila\n", padawan->id);
+  padawan->waitPadawanQueue->push_back(padawan->id);
   pthread_mutex_unlock(padawan->mutexWaitPadawan);
 
-  // Espera na fila para ser liberado
   sem_wait(padawan->semWaitPadawans);
 }
 
 void *start(void *arg) {
   Padawan *padawan = static_cast<Padawan *>(arg);
 
-  // Entra na fila para entrar no salão
-  entra_salao(padawan);
-
-  // Cumprimenta todos os mestres avaliadores
   cumprimenta_mestres_avaliadores(padawan->id);
-
-  // Espera Yoda liberar a avaliação
+  entra_salao(padawan);
   aguarda_avaliacao(padawan);
-
-  // Sai do salão
-  sai_salao(padawan);
+  realiza_avaliacao(padawan);
+  sai_salao(padawan->id);
 
   return nullptr;
 }

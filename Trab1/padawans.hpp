@@ -1,6 +1,8 @@
 #ifndef PADAWAN_HPP
 #define PADAWAN_HPP
 
+#include "common.hpp"
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <vector>
@@ -10,32 +12,41 @@ struct Padawan {
   // Identificador do padawan
   int id;
 
-  // Número de padawans esperando para entrar no salão
-  int *waitPadawan;
+  // Fila para padawans esperando para entrar no salão
+  std::vector<int> *waitPadawanQueue;
 
-  // Número de padawans esperando para realizar teste
-  int *testPadawan;
+  // Fila para padawans esperando para realizar teste
+  std::vector<int> *testPadawanQueue;
 
-  // Número de padawans esperando para sair do salão
-  int *finishPadawan;
+  // Fila para padawans aguardando resultado
+  std::vector<Result> *resultPadawanQueue;
+
+  // Fila para padawans aguardando corte na trança
+  std::vector<int> *cutPadawanQueue;
 
   // Mutex para acesso ao número de padawans esperando entrar no salão
   pthread_mutex_t *mutexWaitPadawan;
 
+  // Mutex para acesso ao número de padawans aguardando resultado
+  pthread_mutex_t *mutexResultPadawan;
+
   // Mutex para acesso ao número de padawans esperando teste no salão
   pthread_mutex_t *mutexTestPadawan;
 
-  // Mutex para acesso ao número de padawans esperando para sair do salão
-  pthread_mutex_t *mutexFinishPadawan;
+  // Mutex para acesso ao número de padawans aguardando corte na trança
+  pthread_mutex_t *mutexCutPadawan;
 
   // Semáforo para a fila de padawans entrando no salão
   sem_t *semWaitPadawans;
 
+  // Semáforo para a fila de padawans aguardando resultado
+  sem_t *semResultPadawans;
+
   // Semáforo para a fila de padawans querendo fazer teste
   sem_t *semTestPadawans;
 
-  // Semáforo para a fila de padawans que terminaram o teste
-  sem_t *semFinishPadawans;
+  // Semáforo para a fila de padawans aguardando corte na trança
+  sem_t *semCutPadawans;
 };
 
 /**
