@@ -19,12 +19,12 @@ void assiste_testes(int idAudience) {
 
 void entra_salao(Audience *audience) {
   // Aumenta o número de pessoas na audiência querendo ver a sessão
-  pthread_mutex_lock(audience->mutexWaitingAudience);
+  pthread_mutex_lock(audience->mutexWaitAudience);
   std::printf("[Audience %d] Esperando na fila\n", audience->id);
   (*audience->waitingAudience)++;
-  pthread_mutex_unlock(audience->mutexWaitingAudience);
+  pthread_mutex_unlock(audience->mutexWaitAudience);
 
-  sem_wait(audience->semWaitingAudience);
+  sem_wait(audience->semWaitAudience);
 }
 
 void *start(void *arg) {
@@ -47,6 +47,7 @@ int init_audience(std::vector<pthread_t> tid, std::vector<Audience> audience) {
     if (pthread_create(&tid[i], nullptr, start, &audience[i]) != 0) {
       std::printf("[Audience %zu] ", i);
       std::perror("pthread_create ");
+      return -1;
     }
   }
 
@@ -54,6 +55,7 @@ int init_audience(std::vector<pthread_t> tid, std::vector<Audience> audience) {
     if (pthread_join(tid[i], nullptr) != 0) {
       std::printf("[Audience %zu] ", i);
       std::perror("pthread_join ");
+      return -1;
     }
   }
 

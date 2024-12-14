@@ -17,10 +17,10 @@ struct Audience {
   int *waitingAudience;
 
   // Mutex para acesso ao número de espectadores esperando entrar no salão
-  pthread_mutex_t *mutexWaitingAudience;
+  pthread_mutex_t *mutexWaitAudience;
 
   // Semáforo para a fila de espectadores entrando no salão
-  sem_t *semWaitingAudience;
+  sem_t *semWaitAudience;
 };
 
 /**
@@ -30,6 +30,8 @@ struct Audience {
  *
  * @param tid Vetor com todas as threads que vão executar
  * @param audience Vetor com todas as pessoas da audiência
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algum problema aconteceu
  */
 int init_audience(std::vector<pthread_t> tid, std::vector<Audience> audience);
 
