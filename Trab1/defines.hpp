@@ -1,0 +1,7 @@
+#ifndef DEFINES_HPP
+#define DEFINES_HPP
+
+#define NUM_PADAWANS 10
+#define NUM_AUDIENCE 100
+
+#endif // DEFINES_HPP

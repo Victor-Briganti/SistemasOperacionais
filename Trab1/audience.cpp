@@ -21,7 +21,7 @@ void entra_salao(Audience *audience) {
   // Aumenta o número de pessoas na audiência querendo ver a sessão
   pthread_mutex_lock(audience->mutexWaitAudience);
   std::printf("[Audience %d] Esperando na fila\n", audience->id);
-  (*audience->waitingAudience)++;
+  (*audience->waitAudience)++;
   pthread_mutex_unlock(audience->mutexWaitAudience);
 
   sem_wait(audience->semWaitAudience);

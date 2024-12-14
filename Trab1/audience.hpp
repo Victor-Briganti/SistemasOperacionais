@@ -14,7 +14,7 @@ struct Audience {
   bool *sessionOver;
 
   // Número de espectadores esperando para entrar no salão
-  int *waitingAudience;
+  int *waitAudience;
 
   // Mutex para acesso ao número de espectadores esperando entrar no salão
   pthread_mutex_t *mutexWaitAudience;
