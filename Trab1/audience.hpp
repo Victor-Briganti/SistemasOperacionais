@@ -5,26 +5,32 @@
 #include <semaphore.h>
 #include <vector>
 
+// Estrutura do espectador
 struct Audience {
   // Identificador do espectador
   int id;
 
-  // Número de pessoas esperando na audiência
+  // Define se as sessões já acabaram
+  bool *sessionOver;
+
+  // Número de espectadores esperando para entrar no salão
   int *waitingAudience;
 
-  // Controla a audiência querendo entrar na sala
-  sem_t *semWaitingAudience;
+  // Mutex para acesso ao número de espectadores esperando entrar no salão
+  pthread_mutex_t *mutexWaitingAudience;
 
-  // Controla o número de pessoas na audiência
-  pthread_mutex_t *mutexAudience;
+  // Semáforo para a fila de espectadores entrando no salão
+  sem_t *semWaitingAudience;
 };
 
 /**
- * @brief Inicializando audiência.
+ * @brief Inicializa a audiência que vai assistir as sessões
  *
- * Inicializa as threads de audiência.
+ * Cria as threads que vão iniciar a audiência.
+ *
+ * @param tid Vetor com todas as threads que vão executar
+ * @param audience Vetor com todas as pessoas da audiência
  */
-void inicia_audiencia(std::vector<pthread_t> tid,
-                      std::vector<Audience> audience);
+int init_audience(std::vector<pthread_t> tid, std::vector<Audience> audience);
 
 #endif // AUDIENCE_HPP
