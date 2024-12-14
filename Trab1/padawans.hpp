@@ -45,6 +45,8 @@ struct Padawan {
  *
  * @param tid Vetor com todas as threads que vão executar
  * @param padawan Vetor com todas as pessoas da Padawans
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algum problema aconteceu
  */
 int init_padawan(std::vector<pthread_t> tid, std::vector<Padawan> padawan);
 

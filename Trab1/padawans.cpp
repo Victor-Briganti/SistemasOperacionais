@@ -19,14 +19,17 @@ void cumprimenta_Yoda(int idPadawan) {
 }
 
 void aguarda_corte_tranca(int idPadawan) {
-  std::printf("[Padawan %d] Cortou a trança\n", idPadawan);
+  std::printf("[Yoda] Cortou a trança de %d\n", idPadawan);
+  std::printf("[Padawan %d] Teve a trança cortada\n", idPadawan);
 }
 
 void realiza_avaliacao(int idPadawan) {
   std::printf("[Padawan %d] Realizando avaliação\n", idPadawan);
   if (std::rand() % 2) {
+    std::printf("[Yoda] %d aprovado\n", idPadawan);
     aguarda_corte_tranca(idPadawan);
   } else {
+    std::printf("[Yoda] %d rejeitado\n", idPadawan);
     cumprimenta_Yoda(idPadawan);
   }
 }
@@ -83,6 +86,7 @@ int init_padawan(std::vector<pthread_t> tid, std::vector<Padawan> padawan) {
     if (pthread_create(&tid[i], nullptr, start, &padawan[i]) != 0) {
       std::printf("[Padawan %zu] ", i);
       std::perror("pthread_create ");
+      return -1;
     }
   }
 
@@ -90,6 +94,7 @@ int init_padawan(std::vector<pthread_t> tid, std::vector<Padawan> padawan) {
     if (pthread_join(tid[i], nullptr) != 0) {
       std::printf("[Padawan %zu] ", i);
       std::perror("pthread_join ");
+      return -1;
     }
   }
 
