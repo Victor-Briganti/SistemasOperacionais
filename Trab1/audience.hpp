@@ -3,8 +3,12 @@
 
 #include <pthread.h>
 #include <semaphore.h>
+#include <vector>
 
 struct Audience {
+  // Identificador do espectador
+  int id;
+
   // Número de pessoas esperando na audiência
   int *waitingAudience;
 
@@ -20,6 +24,7 @@ struct Audience {
  *
  * Inicializa as threads de audiência.
  */
-int inicia_audiencia(pthread_t *tid, Audience *audience);
+void inicia_audiencia(std::vector<pthread_t> tid,
+                      std::vector<Audience> audience);
 
 #endif // AUDIENCE_HPP

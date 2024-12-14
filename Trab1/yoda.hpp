@@ -3,8 +3,12 @@
 
 #include <pthread.h>
 #include <semaphore.h>
+#include <vector>
 
 struct Yoda {
+  // Número de padawans esperando o teste
+  int testPadawan;
+
   // Número de padawans esperando
   int *waitingPadawan;
 
@@ -38,6 +42,6 @@ struct Yoda {
  *
  * Inicializa as threads dos padawans.
  */
-int inicia_yoda(pthread_t *tid, Yoda *yoda);
+void inicia_yoda(std::vector<pthread_t> tid, Yoda *yoda);
 
 #endif // YODA_HPP
