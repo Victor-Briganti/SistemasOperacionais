@@ -20,10 +20,6 @@ void libera_entrada(Yoda *yoda) {
   // Registra o tempo de início
   auto start = std::chrono::steady_clock::now();
 
-  // Armazenam a quantidade de pessoas já na sala
-  int insideAudience = 0;
-  int insidePadawan = 0;
-
   // O loop continuará até o tempo aleatório ter passado
   while (true) {
     // Verifica o tempo decorrido
@@ -33,13 +29,11 @@ void libera_entrada(Yoda *yoda) {
 
     // Se o tempo aleatório foi atingido ou a quantidade de pessoas já atingiu o
     // limite começa testes.
-    if ((elapsed.count() >= randomTime) ||
-        (insideAudience == AUDIENCE_MAX_ENTRY &&
-         insidePadawan == PADAWAN_MAX_ENTRY)) {
+    if (elapsed.count() >= randomTime) {
       break;
     }
 
-    // Pega o número máximo de pessoas que querem assistir a apresentação
+    // Pega o número máximo de pessoas que podem estar dentro do salão
     pthread_mutex_lock(yoda->audience->mutexCount);
     while ((*yoda->audience->countWait) &&
            (*yoda->audience->countInside) < AUDIENCE_MAX_ENTRY) {
@@ -54,24 +48,19 @@ void libera_entrada(Yoda *yoda) {
     }
     pthread_mutex_unlock(yoda->audience->mutexCount);
 
-    // Pega o número máximo de padawans que querem testara a apresentação
+    // Pega o número máximo de padawans que podem entrar no salão
     pthread_mutex_lock(yoda->padawan->mutex);
-    int maxPadawan = yoda->padawan->waitQueue->size() >= PADAWAN_MAX_ENTRY
-                         ? PADAWAN_MAX_ENTRY
-                         : yoda->padawan->waitQueue->size();
-    insidePadawan += maxPadawan;
-    pthread_mutex_unlock(yoda->padawan->mutex);
+    while (yoda->padawan->waitQueue->empty() == false &&
+           yoda->padawan->testQueue->size() <= PADAWAN_MAX_ENTRY) {
 
-    for (int i = 0; i < maxPadawan; i++) {
-      // Remove o padawan da fila de espera e os coloca na fila de teste
-      pthread_mutex_lock(yoda->padawan->mutex);
+      // Remove os padawans da fila de espera e coloca na de teste
       yoda->padawan->testQueue->push_back(yoda->padawan->waitQueue->front());
       yoda->padawan->waitQueue->pop_front();
-      pthread_mutex_unlock(yoda->padawan->mutex);
 
       // Libera todos os padawans da audiência que estavam esperando na fila
       sem_post(yoda->padawan->semWait);
     }
+    pthread_mutex_unlock(yoda->padawan->mutex);
   }
 }
 
