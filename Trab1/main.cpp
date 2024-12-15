@@ -36,8 +36,8 @@ int create_audience() {
     return -1;
   }
 
-  audience->waitAudience = new int(0);
-  if (audience->waitAudience == nullptr) {
+  audience->countWait = new int(0);
+  if (audience->countWait == nullptr) {
     std::printf("Erro ao alocar waitAudience\n");
     return -1;
   }
@@ -53,24 +53,24 @@ int create_audience() {
     return -1;
   }
 
-  audience->mutexWaitAudience = new pthread_mutex_t;
-  if (audience->mutexWaitAudience == nullptr) {
+  audience->mutexWait = new pthread_mutex_t;
+  if (audience->mutexWait == nullptr) {
     std::printf("Erro ao alocar mutexWaitAudience\n");
     return -1;
   }
 
-  if (pthread_mutex_init(audience->mutexWaitAudience, nullptr)) {
+  if (pthread_mutex_init(audience->mutexWait, nullptr)) {
     std::printf("Erro ao inicializar mutexWaitAudience\n");
     return -1;
   }
 
-  audience->semWaitAudience = new sem_t;
-  if (audience->semWaitAudience == nullptr) {
+  audience->semWait = new sem_t;
+  if (audience->semWait == nullptr) {
     std::printf("Erro ao alocar semWaitAudience\n");
     return -1;
   }
 
-  if (sem_init(audience->semWaitAudience, 0, 0)) {
+  if (sem_init(audience->semWait, 0, 0)) {
     std::printf("Erro ao inicializar semWaitAudience\n");
     return -1;
   }

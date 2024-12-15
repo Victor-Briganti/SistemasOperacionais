@@ -11,16 +11,16 @@ struct Audience {
   bool *sessionOver;
 
   // Contador de pessoas esperando entrar na sala
-  int *waitAudience;
+  int *countWait;
 
   // Mutex para acesso ao sessionOver
   pthread_mutex_t *mutexSessionOver;
 
   // Mutex para acesso ao numWaitAudience
-  pthread_mutex_t *mutexWaitAudience;
+  pthread_mutex_t *mutexWait;
 
   // Semáforo para acesso a sala
-  sem_t *semWaitAudience;
+  sem_t *semWait;
 };
 
 /**

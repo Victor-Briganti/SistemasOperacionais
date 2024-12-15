@@ -23,14 +23,14 @@ int audienceCount = 0;
  * @return 0 se conseguiu entrar, -1 caso contrário
  */
 int entra_salao(int idAudience, Audience *audience) {
-  pthread_mutex_lock(audience->mutexWaitAudience);
+  pthread_mutex_lock(audience->mutexWait);
   // Aumenta quantidade de pessoas na fila
-  (*audience->waitAudience)++;
+  (*audience->countWait)++;
   std::printf("[Audience %d] aguardando entrada\n", idAudience);
-  pthread_mutex_unlock(audience->mutexWaitAudience);
+  pthread_mutex_unlock(audience->mutexWait);
 
   // Espera ser liberado sua entrada
-  sem_wait(audience->semWaitAudience);
+  sem_wait(audience->semWait);
   return 0;
 }
 
@@ -73,10 +73,10 @@ void *start(void *arg) {
   Audience *audience = static_cast<Audience *>(arg);
 
   // Fornece um ID para cada pessoa da audiência
-  pthread_mutex_lock(audience->mutexWaitAudience);
+  pthread_mutex_lock(audience->mutexWait);
   audienceCount++;
   int idAudience = audienceCount;
-  pthread_mutex_unlock(audience->mutexWaitAudience);
+  pthread_mutex_unlock(audience->mutexWait);
 
   // Tenta entrar na sala e assistir aos testes
   // Entra no salão

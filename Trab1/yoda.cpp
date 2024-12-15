@@ -31,21 +31,21 @@ void libera_entrada(Yoda *yoda) {
       break;
     }
 
-    pthread_mutex_lock(yoda->audience->mutexWaitAudience);
-    int maxAudience = (*yoda->audience->waitAudience) >= AUDIENCE_MAX_ENTRY
+    pthread_mutex_lock(yoda->audience->mutexWait);
+    int maxAudience = (*yoda->audience->countWait) >= AUDIENCE_MAX_ENTRY
                           ? AUDIENCE_MAX_ENTRY
-                          : (*yoda->audience->waitAudience);
-    pthread_mutex_unlock(yoda->audience->mutexWaitAudience);
+                          : (*yoda->audience->countWait);
+    pthread_mutex_unlock(yoda->audience->mutexWait);
 
     for (int i = 0; i < maxAudience; i++) {
       // Diminui o número de pessoas esperando e aumenta o número de pessoas
       // dentro da sala.
-      pthread_mutex_lock(yoda->audience->mutexWaitAudience);
-      (*yoda->audience->waitAudience)--;
-      pthread_mutex_unlock(yoda->audience->mutexWaitAudience);
+      pthread_mutex_lock(yoda->audience->mutexWait);
+      (*yoda->audience->countWait)--;
+      pthread_mutex_unlock(yoda->audience->mutexWait);
 
       // Libera todas as pessoas da audiência que estavam esperando na fila
-      sem_post(yoda->audience->semWaitAudience);
+      sem_post(yoda->audience->semWait);
     }
   }
 }
@@ -66,16 +66,16 @@ void finaliza_sessao(Yoda *yoda) {
   (*yoda->audience->sessionOver) = true;
   pthread_mutex_unlock(yoda->audience->mutexSessionOver);
 
-  pthread_mutex_lock(yoda->audience->mutexWaitAudience);
-  for (int i = 0; i < *yoda->audience->waitAudience; i++) {
+  pthread_mutex_lock(yoda->audience->mutexWait);
+  for (int i = 0; i < *yoda->audience->countWait; i++) {
     // Diminui o número de pessoas esperando e aumenta o número de pessoas
     // dentro da sala.
-    (*yoda->audience->waitAudience)--;
+    (*yoda->audience->countWait)--;
 
     // Libera todas as pessoas da audiência que estavam esperando na fila
-    sem_post(yoda->audience->semWaitAudience);
+    sem_post(yoda->audience->semWait);
   }
-  pthread_mutex_unlock(yoda->audience->mutexWaitAudience);
+  pthread_mutex_unlock(yoda->audience->mutexWait);
 }
 
 /**
