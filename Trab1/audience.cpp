@@ -1,5 +1,4 @@
 #include "audience.hpp"
-#include "common.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -20,22 +19,19 @@ int audienceCount = 0;
  *
  * @param idAudience Identificar da audiência
  * @param Audience Estrutura que armazena informações da audiência
+ *
+ * @return 0 se conseguiu entrar, -1 caso contrário
  */
-void entra_salao(int idAudience, Audience *audience) {
+int entra_salao(int idAudience, Audience *audience) {
   pthread_mutex_lock(audience->mutexWaitAudience);
-  if ((*audience->waitAudience) == AUDIENCE_MAX_ENTRY) {
-    // Salão está cheio tenta entrar na fila depois
-    pthread_mutex_unlock(audience->mutexWaitAudience);
-    return;
-  } else {
-    // Aumenta quantidade de pessoas na fila
-    (*audience->waitAudience)++;
-    std::printf("[Audience %d] aguardando entrada\n", idAudience);
-    pthread_mutex_unlock(audience->mutexWaitAudience);
+  // Aumenta quantidade de pessoas na fila
+  (*audience->waitAudience)++;
+  std::printf("[Audience %d] aguardando entrada\n", idAudience);
+  pthread_mutex_unlock(audience->mutexWaitAudience);
 
-    // Espera ser liberado sua entrada
-    sem_post(audience->semWaitAudience);
-  }
+  // Espera ser liberado sua entrada
+  sem_wait(audience->semWaitAudience);
+  return 0;
 }
 
 /**
@@ -83,19 +79,20 @@ void *start(void *arg) {
   pthread_mutex_unlock(audience->mutexWaitAudience);
 
   // Tenta entrar na sala e assistir aos testes
-  while (true) {
-    // Verifica se a sessão já terminou.
-    pthread_mutex_lock(audience->mutexSessionOver);
-    if (*audience->sessionOver) {
-      pthread_mutex_unlock(audience->mutexSessionOver);
-      break;
-    }
-    pthread_mutex_unlock(audience->mutexSessionOver);
+  // Entra no salão
+  entra_salao(idAudience, audience);
 
-    entra_salao(idAudience, audience);
-    assiste_teste(idAudience);
-    sai_salao(idAudience);
+  // Verifica se a sessão já terminou.
+  pthread_mutex_lock(audience->mutexSessionOver);
+  if (*audience->sessionOver) {
+    pthread_mutex_unlock(audience->mutexSessionOver);
+    return nullptr;
   }
+  pthread_mutex_unlock(audience->mutexSessionOver);
+
+  // Assiste ao teste e sai do salão
+  assiste_teste(idAudience);
+  sai_salao(idAudience);
 
   return nullptr;
 }

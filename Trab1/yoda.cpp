@@ -1,4 +1,5 @@
 #include "yoda.hpp"
+#include "common.hpp"
 
 #include <chrono>
 #include <cstdio>
@@ -31,16 +32,50 @@ void libera_entrada(Yoda *yoda) {
     }
 
     pthread_mutex_lock(yoda->audience->mutexWaitAudience);
-    for (int i = 0; i < (*yoda->audience->waitAudience); i++) {
+    int maxAudience = (*yoda->audience->waitAudience) >= AUDIENCE_MAX_ENTRY
+                          ? AUDIENCE_MAX_ENTRY
+                          : (*yoda->audience->waitAudience);
+    pthread_mutex_unlock(yoda->audience->mutexWaitAudience);
+
+    for (int i = 0; i < maxAudience; i++) {
       // Diminui o número de pessoas esperando e aumenta o número de pessoas
       // dentro da sala.
+      pthread_mutex_lock(yoda->audience->mutexWaitAudience);
       (*yoda->audience->waitAudience)--;
+      pthread_mutex_unlock(yoda->audience->mutexWaitAudience);
 
       // Libera todas as pessoas da audiência que estavam esperando na fila
       sem_post(yoda->audience->semWaitAudience);
     }
-    pthread_mutex_unlock(yoda->audience->mutexWaitAudience);
   }
+}
+
+/**
+ * @brief Finaliza as sessões
+ *
+ * Termina a sessão e manda todos embora.
+ *
+ * @param arg Ponteiro de void para Yoda
+ *
+ * @return nullptr
+ */
+void finaliza_sessao(Yoda *yoda) {
+  std::printf("[Yoda] finaliza sessão");
+
+  pthread_mutex_lock(yoda->audience->mutexSessionOver);
+  (*yoda->audience->sessionOver) = true;
+  pthread_mutex_unlock(yoda->audience->mutexSessionOver);
+
+  pthread_mutex_lock(yoda->audience->mutexWaitAudience);
+  for (int i = 0; i < *yoda->audience->waitAudience; i++) {
+    // Diminui o número de pessoas esperando e aumenta o número de pessoas
+    // dentro da sala.
+    (*yoda->audience->waitAudience)--;
+
+    // Libera todas as pessoas da audiência que estavam esperando na fila
+    sem_post(yoda->audience->semWaitAudience);
+  }
+  pthread_mutex_unlock(yoda->audience->mutexWaitAudience);
 }
 
 /**
@@ -55,13 +90,9 @@ void *start(void *arg) {
 
   for (int i = 0; i < 2; i++) {
     libera_entrada(yoda);
-
-    if (i == 1) {
-      pthread_mutex_lock(yoda->audience->mutexSessionOver);
-      (*yoda->audience->sessionOver) = true;
-      pthread_mutex_unlock(yoda->audience->mutexSessionOver);
-    }
   }
+
+  finaliza_sessao(yoda);
 
   return nullptr;
 }
