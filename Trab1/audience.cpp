@@ -1,69 +1,104 @@
 #include "audience.hpp"
 #include "common.hpp"
 #include <cstdio>
+#include <cstdlib>
 #include <pthread.h>
 #include <unistd.h>
 
 namespace {
 
+// Contador do identificador das pessoas na audiência
+int audienceCount = 0;
+
 /**
- * @brief Entra no salão para assistir as apresentações
+ * @brief Tenta entrar no salão para assistir aos testes
  *
- * @param audience Ponteiro pra a estrutura audiência
+ * Entra na sessão crítica de espera, se possível aumenta a quantidade de
+ * pessoas esperando e vai para o Mutex. Se o limite de pessoas no salão
+ * estourou vai embora e tenta depois.
+ *
+ * @param idAudience Identificar da audiência
+ * @param Audience Estrutura que armazena informações da audiência
  */
-void entra_salao(Audience *audience) {
+void entra_salao(int idAudience, Audience *audience) {
   pthread_mutex_lock(audience->mutexWaitAudience);
-  std::printf("[Audience %d] quer entrar no salão\n", audience->id);
-  (*audience->waitAudience)++;
-  pthread_mutex_unlock(audience->mutexWaitAudience);
+  if ((*audience->waitAudience) == AUDIENCE_MAX_ENTRY) {
+    // Salão está cheio tenta entrar na fila depois
+    pthread_mutex_unlock(audience->mutexWaitAudience);
+    return;
+  } else {
+    // Aumenta quantidade de pessoas na fila
+    (*audience->waitAudience)++;
+    std::printf("[Audience %d] aguardando entrada\n", idAudience);
+    pthread_mutex_unlock(audience->mutexWaitAudience);
 
-  sem_wait(audience->semWaitAudience);
-  std::printf("[Audience %d] entra no salão\n", audience->id);
+    // Espera ser liberado sua entrada
+    sem_post(audience->semWaitAudience);
+  }
 }
 
 /**
- * @brief Assiste as sessões
+ * @brief Tenta entrar no salão para assistir aos testes
  *
- * Assiste os testes por um período de tempo e então sai.
+ * Entra na sessão crítica de espera, se possível aumenta a quantidade de
+ * pessoas esperando e vai para o Mutex. Se o limite de pessoas no salão
+ * estourou vai embora e tenta depois.
  *
- * @param audienceId Identificador da audiência
+ * @param idAudience Identificar da audiência
+ * @param Audience Estrutura que armazena informações da audiência
  */
-void assiste_testes(int audienceId) {
-  int watchTime = AUDIENCE_WATCH_TIME;
-  std::printf("[Audience %d] assiste testes %ds\n", audienceId, watchTime);
-  sleep(watchTime);
+void assiste_teste(int idAudience) {
+  int watchTime = std::rand() % 500 + 1;
+  std::printf("[Audience %d] assiste teste por %dms\n", idAudience, watchTime);
+  usleep(watchTime);
 }
 
 /**
- * @brief Sai do salão
+ * @brief Sai do salão após assistir aos testes
  *
- * @param audienceId Identificação da audiência
+ * Entra na sessão crítica e diminui a quantidade de pessoas na sala assistindo
+ * aos teste.
+ *
+ * @param idAudience Identificar da audiência
+ * @param Audience Estrutura que armazena informações da audiência
  */
-void sai_salao(int audienceId) {
-  std::printf("[Audience %d] sai do salão\n", audienceId);
+void sai_salao(int idAudience, Audience *audience) {
+  pthread_mutex_lock(audience->mutexInsideAudience);
+  // Diminui a quantidade de pessoas dentro da sala
+  (*audience->insideAudience)--;
+  std::printf("[Audience %d] saindo da sala\n", idAudience);
+  pthread_mutex_unlock(audience->mutexInsideAudience);
 }
 
 /**
- * @brief Inicia as ações da audiência
+ * @brief Inicializa as ações da audiência
  *
- * @param arg Ponteiro void para estrutura Audience
+ * @param arg Ponteiro de void para estrutura Audience
  *
  * @return nullptr
  */
 void *start(void *arg) {
   Audience *audience = static_cast<Audience *>(arg);
 
+  // Fornece um ID para cada pessoa da audiência
+  pthread_mutex_lock(audience->mutexWaitAudience);
+  audienceCount++;
+  int idAudience = audienceCount;
+  pthread_mutex_unlock(audience->mutexWaitAudience);
+
+  // Tenta entrar na sala e assistir aos testes
   while (true) {
+    // Verifica se a sessão já terminou.
     pthread_mutex_lock(audience->mutexSessionOver);
-    if ((*audience->sessionOver) == true) {
+    if (*audience->sessionOver) {
       pthread_mutex_unlock(audience->mutexSessionOver);
       break;
     }
     pthread_mutex_unlock(audience->mutexSessionOver);
 
-    entra_salao(audience);
-    assiste_testes(audience->id);
-    sai_salao(audience->id);
+    entra_salao(idAudience, audience);
+    assiste_teste(idAudience);
+    sai_salao(idAudience, audience);
   }
 
   return nullptr;
@@ -72,14 +107,13 @@ void *start(void *arg) {
 } // namespace
 
 int init_audience(std::vector<pthread_t *> audienceThreads,
-                  std::vector<Audience *> audienceList) {
+                  Audience *audience) {
   for (size_t i = 0; i < audienceThreads.size(); i++) {
-    if (pthread_create(audienceThreads[i], nullptr, start, audienceList[i])) {
+    if (pthread_create(audienceThreads[i], nullptr, start, audience)) {
       std::printf("[Audience %zu] ", i);
       std::perror("pthread_create");
       return -1;
     }
   }
-
   return 0;
 }
