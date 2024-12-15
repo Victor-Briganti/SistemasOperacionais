@@ -1,5 +1,6 @@
 #include "audience.hpp"
 #include "common.hpp"
+
 #include <cstdio>
 #include <cstdlib>
 #include <pthread.h>
@@ -60,14 +61,9 @@ void assiste_teste(int idAudience) {
  * aos teste.
  *
  * @param idAudience Identificar da audiência
- * @param Audience Estrutura que armazena informações da audiência
  */
-void sai_salao(int idAudience, Audience *audience) {
-  pthread_mutex_lock(audience->mutexInsideAudience);
-  // Diminui a quantidade de pessoas dentro da sala
-  (*audience->insideAudience)--;
+void sai_salao(int idAudience) {
   std::printf("[Audience %d] saindo da sala\n", idAudience);
-  pthread_mutex_unlock(audience->mutexInsideAudience);
 }
 
 /**
@@ -98,7 +94,7 @@ void *start(void *arg) {
 
     entra_salao(idAudience, audience);
     assiste_teste(idAudience);
-    sai_salao(idAudience, audience);
+    sai_salao(idAudience);
   }
 
   return nullptr;
