@@ -28,4 +28,4 @@ check-helgrind: debug
 	valgrind --tool=helgrind --max-threads=10500 --verbose ./debug 6
 
 clean:
-	rm -rf main debug
+	rm -rf main debug ouput.log

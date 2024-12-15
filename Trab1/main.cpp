@@ -42,12 +42,6 @@ int create_audience() {
     return -1;
   }
 
-  audience->insideAudience = new int(0);
-  if (audience->insideAudience == nullptr) {
-    std::printf("Erro ao alocar insideAudience\n");
-    return -1;
-  }
-
   audience->mutexSessionOver = new pthread_mutex_t;
   if (audience->mutexSessionOver == nullptr) {
     std::printf("Erro ao alocar mutexSessionOver\n");
@@ -67,17 +61,6 @@ int create_audience() {
 
   if (pthread_mutex_init(audience->mutexWaitAudience, nullptr)) {
     std::printf("Erro ao inicializar mutexWaitAudience\n");
-    return -1;
-  }
-
-  audience->mutexInsideAudience = new pthread_mutex_t;
-  if (audience->mutexInsideAudience == nullptr) {
-    std::printf("Erro ao alocar mutexInsideAudience\n");
-    return -1;
-  }
-
-  if (pthread_mutex_init(audience->mutexInsideAudience, nullptr)) {
-    std::printf("Erro ao inicializar mutexInsideAudience\n");
     return -1;
   }
 
