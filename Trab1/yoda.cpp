@@ -31,6 +31,7 @@ void libera_entrada(Yoda *yoda) {
       break;
     }
 
+    // Pega o número máximo de pessoas que querem assistir a apresentação
     pthread_mutex_lock(yoda->audience->mutexWait);
     int maxAudience = (*yoda->audience->countWait) >= AUDIENCE_MAX_ENTRY
                           ? AUDIENCE_MAX_ENTRY
@@ -47,6 +48,23 @@ void libera_entrada(Yoda *yoda) {
       // Libera todas as pessoas da audiência que estavam esperando na fila
       sem_post(yoda->audience->semWait);
     }
+
+    // Pega o número máximo de padawans que querem testara a apresentação
+    pthread_mutex_lock(yoda->padawan->mutex);
+    int maxPadawan = yoda->padawan->waitQueue->size() >= PADAWAN_MAX_ENTRY
+                         ? PADAWAN_MAX_ENTRY
+                         : yoda->padawan->waitQueue->size();
+    pthread_mutex_unlock(yoda->padawan->mutex);
+
+    for (int i = 0; i < maxPadawan; i++) {
+      // Remove o padawan da fila de espera
+      pthread_mutex_lock(yoda->padawan->mutex);
+      yoda->padawan->waitQueue->pop();
+      pthread_mutex_unlock(yoda->padawan->mutex);
+
+      // Libera todos os padawans da audiência que estavam esperando na fila
+      sem_post(yoda->padawan->semWait);
+    }
   }
 }
 
@@ -60,7 +78,7 @@ void libera_entrada(Yoda *yoda) {
  * @return nullptr
  */
 void finaliza_sessao(Yoda *yoda) {
-  std::printf("[Yoda] finaliza sessão");
+  std::printf("[Yoda] finaliza sessão\n");
 
   pthread_mutex_lock(yoda->audience->mutexSessionOver);
   (*yoda->audience->sessionOver) = true;
@@ -88,7 +106,13 @@ void finaliza_sessao(Yoda *yoda) {
 void *start(void *arg) {
   Yoda *yoda = static_cast<Yoda *>(arg);
 
-  for (int i = 0; i < 2; i++) {
+  while (true) {
+    pthread_mutex_lock(yoda->padawan->mutex);
+    if (yoda->padawan->waitQueue->empty() != false) {
+      pthread_mutex_unlock(yoda->padawan->mutex);
+      break;
+    }
+    pthread_mutex_unlock(yoda->padawan->mutex);
     libera_entrada(yoda);
   }
 

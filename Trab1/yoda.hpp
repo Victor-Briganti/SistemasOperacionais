@@ -2,11 +2,15 @@
 #define YODA_HPP
 
 #include "audience.hpp"
+#include "padawan.hpp"
 
 // Estrutura básica do Yoda
 struct Yoda {
   // Ponteiro para a estrutura de audiência
   Audience *audience;
+
+  // Ponteiro para a estrutura de padawans
+  Padawan *padawan;
 };
 
 /**
