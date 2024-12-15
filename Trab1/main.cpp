@@ -1,5 +1,6 @@
 #include "audience.hpp"
 #include "common.hpp"
+#include "padawan.hpp"
 #include "yoda.hpp"
 
 #include <cstdio>
@@ -30,6 +31,12 @@ sem_t *semWaitAudience;
 //===----------------------------------------------------------------------===//
 // Padawans
 //===----------------------------------------------------------------------===//
+
+// Lista da estrutura dos Padawans
+std::vector<Padawan *> padawanList;
+
+// Lista de threads dos Padawans
+std::vector<pthread_t *> padawanThreads;
 
 // Lista de padawans esperando para entrar
 std::list<int> *listWaitPadawan;
@@ -250,6 +257,44 @@ int create_audience() {
 }
 
 /**
+ * @brief Cria os padawans
+ *
+ * Cria as estruturas inicias e as threads dos padawans.
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado.
+ */
+int create_padawan() {
+  for (int i = 0; i < PADAWAN_NUM; i++) {
+    Padawan *padawan = new Padawan;
+    if (padawan == nullptr) {
+      std::printf("Não foi possível inicializar padawans\n");
+      return -1;
+    }
+
+    padawan->listWaitPadawan = listWaitPadawan;
+    padawan->listTestPadawan = listTestPadawan;
+    padawan->listResultPadawan = listResultPadawan;
+    padawan->mutexWaitPadawan = mutexWaitPadawan;
+    padawan->mutexTestPadawan = mutexTestPadawan;
+    padawan->mutexResultPadawan = mutexResultPadawan;
+    padawan->semWaitPadawan = semWaitPadawan;
+    padawan->semTestPadawan = semTestPadawan;
+    padawan->semResultPadawan = semResultPadawan;
+    padawanList.push_back(padawan);
+
+    pthread_t *padawanThread = new pthread_t;
+    if (padawanThread == nullptr) {
+      std::printf("Não foi possível inicializar thread da audiência\n");
+      return -1;
+    }
+
+    padawanThreads.push_back(padawanThread);
+  }
+
+  return init_padawan(padawanThreads, padawanList);
+}
+
+/**
  * @brief Cria o Yoda
  *
  * Cria a estrutura inicial e a thread do Yoda.
@@ -305,6 +350,23 @@ int join_audience() {
 }
 
 /**
+ * @brief Realiza o join com todas as threads do tipo padawan
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado.
+ */
+int join_padawan() {
+  for (int i = 0; i < PADAWAN_NUM; i++) {
+    if (pthread_join(*padawanThreads[i], nullptr)) {
+      std::printf("[Padawan %d] ", i);
+      std::perror("pthread_join");
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+/**
  * @brief Realiza o join com a thread Yoda
  *
  * @return 0 se tudo ocorreu bem, -1 se algo deu errado.
@@ -331,11 +393,19 @@ int main() {
     exit(1);
   }
 
+  if (create_padawan()) {
+    exit(1);
+  }
+
   if (create_yoda()) {
     exit(1);
   }
 
   if (join_audience()) {
+    exit(1);
+  }
+
+  if (join_padawan()) {
     exit(1);
   }
 

@@ -46,7 +46,7 @@ void sai_salao(int audienceId) {
 /**
  * @brief Inicia as ações da audiência
  *
- * @param arg Ponteiro void para estrutura audiência
+ * @param arg Ponteiro void para estrutura Audience
  *
  * @return nullptr
  */

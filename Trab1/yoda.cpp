@@ -9,6 +9,8 @@
 
 namespace {
 
+int numPadawans = PADAWAN_NUM;
+
 /**
  * @brief Libera a entrada das pessoas na sala
  *
@@ -21,13 +23,22 @@ void libera_entrada(Yoda *yoda) {
   // Liber as pessoas conforme o tempo especificado
   while (time(nullptr) - tmpTime < YODA_ENTRY_TIME) {
 
-    // Região crítica de acesso da audiência
+    // Região crítica de acesso ao salão pela audiência
     pthread_mutex_lock(yoda->mutexWaitAudience);
     if ((*yoda->waitAudience)) {
       (*yoda->waitAudience)--;
       sem_post(yoda->semWaitAudience);
     }
     pthread_mutex_unlock(yoda->mutexWaitAudience);
+
+    // Região crítica de acesso ao salão pelos padawans
+    pthread_mutex_lock(yoda->mutexWaitPadawan);
+    if (yoda->listWaitPadawan->empty() == false) {
+      numPadawans--;
+      yoda->listWaitPadawan->pop_front();
+      sem_post(yoda->semWaitPadawan);
+    }
+    pthread_mutex_unlock(yoda->mutexWaitPadawan);
   }
 }
 
@@ -66,7 +77,7 @@ void discurso() { std::printf("[Yoda] faz discurso\n"); }
 void *start(void *arg) {
   Yoda *yoda = static_cast<Yoda *>(arg);
 
-  for (int i = 0; i < 10; i++) {
+  while (numPadawans) {
     libera_entrada(yoda);
     inicia_testes();
     anuncia_resultado();
