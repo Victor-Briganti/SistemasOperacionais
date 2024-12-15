@@ -11,8 +11,12 @@ namespace {
  * @param audience Ponteiro pra a estrutura audiência
  */
 void entra_salao(Audience *audience) {
-  std::printf("[Audience %d] entra no salao\n", audience->id);
-  sleep(1);
+  pthread_mutex_lock(audience->mutexWaitAudience);
+  (*audience->waitAudience)++;
+  pthread_mutex_unlock(audience->mutexWaitAudience);
+
+  sem_wait(audience->semWaitAudience);
+  std::printf("[Audience %d] entra no salão\n", audience->id);
 }
 
 /**
@@ -24,7 +28,7 @@ void entra_salao(Audience *audience) {
  */
 void assiste_testes(int audienceId) {
   int watchTime = AUDIENCE_SLEEP_TIME;
-  std::printf("[Audience %d] assiste testes\n", audienceId);
+  std::printf("[Audience %d] assiste testes %ds\n", audienceId, watchTime);
   sleep(watchTime);
 }
 
@@ -46,7 +50,13 @@ void sai_salao(int audienceId) {
  */
 void *start(void *arg) {
   Audience *audience = static_cast<Audience *>(arg);
-  entra_salao(audience);
+
+  while ((*audience->sessionOver) == false) {
+    entra_salao(audience);
+    assiste_testes(audience->id);
+    sai_salao(audience->id);
+  }
+
   return nullptr;
 }
 
