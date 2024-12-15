@@ -33,11 +33,17 @@ void libera_entrada(Yoda *yoda) {
 
     // Região crítica de acesso ao salão pelos padawans
     pthread_mutex_lock(yoda->mutexWaitPadawan);
+    pthread_mutex_lock(yoda->mutexTestPadawan);
     if (yoda->listWaitPadawan->empty() == false) {
       numPadawans--;
+
+      // Passa os padawans da fila de espera para a fila de testes
+      yoda->listTestPadawan->push_back(yoda->listWaitPadawan->front());
       yoda->listWaitPadawan->pop_front();
+
       sem_post(yoda->semWaitPadawan);
     }
+    pthread_mutex_unlock(yoda->mutexTestPadawan);
     pthread_mutex_unlock(yoda->mutexWaitPadawan);
   }
 }
@@ -45,7 +51,18 @@ void libera_entrada(Yoda *yoda) {
 /**
  * @brief Inicializa os testes
  */
-void inicia_testes() { std::printf("[Yoda] inicia testes\n"); }
+void inicia_testes(Yoda *yoda) {
+  std::printf("[Yoda] inicia testes\n");
+
+  pthread_mutex_lock(yoda->mutexTestPadawan);
+
+  for (auto padawan : (*yoda->listTestPadawan)) {
+    std::printf("[Padawan %d] aguardando\n", padawan);
+    sem_post(yoda->semTestPadawan);
+  }
+
+  pthread_mutex_unlock(yoda->mutexTestPadawan);
+}
 
 /**
  * @brief Anuncia quais foram os resultados dos testes
@@ -79,7 +96,7 @@ void *start(void *arg) {
 
   while (numPadawans) {
     libera_entrada(yoda);
-    inicia_testes();
+    inicia_testes(yoda);
     anuncia_resultado();
     corta_tranca();
     finaliza_testes();

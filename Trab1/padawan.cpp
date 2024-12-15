@@ -1,32 +1,47 @@
 #include "padawan.hpp"
 
 #include <cstdio>
+#include <cstdlib>
 #include <pthread.h>
+#include <unistd.h>
 
 namespace {
 
-void entra_salao(int &idPadawan, Padawan *padawan) {
+// Contador que identifica os Padawans
+int idPadawan = 0;
+
+void entra_salao(Padawan *padawan) {
   pthread_mutex_lock(padawan->mutexWaitPadawan);
-  // Salva o id do padawan enquanto ele espera
-  idPadawan = padawan->listWaitPadawan->size();
-  std::printf("[Padawan %d] esperando para entrar no salão\n", idPadawan);
-  padawan->listWaitPadawan->push_back(padawan->listWaitPadawan->size());
+  // Atualiza o contador e salva seu valor
+  idPadawan++;
+  int id = idPadawan;
+
+  padawan->listWaitPadawan->push_back(id);
+
+  std::printf("[Padawan %d] esperando para entrar no salão\n", id);
   pthread_mutex_unlock(padawan->mutexWaitPadawan);
 
+  // Espera ser liberado
   sem_wait(padawan->semWaitPadawan);
-  std::printf("[Padawan %d] entrou no salão\n", idPadawan);
+
+  std::printf("[Padawan %d] entrou no salão\n", id);
+  std::printf("[Padawan %d] cumprimenta todos os mestres\n", id);
+  usleep(500);
 }
 
-void cumprimenta_mestres_avaliadores(int &idPadawan) {
-  std::printf("[Padawan %d] cumprimenta todos os mestres\n", idPadawan);
-}
+void realiza_avaliacao(Padawan *padawan) {
+  // Aguarda ser liberado
+  sem_wait(padawan->semTestPadawan);
 
-void aguarda_avaliacao(int &idPadawan) {
-  std::printf("[Padawan %d] aguarda avaliaçao\n", idPadawan);
-}
+  pthread_mutex_lock(padawan->mutexTestPadawan);
 
-void realiza_avaliacao(int &idPadawan) {
-  std::printf("[Padawan %d] realiza avaliacao\n", idPadawan);
+  int idPadawan = padawan->listTestPadawan->front();
+  padawan->listTestPadawan->pop_front();
+
+  std::printf("[Padawan %d] realiza avaliaçao\n", idPadawan);
+  pthread_mutex_unlock(padawan->mutexTestPadawan);
+
+  usleep(500);
 }
 
 void aguarda_corte_tranca(int &idPadawan) {
@@ -53,13 +68,8 @@ void *start(void *arg) {
 
   int idPadawan = 0;
 
-  entra_salao(idPadawan, padawan);
-  cumprimenta_mestres_avaliadores(idPadawan);
-  aguarda_avaliacao(idPadawan);
-  realiza_avaliacao(idPadawan);
-  aguarda_corte_tranca(idPadawan);
-  cumprimenta_Yoda(idPadawan);
-  sai_salao(idPadawan);
+  entra_salao(padawan);
+  realiza_avaliacao(padawan);
   return nullptr;
 }
 
