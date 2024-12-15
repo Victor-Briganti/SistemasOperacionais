@@ -38,22 +38,29 @@ void realiza_avaliacao(Padawan *padawan) {
   int idPadawan = padawan->listTestPadawan->front();
   padawan->listTestPadawan->pop_front();
 
-  std::printf("[Padawan %d] realiza avaliaçao\n", idPadawan);
   pthread_mutex_unlock(padawan->mutexTestPadawan);
 
   usleep(500);
 }
 
-void aguarda_corte_tranca(int &idPadawan) {
-  std::printf("[Padawan %d] aguarda corte tranca\n", idPadawan);
-}
+void verifica_resultado(Padawan *padawan) {
+  // Aguarda ser liberado
+  sem_wait(padawan->semResultPadawan);
 
-void cumprimenta_Yoda(int &idPadawan) {
-  std::printf("[Padawan %d] cumprimenta yoda\n", idPadawan);
-}
+  pthread_mutex_lock(padawan->mutexResultPadawan);
 
-void sai_salao(int &idPadawan) {
-  std::printf("[Padawan %d] sai do salão\n", idPadawan);
+  std::pair<int, bool> result = padawan->listResultPadawan->front();
+  padawan->listResultPadawan->pop_front();
+
+  if (result.second) {
+    std::printf("[Padawan %d] aguarda corte de trança\n", result.first);
+    std::printf("[Yoda] corta trança de %d\n", result.first);
+  } else {
+    std::printf("[Padawan %d] cumprimenta yoda\n", result.first);
+  }
+
+  std::printf("[Padawan %d] sai do salão\n", result.first);
+  pthread_mutex_unlock(padawan->mutexResultPadawan);
 }
 
 /**
@@ -66,10 +73,9 @@ void sai_salao(int &idPadawan) {
 void *start(void *arg) {
   Padawan *padawan = static_cast<Padawan *>(arg);
 
-  int idPadawan = 0;
-
   entra_salao(padawan);
   realiza_avaliacao(padawan);
+  verifica_resultado(padawan);
   return nullptr;
 }
 

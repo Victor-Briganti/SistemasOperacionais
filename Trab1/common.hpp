@@ -20,6 +20,10 @@
 // Define quantidade de padawans
 #define PADAWAN_NUM 30
 
+// Estados que um padawan pode ser encotrado
+#define PADAWAN_APPROVED 1
+#define PADAWAN_REJECTED 0
+
 //===----------------------------------------------------------------------===//
 // Yoda
 //===----------------------------------------------------------------------===//

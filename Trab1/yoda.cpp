@@ -57,7 +57,16 @@ void inicia_testes(Yoda *yoda) {
   pthread_mutex_lock(yoda->mutexTestPadawan);
 
   for (auto padawan : (*yoda->listTestPadawan)) {
-    std::printf("[Padawan %d] aguardando\n", padawan);
+    std::printf("[Padawan %d] realiza avaliação\n", padawan);
+
+    pthread_mutex_lock(yoda->mutexResultPadawan);
+    if (std::rand() % 2) {
+      yoda->listResultPadawan->push_back({padawan, PADAWAN_APPROVED});
+    } else {
+      yoda->listResultPadawan->push_back({padawan, PADAWAN_REJECTED});
+    }
+    pthread_mutex_unlock(yoda->mutexResultPadawan);
+
     sem_post(yoda->semTestPadawan);
   }
 
@@ -67,12 +76,28 @@ void inicia_testes(Yoda *yoda) {
 /**
  * @brief Anuncia quais foram os resultados dos testes
  */
-void anuncia_resultado() { std::printf("[Yoda] anuncia resultados\n"); }
+void anuncia_resultado(Yoda *yoda) {
+  std::printf("[Yoda] anuncia resultados\n");
 
-/**
- * @brief Corta a trança de quem foi aprovado
- */
-void corta_tranca() { std::printf("[Yoda] corta tranças\n"); }
+  pthread_mutex_lock(yoda->mutexResultPadawan);
+
+  size_t sizeResultList = yoda->listResultPadawan->size();
+
+  for (auto padawan : (*yoda->listResultPadawan)) {
+    if (padawan.second) {
+      std::printf("[Yoda] %d aprovado\n", padawan.first);
+    } else {
+      std::printf("[Yoda] %d reprovado\n", padawan.first);
+    }
+  }
+
+  while (sizeResultList) {
+    sem_post(yoda->semResultPadawan);
+    sizeResultList--;
+  }
+
+  pthread_mutex_unlock(yoda->mutexResultPadawan);
+}
 
 /**
  * @brief Finaliza todos os testes
@@ -97,8 +122,7 @@ void *start(void *arg) {
   while (numPadawans) {
     libera_entrada(yoda);
     inicia_testes(yoda);
-    anuncia_resultado();
-    corta_tranca();
+    anuncia_resultado(yoda);
     finaliza_testes();
   }
 
