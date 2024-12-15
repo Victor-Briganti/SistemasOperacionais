@@ -20,6 +20,7 @@ void libera_entrada(Yoda *yoda) {
   // Registra o tempo de início
   auto start = std::chrono::steady_clock::now();
 
+  // Armazenam a quantidade de pessoas já na sala
   int insideAudience = 0;
   int insidePadawan = 0;
 
@@ -39,23 +40,19 @@ void libera_entrada(Yoda *yoda) {
     }
 
     // Pega o número máximo de pessoas que querem assistir a apresentação
-    pthread_mutex_lock(yoda->audience->mutexWait);
-    int maxAudience = (*yoda->audience->countWait) >= AUDIENCE_MAX_ENTRY
-                          ? AUDIENCE_MAX_ENTRY
-                          : (*yoda->audience->countWait);
-    insideAudience += maxAudience;
-    pthread_mutex_unlock(yoda->audience->mutexWait);
+    pthread_mutex_lock(yoda->audience->mutexCount);
+    while ((*yoda->audience->countWait) &&
+           (*yoda->audience->countInside) < AUDIENCE_MAX_ENTRY) {
 
-    for (int i = 0; i < maxAudience; i++) {
-      // Diminui o número de pessoas esperando e aumenta o número de pessoas
-      // dentro da sala.
-      pthread_mutex_lock(yoda->audience->mutexWait);
+      // Diminui a quantidade de pessoas na fila e aumenta a quantidade de
+      // pessoas dentro do salão
       (*yoda->audience->countWait)--;
-      pthread_mutex_unlock(yoda->audience->mutexWait);
+      (*yoda->audience->countInside)++;
 
       // Libera todas as pessoas da audiência que estavam esperando na fila
       sem_post(yoda->audience->semWait);
     }
+    pthread_mutex_unlock(yoda->audience->mutexCount);
 
     // Pega o número máximo de padawans que querem testara a apresentação
     pthread_mutex_lock(yoda->padawan->mutex);
@@ -88,9 +85,7 @@ void avalia(Yoda *yoda) {
   for (auto a : (*yoda->padawan->testQueue)) {
     std::printf("[Padawan %d] aguarda avaliação\n", a);
   }
-  pthread_mutex_unlock(yoda->padawan->mutex);
 
-  pthread_mutex_lock(yoda->padawan->mutex);
   std::printf("[Yoda] realiza avaliação\n");
   for (int i = 0; i < yoda->padawan->testQueue->size(); i++) {
     int idPadawan = yoda->padawan->testQueue->front();
@@ -105,6 +100,36 @@ void avalia(Yoda *yoda) {
     }
   }
   pthread_mutex_unlock(yoda->padawan->mutex);
+}
+
+/**
+ * @brief Anuncia os resultados de cada Padawan
+ *
+ * @param yoda Ponteiro para estrutura Yoda
+ */
+void anuncia_resultados(Yoda *yoda) {
+  pthread_mutex_lock(yoda->padawan->mutex);
+  // Armazena o tamanho total da fila de resultados
+  int resultQueueSize = yoda->padawan->resultQueue->size();
+
+  // Anuncia os resultados individuais de cada Padawan
+  for (auto pwd : (*yoda->padawan->resultQueue)) {
+    if (pwd.second) {
+      std::printf("[Yoda] %d aceito\n", pwd.first);
+    } else {
+      std::printf("[Yoda] %d rejeitado\n", pwd.first);
+    }
+  }
+
+  // Libera os Padawans aguardando o resultado
+  while (resultQueueSize) {
+    resultQueueSize--;
+    sem_post(yoda->padawan->semResult);
+  }
+  pthread_mutex_unlock(yoda->padawan->mutex);
+
+  // Aguarda todos os padawans terminarem de ver o resultado
+  sem_wait(yoda->padawan->semFinish);
 }
 
 /**
@@ -123,16 +148,12 @@ void finaliza_sessao(Yoda *yoda) {
   (*yoda->audience->sessionOver) = true;
   pthread_mutex_unlock(yoda->audience->mutexSessionOver);
 
-  pthread_mutex_lock(yoda->audience->mutexWait);
-  for (int i = 0; i < *yoda->audience->countWait; i++) {
-    // Diminui o número de pessoas esperando e aumenta o número de pessoas
-    // dentro da sala.
-    (*yoda->audience->countWait)--;
-
-    // Libera todas as pessoas da audiência que estavam esperando na fila
+  // Libera todas as pessoas da audiência que podem estar esperando na fila
+  pthread_mutex_lock(yoda->audience->mutexCount);
+  for (int i = 0; i < AUDIENCE_NUM; i++) {
     sem_post(yoda->audience->semWait);
   }
-  pthread_mutex_unlock(yoda->audience->mutexWait);
+  pthread_mutex_unlock(yoda->audience->mutexCount);
 }
 
 /**
@@ -154,6 +175,7 @@ void *start(void *arg) {
     pthread_mutex_unlock(yoda->padawan->mutex);
     libera_entrada(yoda);
     avalia(yoda);
+    anuncia_resultados(yoda);
   }
 
   finaliza_sessao(yoda);

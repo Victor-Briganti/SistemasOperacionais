@@ -6,20 +6,20 @@
 //===------------------------------------------------------------------------===
 
 // Define a quantidade de pessoas na audiência
-#define AUDIENCE_NUM 500
+#define AUDIENCE_NUM 100
 
 // Define a quantidade máxima de pessoas que pode estar na sala
-#define AUDIENCE_MAX_ENTRY 25
+#define AUDIENCE_MAX_ENTRY 5
 
 //===------------------------------------------------------------------------===
 // Padawan
 //===------------------------------------------------------------------------===
 
 // Define a quantidade de padawans
-#define PADAWAN_NUM 300
+#define PADAWAN_NUM 20
 
 // Define a quantidade máxima de padawans que podem estar na sala
-#define PADAWAN_MAX_ENTRY 14
+#define PADAWAN_MAX_ENTRY 2
 
 //===------------------------------------------------------------------------===
 // Yoda

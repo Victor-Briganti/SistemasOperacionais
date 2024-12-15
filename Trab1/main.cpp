@@ -39,7 +39,13 @@ int create_audience() {
 
   audience->countWait = new int(0);
   if (audience->countWait == nullptr) {
-    std::printf("Erro ao alocar waitAudience\n");
+    std::printf("Erro ao alocar countWait\n");
+    return -1;
+  }
+
+  audience->countInside = new int(0);
+  if (audience->countInside == nullptr) {
+    std::printf("Erro ao alocar countInside\n");
     return -1;
   }
 
@@ -54,13 +60,13 @@ int create_audience() {
     return -1;
   }
 
-  audience->mutexWait = new pthread_mutex_t;
-  if (audience->mutexWait == nullptr) {
+  audience->mutexCount = new pthread_mutex_t;
+  if (audience->mutexCount == nullptr) {
     std::printf("Erro ao alocar mutexWaitAudience\n");
     return -1;
   }
 
-  if (pthread_mutex_init(audience->mutexWait, nullptr)) {
+  if (pthread_mutex_init(audience->mutexCount, nullptr)) {
     std::printf("Erro ao inicializar mutexWaitAudience\n");
     return -1;
   }
@@ -298,11 +304,11 @@ int main() {
     exit(-1);
   }
 
-  if (join_padawan()) {
-    exit(-1);
-  }
-
   if (join_yoda()) {
     exit(-1);
   }
+
+  // if (join_padawan()) {
+  //   exit(-1);
+  // }
 }

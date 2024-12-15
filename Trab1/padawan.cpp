@@ -22,6 +22,37 @@ void entra_salao(Padawan *padawan) {
 }
 
 /**
+ * @brief Aguarda o resultado e realiza a ação conforme o resultado obtido
+ *
+ * @param padawan Estrutura do padawan
+ */
+void aguarda_resultado(Padawan *padawan) {
+  // Espera os resultados serem liberados
+  sem_wait(padawan->semResult);
+
+  pthread_mutex_lock(padawan->mutex);
+  auto pwd = padawan->resultQueue->front();
+  padawan->resultQueue->pop_front();
+  pthread_mutex_unlock(padawan->mutex);
+
+  if (pwd.second) {
+    std::printf("[Padawan %d] aguarda corte trança\n", pwd.first);
+    std::printf("[Yoda] corta trança de %d\n", pwd.first);
+  } else {
+    std::printf("[Padawan %d] cumprimenta Yoda\n", pwd.first);
+  }
+
+  std::printf("[Padawan %d] sai do salão\n", pwd.first);
+
+  // Se este é o último padawan na sala sinaliza
+  pthread_mutex_lock(padawan->mutex);
+  if (padawan->resultQueue->empty() == true) {
+    sem_post(padawan->semFinish);
+  }
+  pthread_mutex_unlock(padawan->mutex);
+}
+
+/**
  * @brief Inicializa as ações dos padawans
  *
  * @param arg Ponteiro de void para estrutura Padawan
@@ -32,6 +63,7 @@ void *start(void *arg) {
   Padawan *padawan = static_cast<Padawan *>(arg);
 
   entra_salao(padawan);
+  aguarda_resultado(padawan);
 
   return nullptr;
 }
