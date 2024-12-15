@@ -15,7 +15,7 @@ struct Padawan {
   std::list<int> *testQueue;
 
   // Fila de padawans esperando resultado
-  std::list<int> *resultQueue;
+  std::list<std::pair<int, bool>> *resultQueue;
 
   // Mutex para acesso da estrutura
   pthread_mutex_t *mutex;

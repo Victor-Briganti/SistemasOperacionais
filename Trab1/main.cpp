@@ -139,7 +139,7 @@ int create_padawan() {
     return -1;
   }
 
-  padawan->resultQueue = new std::list<int>;
+  padawan->resultQueue = new std::list<std::pair<int, bool>>;
   if (padawan->resultQueue == nullptr) {
     std::printf("Erro não foi possível alocar resultQueue\n");
     return -1;

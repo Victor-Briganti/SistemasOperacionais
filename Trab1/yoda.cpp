@@ -71,6 +71,35 @@ void libera_entrada(Yoda *yoda) {
 }
 
 /**
+ * @brief Realiza as avaliações dos Padawans
+ *
+ * @param yoda Ponteiro para estrutura Yoda
+ */
+void avalia(Yoda *yoda) {
+  pthread_mutex_lock(yoda->padawan->mutex);
+  for (auto a : (*yoda->padawan->testQueue)) {
+    std::printf("[Padawan %d] aguarda avaliação\n", a);
+  }
+  pthread_mutex_unlock(yoda->padawan->mutex);
+
+  pthread_mutex_lock(yoda->padawan->mutex);
+  std::printf("[Yoda] realiza avaliação\n");
+  for (int i = 0; i < yoda->padawan->testQueue->size(); i++) {
+    int idPadawan = yoda->padawan->testQueue->front();
+    yoda->padawan->testQueue->pop_front();
+
+    std::printf("[Padawan %d] realiza avaliação\n", idPadawan);
+
+    if (std::rand() % 2) {
+      yoda->padawan->resultQueue->push_back({idPadawan, true});
+    } else {
+      yoda->padawan->resultQueue->push_back({idPadawan, false});
+    }
+  }
+  pthread_mutex_unlock(yoda->padawan->mutex);
+}
+
+/**
  * @brief Finaliza as sessões
  *
  * Termina a sessão e manda todos embora.
@@ -116,6 +145,7 @@ void *start(void *arg) {
     }
     pthread_mutex_unlock(yoda->padawan->mutex);
     libera_entrada(yoda);
+    avalia(yoda);
   }
 
   finaliza_sessao(yoda);
