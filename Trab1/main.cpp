@@ -3,6 +3,7 @@
 #include "yoda.hpp"
 
 #include <cstdio>
+#include <list>
 #include <pthread.h>
 #include <semaphore.h>
 #include <vector>
@@ -27,6 +28,37 @@ pthread_mutex_t *mutexWaitAudience;
 sem_t *semWaitAudience;
 
 //===----------------------------------------------------------------------===//
+// Padawans
+//===----------------------------------------------------------------------===//
+
+// Lista de padawans esperando para entrar
+std::list<int> *listWaitPadawan;
+
+// Lista de padawans esperando teste
+std::list<int> *listTestPadawan;
+
+// Lista dos resultados dos padawans
+std::list<std::pair<int, bool>> *listResultPadawan;
+
+// Mutex para acesso a lista de padawans esperando para entrar
+pthread_mutex_t *mutexWaitPadawan;
+
+// Mutex para acesso a lista de padawans esperando teste
+pthread_mutex_t *mutexTestPadawan;
+
+// Mutex para acesso a lista de padawans esperando resultados
+pthread_mutex_t *mutexResultPadawan;
+
+// Semáforo para esperar a entrada
+sem_t *semWaitPadawan;
+
+// Semáforo de padawans esperando teste
+sem_t *semTestPadawan;
+
+// Semáforo de padawans esperando resultado
+sem_t *semResultPadawan;
+
+//===----------------------------------------------------------------------===//
 // Yoda
 //===----------------------------------------------------------------------===//
 
@@ -39,6 +71,9 @@ pthread_t *yodaThread;
 // Define se a sessão de testes acabou
 bool *sessionOver;
 
+// Mutex para acesso da global sessionOver
+pthread_mutex_t *mutexSessionOver;
+
 //===----------------------------------------------------------------------===//
 // Funções Padrões
 //===----------------------------------------------------------------------===//
@@ -47,6 +82,25 @@ namespace {
 
 /** @brief Inicializa todas as globais do sistema */
 int init_globals() {
+
+  listWaitPadawan = new std::list<int>();
+  if (listWaitPadawan == nullptr) {
+    std::printf("Erro alocando listWaitPadawan\n");
+    return -1;
+  }
+
+  listTestPadawan = new std::list<int>();
+  if (listTestPadawan == nullptr) {
+    std::printf("Erro alocando listTestPadawan\n");
+    return -1;
+  }
+
+  listResultPadawan = new std::list<std::pair<int, bool>>();
+  if (listResultPadawan == nullptr) {
+    std::printf("Erro alocando listResultPadawan\n");
+    return -1;
+  }
+
   waitAudience = new int(0);
   if (waitAudience == nullptr) {
     std::printf("Erro alocando waitAudience\n");
@@ -70,6 +124,50 @@ int init_globals() {
     return -1;
   }
 
+  mutexSessionOver = new pthread_mutex_t;
+  if (mutexSessionOver == nullptr) {
+    std::printf("Erro alocando mutexSessionOver\n");
+    return -1;
+  }
+
+  if (pthread_mutex_init(mutexSessionOver, nullptr)) {
+    std::printf("Erro iniciando mutexSessionOver\n");
+    return -1;
+  }
+
+  mutexResultPadawan = new pthread_mutex_t;
+  if (mutexResultPadawan == nullptr) {
+    std::printf("Erro alocando mutexResultPadawan\n");
+    return -1;
+  }
+
+  if (pthread_mutex_init(mutexResultPadawan, nullptr)) {
+    std::printf("Erro iniciando mutexResultPadawan\n");
+    return -1;
+  }
+
+  mutexWaitPadawan = new pthread_mutex_t;
+  if (mutexWaitPadawan == nullptr) {
+    std::printf("Erro alocando mutexWaitPadawan\n");
+    return -1;
+  }
+
+  if (pthread_mutex_init(mutexWaitPadawan, nullptr)) {
+    std::printf("Erro iniciando mutexWaitPadawan\n");
+    return -1;
+  }
+
+  mutexTestPadawan = new pthread_mutex_t;
+  if (mutexTestPadawan == nullptr) {
+    std::printf("Erro alocando mutexTestPadawan\n");
+    return -1;
+  }
+
+  if (pthread_mutex_init(mutexTestPadawan, nullptr)) {
+    std::printf("Erro iniciando mutexTestPadawan\n");
+    return -1;
+  }
+
   semWaitAudience = new sem_t;
   if (semWaitAudience == nullptr) {
     std::printf("Erro alocando semWaitAudience\n");
@@ -78,6 +176,39 @@ int init_globals() {
 
   if (sem_init(semWaitAudience, 0, 0)) {
     std::printf("Erro iniciando semWaitAudience\n");
+    return -1;
+  }
+
+  semWaitPadawan = new sem_t;
+  if (semWaitPadawan == nullptr) {
+    std::printf("Erro alocando semWaitPadawan\n");
+    return -1;
+  }
+
+  if (sem_init(semWaitPadawan, 0, 0)) {
+    std::printf("Erro iniciando semWaitPadawan\n");
+    return -1;
+  }
+
+  semTestPadawan = new sem_t;
+  if (semTestPadawan == nullptr) {
+    std::printf("Erro alocando semTestPadawan\n");
+    return -1;
+  }
+
+  if (sem_init(semTestPadawan, 0, 0)) {
+    std::printf("Erro iniciando semTestPadawan\n");
+    return -1;
+  }
+
+  semResultPadawan = new sem_t;
+  if (semResultPadawan == nullptr) {
+    std::printf("Erro alocando semResultPadawan\n");
+    return -1;
+  }
+
+  if (sem_init(semResultPadawan, 0, 0)) {
+    std::printf("Erro iniciando semResultPadawan\n");
     return -1;
   }
 
@@ -102,6 +233,7 @@ int create_audience() {
     audience->sessionOver = sessionOver;
     audience->waitAudience = waitAudience;
     audience->mutexWaitAudience = mutexWaitAudience;
+    audience->mutexSessionOver = mutexSessionOver;
     audience->semWaitAudience = semWaitAudience;
     audienceList.push_back(audience);
 
@@ -133,8 +265,18 @@ int create_yoda() {
 
   yoda->sessionOver = sessionOver;
   yoda->waitAudience = waitAudience;
+  yoda->listWaitPadawan = listWaitPadawan;
+  yoda->listResultPadawan = listResultPadawan;
+  yoda->listTestPadawan = listTestPadawan;
   yoda->mutexWaitAudience = mutexWaitAudience;
+  yoda->mutexWaitPadawan = mutexWaitPadawan;
+  yoda->mutexTestPadawan = mutexTestPadawan;
+  yoda->mutexResultPadawan = mutexResultPadawan;
+  yoda->mutexSessionOver = mutexSessionOver;
   yoda->semWaitAudience = semWaitAudience;
+  yoda->semWaitPadawan = semWaitPadawan;
+  yoda->semTestPadawan = semTestPadawan;
+  yoda->semResultPadawan = semResultPadawan;
 
   yodaThread = new pthread_t;
   if (yodaThread == nullptr) {

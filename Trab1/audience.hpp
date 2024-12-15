@@ -19,6 +19,9 @@ struct Audience {
   // Mutex para acesso da fila de audiência
   pthread_mutex_t *mutexWaitAudience;
 
+  // Mutex para acesso da variável sessionOver
+  pthread_mutex_t *mutexSessionOver;
+
   // Semáforo para controle de acesso da audiência
   sem_t *semWaitAudience;
 };

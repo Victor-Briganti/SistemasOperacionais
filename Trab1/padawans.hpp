@@ -1,18 +1,13 @@
-#ifndef YODA_HPP
-#define YODA_HPP
+#ifndef PADAWANS_HPP
+#define PADAWANS_HPP
 
 #include <list>
 #include <pthread.h>
 #include <semaphore.h>
+#include <vector>
 
-// Estrutura do Yoda
-struct Yoda {
-  // Define se a sessão de testes acabou
-  bool *sessionOver;
-
-  // Armazena o número de pessoas da audiência esperando para entrar
-  int *waitAudience;
-
+// Estrutura dos Padawans
+struct Padawan {
   // Lista de padawans esperando para entrar
   std::list<int> *listWaitPadawan;
 
@@ -22,12 +17,6 @@ struct Yoda {
   // Lista dos resultados dos padawans
   std::list<std::pair<int, bool>> *listResultPadawan;
 
-  // Mutex para acesso a sessão
-  pthread_mutex_t *mutexSessionOver;
-
-  // Mutex para acesso da fila de audiência
-  pthread_mutex_t *mutexWaitAudience;
-
   // Mutex para acesso a lista de padawans esperando para entrar
   pthread_mutex_t *mutexWaitPadawan;
 
@@ -36,9 +25,6 @@ struct Yoda {
 
   // Mutex para acesso a lista de padawans esperando resultados
   pthread_mutex_t *mutexResultPadawan;
-
-  // Semáforo para controle de acesso da audiência
-  sem_t *semWaitAudience;
 
   // Semáforo para esperar a entrada
   sem_t *semWaitPadawan;
@@ -51,13 +37,14 @@ struct Yoda {
 };
 
 /**
- * @brief Inicializa o Yoda
+ * @brief Inicializa os Padawans
  *
- * @param yodaThreads Thread que representa o Yoda
- * @param yoda Estrutura com todas as informações que o Yoda usa
+ * @param padawanThreads Threads que representam os Padawans
+ * @param padawan Estrutura com todas as informações que os Padawans usam
  *
  * @return 0 se tudo ocorreu bem, -1 se algo deu errado.
  */
-int init_yoda(pthread_t *yodaThread, Yoda *yoda);
+int init_padawan(std::vector<pthread_t *> padawanThreads,
+                 std::vector<Padawan *> padawanList);
 
-#endif // YODA_HPP
+#endif // PADAWANS_HPP

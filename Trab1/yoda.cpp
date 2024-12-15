@@ -9,11 +9,19 @@
 
 namespace {
 
+/**
+ * @brief Libera a entrada das pessoas na sala
+ *
+ * @param arg Ponteiro void para estrutura Yoda
+ */
 void libera_entrada(Yoda *yoda) {
   std::printf("[Yoda] libera entrada\n");
   time_t tmpTime = time(nullptr);
 
+  // Liber as pessoas conforme o tempo especificado
   while (time(nullptr) - tmpTime < YODA_ENTRY_TIME) {
+
+    // Região crítica de acesso da audiência
     pthread_mutex_lock(yoda->mutexWaitAudience);
     if ((*yoda->waitAudience)) {
       (*yoda->waitAudience)--;
@@ -23,14 +31,29 @@ void libera_entrada(Yoda *yoda) {
   }
 }
 
+/**
+ * @brief Inicializa os testes
+ */
 void inicia_testes() { std::printf("[Yoda] inicia testes\n"); }
 
+/**
+ * @brief Anuncia quais foram os resultados dos testes
+ */
 void anuncia_resultado() { std::printf("[Yoda] anuncia resultados\n"); }
 
+/**
+ * @brief Corta a trança de quem foi aprovado
+ */
 void corta_tranca() { std::printf("[Yoda] corta tranças\n"); }
 
+/**
+ * @brief Finaliza todos os testes
+ */
 void finaliza_testes() { std::printf("[Yoda] finaliza testes\n"); }
 
+/**
+ * @brief Realiza o discurso que finaliza a sessão
+ */
 void discurso() { std::printf("[Yoda] faz discurso\n"); }
 
 /**
@@ -51,7 +74,10 @@ void *start(void *arg) {
     finaliza_testes();
   }
 
+  pthread_mutex_lock(yoda->mutexSessionOver);
   (*yoda->sessionOver) = true;
+  pthread_mutex_unlock(yoda->mutexSessionOver);
+
   discurso();
 
   return nullptr;
