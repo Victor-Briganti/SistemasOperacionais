@@ -1,15 +1,13 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#define APPROVED 1
-#define REJECTED 0
+#include <cstdlib>
 
-struct Result {
-  // Id do Padawan
-  int idPadawan;
+//===----------------------------------------------------------------------===//
+// Audiência
+//===----------------------------------------------------------------------===//
 
-  // Resultado do teste. Deve ser aprovado ou rejeitado.
-  int result;
-};
+#define AUDIENCE_SLEEP_TIME (std::rand() % 10 + 1)
+#define AUDIENCE_NUM 100
 
 #endif // COMMON_HPP

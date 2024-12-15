@@ -1,60 +1,63 @@
 #include "audience.hpp"
+#include "common.hpp"
 #include <cstdio>
-#include <cstdlib>
-#include <pthread.h>
-#include <semaphore.h>
 #include <unistd.h>
 
 namespace {
 
-void sai_salao(int idAudience) {
-  std::printf("[Audience %d] Saindo da sala\n", idAudience);
+/**
+ * @brief Entra no salão para assistir as apresentações
+ *
+ * @param audience Ponteiro pra a estrutura audiência
+ */
+void entra_salao(Audience *audience) {
+  std::printf("[Audience %d] entra no salao\n", audience->id);
+  sleep(1);
 }
 
-void assiste_testes(int idAudience) {
-  int watchTime = std::rand() % 10 + 1;
-  std::printf("[Audience %d] Assistindo por %ds\n", idAudience, watchTime);
+/**
+ * @brief Assiste as sessões
+ *
+ * Assiste os testes por um período de tempo e então sai.
+ *
+ * @param audienceId Identificador da audiência
+ */
+void assiste_testes(int audienceId) {
+  int watchTime = AUDIENCE_SLEEP_TIME;
+  std::printf("[Audience %d] assiste testes\n", audienceId);
   sleep(watchTime);
 }
 
-void entra_salao(Audience *audience) {
-  // Aumenta o número de pessoas na audiência querendo ver a sessão
-  pthread_mutex_lock(audience->mutexWaitAudience);
-  std::printf("[Audience %d] Esperando na fila\n", audience->id);
-  (*audience->waitAudience)++;
-  pthread_mutex_unlock(audience->mutexWaitAudience);
-
-  sem_wait(audience->semWaitAudience);
+/**
+ * @brief Sai do salão
+ *
+ * @param audienceId Identificação da audiência
+ */
+void sai_salao(int audienceId) {
+  std::printf("[Audience %d] sai do salão\n", audienceId);
 }
 
+/**
+ * @brief Inicia as ações da audiência
+ *
+ * @param arg Ponteiro void para estrutura audiência
+ *
+ * @return nullptr
+ */
 void *start(void *arg) {
   Audience *audience = static_cast<Audience *>(arg);
-
-  // Assiste as sessões enquanto elas existirem
-  while (*(audience->sessionOver) == false) {
-    entra_salao(audience);
-    assiste_testes(audience->id);
-    sai_salao(audience->id);
-  }
-
+  entra_salao(audience);
   return nullptr;
 }
 
 } // namespace
 
-int init_audience(std::vector<pthread_t> tid, std::vector<Audience> audience) {
-  for (size_t i = 0; i < tid.size(); i++) {
-    if (pthread_create(&tid[i], nullptr, start, &audience[i]) != 0) {
+int init_audience(std::vector<pthread_t *> audienceThreads,
+                  std::vector<Audience *> audienceList) {
+  for (size_t i = 0; i < audienceThreads.size(); i++) {
+    if (pthread_create(audienceThreads[i], nullptr, start, audienceList[i])) {
       std::printf("[Audience %zu] ", i);
-      std::perror("pthread_create ");
-      return -1;
-    }
-  }
-
-  for (size_t i = 0; i < tid.size(); i++) {
-    if (pthread_join(tid[i], nullptr) != 0) {
-      std::printf("[Audience %zu] ", i);
-      std::perror("pthread_join ");
+      std::perror("pthread_create");
       return -1;
     }
   }

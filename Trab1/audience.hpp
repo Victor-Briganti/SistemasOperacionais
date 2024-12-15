@@ -2,37 +2,23 @@
 #define AUDIENCE_HPP
 
 #include <pthread.h>
-#include <semaphore.h>
 #include <vector>
 
-// Estrutura do espectador
+// Estrutura inicial da audiência
 struct Audience {
-  // Identificador do espectador
+  // Identificador da audiência
   int id;
-
-  // Define se as sessões já acabaram
-  bool *sessionOver;
-
-  // Número de espectadores esperando para entrar no salão
-  int *waitAudience;
-
-  // Mutex para acesso ao número de espectadores esperando entrar no salão
-  pthread_mutex_t *mutexWaitAudience;
-
-  // Semáforo para a fila de espectadores entrando no salão
-  sem_t *semWaitAudience;
 };
 
 /**
- * @brief Inicializa a audiência que vai assistir as sessões
+ * @brief Inicializa a platéia que vai assistir ao evento
  *
- * Cria as threads que vão iniciar a audiência.
+ * @param audienceThreads Threads que representam cada pessoa na plateia
+ * @param audienceList Vetor com estruturas que armazenam informações da plateia
  *
- * @param tid Vetor com todas as threads que vão executar
- * @param audience Vetor com todas as pessoas da audiência
- *
- * @return 0 se tudo ocorreu bem, -1 se algum problema aconteceu
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado.
  */
-int init_audience(std::vector<pthread_t> tid, std::vector<Audience> audience);
+int init_audience(std::vector<pthread_t *> audienceThreads,
+                  std::vector<Audience *> audienceList);
 
 #endif // AUDIENCE_HPP
