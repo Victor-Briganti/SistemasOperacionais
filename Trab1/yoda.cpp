@@ -20,6 +20,9 @@ void libera_entrada(Yoda *yoda) {
   // Registra o tempo de início
   auto start = std::chrono::steady_clock::now();
 
+  int insideAudience = 0;
+  int insidePadawan = 0;
+
   // O loop continuará até o tempo aleatório ter passado
   while (true) {
     // Verifica o tempo decorrido
@@ -27,8 +30,11 @@ void libera_entrada(Yoda *yoda) {
     auto elapsed =
         std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
 
-    // Se o tempo aleatório foi atingido, sai do loop
-    if (elapsed.count() >= randomTime) {
+    // Se o tempo aleatório foi atingido ou a quantidade de pessoas já atingiu o
+    // limite começa testes.
+    if ((elapsed.count() >= randomTime) ||
+        (insideAudience == AUDIENCE_MAX_ENTRY &&
+         insidePadawan == PADAWAN_MAX_ENTRY)) {
       break;
     }
 
@@ -37,6 +43,7 @@ void libera_entrada(Yoda *yoda) {
     int maxAudience = (*yoda->audience->countWait) >= AUDIENCE_MAX_ENTRY
                           ? AUDIENCE_MAX_ENTRY
                           : (*yoda->audience->countWait);
+    insideAudience += maxAudience;
     pthread_mutex_unlock(yoda->audience->mutexWait);
 
     for (int i = 0; i < maxAudience; i++) {
@@ -55,6 +62,7 @@ void libera_entrada(Yoda *yoda) {
     int maxPadawan = yoda->padawan->waitQueue->size() >= PADAWAN_MAX_ENTRY
                          ? PADAWAN_MAX_ENTRY
                          : yoda->padawan->waitQueue->size();
+    insidePadawan += maxPadawan;
     pthread_mutex_unlock(yoda->padawan->mutex);
 
     for (int i = 0; i < maxPadawan; i++) {
