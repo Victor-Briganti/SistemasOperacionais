@@ -7,6 +7,7 @@
 #include <pthread.h>
 
 namespace {
+
 /**
  * @brief Libera o público e os padawans para entrarem na sala
  *
@@ -57,9 +58,10 @@ void libera_entrada(Yoda *yoda) {
     pthread_mutex_unlock(yoda->padawan->mutex);
 
     for (int i = 0; i < maxPadawan; i++) {
-      // Remove o padawan da fila de espera
+      // Remove o padawan da fila de espera e os coloca na fila de teste
       pthread_mutex_lock(yoda->padawan->mutex);
-      yoda->padawan->waitQueue->pop();
+      yoda->padawan->testQueue->push_back(yoda->padawan->waitQueue->front());
+      yoda->padawan->waitQueue->pop_front();
       pthread_mutex_unlock(yoda->padawan->mutex);
 
       // Libera todos os padawans da audiência que estavam esperando na fila

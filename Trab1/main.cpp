@@ -127,19 +127,19 @@ int create_padawan() {
     return -1;
   }
 
-  padawan->waitQueue = new std::queue<int>;
+  padawan->waitQueue = new std::list<int>;
   if (padawan->waitQueue == nullptr) {
     std::printf("Erro não foi possível alocar waitQueue\n");
     return -1;
   }
 
-  padawan->testQueue = new std::queue<int>;
+  padawan->testQueue = new std::list<int>;
   if (padawan->testQueue == nullptr) {
     std::printf("Erro não foi possível alocar testQueue\n");
     return -1;
   }
 
-  padawan->resultQueue = new std::queue<int>;
+  padawan->resultQueue = new std::list<int>;
   if (padawan->resultQueue == nullptr) {
     std::printf("Erro não foi possível alocar resultQueue\n");
     return -1;

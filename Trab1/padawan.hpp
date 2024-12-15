@@ -1,20 +1,21 @@
 #ifndef PADAWAN_HPP
 #define PADAWAN_HPP
 
+#include <list>
 #include <pthread.h>
-#include <queue>
 #include <semaphore.h>
+#include <vector>
 
 // Estrutura do Padawan
 struct Padawan {
   // Fila de padawans esperando entrar no salão
-  std::queue<int> *waitQueue;
+  std::list<int> *waitQueue;
 
   // Fila de padawans esperando teste
-  std::queue<int> *testQueue;
+  std::list<int> *testQueue;
 
   // Fila de padawans esperando resultado
-  std::queue<int> *resultQueue;
+  std::list<int> *resultQueue;
 
   // Mutex para acesso da estrutura
   pthread_mutex_t *mutex;

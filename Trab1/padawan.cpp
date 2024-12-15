@@ -10,7 +10,7 @@ void entra_salao(Padawan *padawan) {
   pthread_mutex_lock(padawan->mutex);
   // Salva o ID do Padawan na fila de espera
   int idPadawan = padawan->waitQueue->size() + 1;
-  padawan->waitQueue->push(idPadawan);
+  padawan->waitQueue->push_back(idPadawan);
 
   std::printf("[Padawan %d] aguardando entrada\n", idPadawan);
   pthread_mutex_unlock(padawan->mutex);
