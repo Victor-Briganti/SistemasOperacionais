@@ -169,14 +169,14 @@ int create_padawan() {
     return -1;
   }
 
-  padawan->semTest = new sem_t;
-  if (padawan->semTest == nullptr) {
-    std::printf("Erro não foi possível alocar semTest\n");
+  padawan->semFinish = new sem_t;
+  if (padawan->semFinish == nullptr) {
+    std::printf("Erro não foi possível alocar semFinish\n");
     return -1;
   }
 
-  if (sem_init(padawan->semTest, 0, 0)) {
-    std::printf("Erro ao iniciar o semáforo semTest\n");
+  if (sem_init(padawan->semFinish, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semFinish\n");
     std::perror("sem_init\n");
     return -1;
   }

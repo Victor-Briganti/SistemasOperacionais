@@ -23,11 +23,11 @@ struct Padawan {
   // Semáforo para padawans esperando entrar no salão
   sem_t *semWait;
 
-  // Semáforo para padawans esperando teste
-  sem_t *semTest;
-
   // Semáforo para padawans esperando resultado
   sem_t *semResult;
+
+  // Semáforo para padawans que finalizaram toda sessão
+  sem_t *semFinish;
 };
 
 /**
