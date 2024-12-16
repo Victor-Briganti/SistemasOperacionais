@@ -44,7 +44,11 @@ int entra_salao(int idAudience, Audience *audience) {
  * @param idAudience Identificar da audiência
  * @param Audience Estrutura que armazena informações da audiência
  */
-void assiste_teste(int idAudience) {
+void assiste_teste(int idAudience, Audience *audience) {
+  std::printf("[Audience %d] entrou no salão\n", idAudience);
+  // Espera os testes começarem
+  sem_wait(audience->semTest);
+
   int watchTime = std::rand() % 500 + 1;
   std::printf("[Audience %d] assiste teste por %dms\n", idAudience, watchTime);
   usleep(watchTime);
@@ -95,7 +99,7 @@ void *start(void *arg) {
   pthread_mutex_unlock(audience->mutexSessionOver);
 
   // Assiste ao teste e sai do salão
-  assiste_teste(idAudience);
+  assiste_teste(idAudience, audience);
   sai_salao(idAudience, audience);
 
   return nullptr;

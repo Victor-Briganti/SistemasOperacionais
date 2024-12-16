@@ -82,6 +82,17 @@ int create_audience() {
     return -1;
   }
 
+  audience->semTest = new sem_t;
+  if (audience->semTest == nullptr) {
+    std::printf("Erro ao alocar semTestAudience\n");
+    return -1;
+  }
+
+  if (sem_init(audience->semTest, 0, 0)) {
+    std::printf("Erro ao inicializar semTestAudience\n");
+    return -1;
+  }
+
   for (int i = 0; i < AUDIENCE_NUM; i++) {
     pthread_t *audience = new pthread_t;
     if (audience == nullptr) {
@@ -272,8 +283,8 @@ int create_yoda() {
  * @return 0 se tudo ocorreu bem, -1 se algo deu errado
  */
 int join_yoda() {
-  std::printf("[Yoda] Finaliza sessão\n");
   std::printf("[Yoda] Faz discurso\n");
+  std::printf("[Yoda] Finaliza sessão\n");
 
   if (pthread_join(*yodaThread, nullptr)) {
     std::printf("[Yoda] ");

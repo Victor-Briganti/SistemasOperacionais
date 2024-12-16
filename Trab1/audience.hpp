@@ -24,6 +24,9 @@ struct Audience {
 
   // Semáforo para acesso a sala
   sem_t *semWait;
+
+  // Semáforo para sincronizar ao assistir os testes
+  sem_t *semTest;
 };
 
 /**

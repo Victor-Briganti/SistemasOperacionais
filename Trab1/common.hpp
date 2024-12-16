@@ -6,19 +6,19 @@
 //===------------------------------------------------------------------------===
 
 // Define a quantidade de pessoas na audiência
-#define AUDIENCE_NUM 6000
+#define AUDIENCE_NUM 10000
 
 // Define a quantidade máxima de pessoas que pode estar na sala
-#define AUDIENCE_MAX_ENTRY 10
+#define AUDIENCE_MAX_ENTRY 100
 
 //===------------------------------------------------------------------------===
 // Padawan
 //===------------------------------------------------------------------------===
 
 // Define a quantidade de padawans
-#define PADAWAN_NUM 3000
+#define PADAWAN_NUM 4000
 
 // Define a quantidade máxima de padawans que podem estar na sala
-#define PADAWAN_MAX_ENTRY 15
+#define PADAWAN_MAX_ENTRY 50
 
 #endif // COMMON_HPP
