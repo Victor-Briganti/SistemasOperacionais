@@ -1,3 +1,14 @@
+//===---- yoda.hpp - Cabeçalho do Yoda ------------------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Definição da estrutura Yoda, e da função que inicializa sua thread.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef YODA_HPP
 #define YODA_HPP
 

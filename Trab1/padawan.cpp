@@ -1,11 +1,32 @@
+//===---- padawan.cpp - Implementação das funções do Padawan --------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Implementação das ações que o Padawan irá realizar ao longo da sessão de
+// testes
+//
+//===----------------------------------------------------------------------===//
+
 #include "padawan.hpp"
 
-#include <cstdio>
-#include <pthread.h>
-#include <unistd.h>
+#include <cstdio> // perror(), printf(), size_t
+#include <pthread.h> // pthread_create(), pthread_mutex_lock(), pthread_mutex_unlock()
+#include <unistd.h> // usleep()
 
 namespace {
 
+/**
+ * @brief Entra no salão
+ *
+ * Aguarda sua entrada ser liberada e assim que aceito entra no salão e
+ * cumprimenta os mestres.
+ *
+ * @param padawan Estrutura que armazena variavéis globais utilizadas pelo
+ * Padawan
+ */
 void entra_salao(Padawan *padawan) {
   pthread_mutex_lock(padawan->mutex);
   // Salva o ID do Padawan na fila de espera
@@ -17,6 +38,8 @@ void entra_salao(Padawan *padawan) {
 
   // Aguarda liberação do salão
   sem_wait(padawan->semWait);
+
+  std::printf("[Padawan %d] entrou\n", idPadawan);
   std::printf("[Padawan %d] cumprimenta mestres\n", idPadawan);
   usleep(500);
 }
@@ -24,7 +47,12 @@ void entra_salao(Padawan *padawan) {
 /**
  * @brief Aguarda o resultado e realiza a ação conforme o resultado obtido
  *
- * @param padawan Estrutura do padawan
+ * Aguarda os resultados dos testes. Após liberado verifica se passou ou não e
+ * então realiza sua ação.
+ * Ao sair do salão verifica se foi é o último Padawan em testes e se for avisa
+ * o Yoda.
+ *
+ * @param padawan Estrutura que armazena variavéis globais utilizadas pelo
  */
 void aguarda_resultado(Padawan *padawan) {
   // Espera os resultados serem liberados

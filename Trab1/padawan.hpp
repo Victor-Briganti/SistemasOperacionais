@@ -1,10 +1,21 @@
+//===---- padawan.hpp - Cabeçalho do Padawan ------------------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Definição da estrutura Padawan, e da função que inicializa sua thread.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef PADAWAN_HPP
 #define PADAWAN_HPP
 
-#include <list>
-#include <pthread.h>
-#include <semaphore.h>
-#include <vector>
+#include <list>        // list
+#include <pthread.h>   // pthread_mutex_t, phtread_t
+#include <semaphore.h> // sem_t, sem_post(), sem_wait()
+#include <vector>      // vector
 
 // Estrutura do Padawan
 struct Padawan {

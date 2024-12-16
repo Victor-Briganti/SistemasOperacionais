@@ -1,12 +1,24 @@
+//===---- main.cpp - Cabeçalho do Yoda ------------------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Início do programa. Inicializa as estruturas necessárias e então coloca cada
+// uma das threads para executar.
+//
+//===----------------------------------------------------------------------===//
+
 #include "audience.hpp"
 #include "common.hpp"
 #include "padawan.hpp"
 #include "yoda.hpp"
 
-#include <cstdio>
-#include <cstdlib>
-#include <pthread.h>
-#include <semaphore.h>
+#include <cstdio>      // perror(), printf(), size_t
+#include <cstdlib>     // exit()
+#include <pthread.h>   // pthread_join(), pthread_mutex_init()
+#include <semaphore.h> // sem_init(), sem_t
 
 //===------------------------------------------------------------------------===
 // Audiência
@@ -26,6 +38,7 @@ Audience *audience = nullptr;
  * @return 0 se tudo ocorreu bem, -1 se algo deu errado
  */
 int create_audience() {
+  // Inicializa a estrutura
   audience = new Audience;
   if (audience == nullptr) {
     return -1;
@@ -93,6 +106,7 @@ int create_audience() {
     return -1;
   }
 
+  // Inicializa a thread
   for (int i = 0; i < AUDIENCE_NUM; i++) {
     pthread_t *audience = new pthread_t;
     if (audience == nullptr) {
@@ -134,11 +148,12 @@ std::vector<pthread_t *> padawanThreads;
 Padawan *padawan = nullptr;
 
 /**
- * @brief Cria a estrutura da audiência e inicializa suas threads
+ * @brief Cria a estrutura padawan e inicializa suas threads
  *
  * @return 0 se tudo ocorreu bem, -1 se algo deu errado
  */
 int create_padawan() {
+  // Inicializa a estrutura
   padawan = new Padawan;
   if (padawan == nullptr) {
     return -1;
@@ -210,6 +225,7 @@ int create_padawan() {
     return -1;
   }
 
+  // Inicializa a thread
   for (int i = 0; i < PADAWAN_NUM; i++) {
     pthread_t *thread = new pthread_t;
     if (thread == nullptr) {

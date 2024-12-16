@@ -1,9 +1,20 @@
+//===---- audience.hpp - Cabeçalho da Audiência ---------------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Definição da estrutura Audience, e da função que inicializa sua thread.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef AUDIENCE_HPP
 #define AUDIENCE_HPP
 
-#include <pthread.h>
-#include <semaphore.h>
-#include <vector>
+#include <pthread.h>   // phtread_mutex_t
+#include <semaphore.h> // sem_t, sem_post(), sem_wait()
+#include <vector>      // vector
 
 // Estrutura da audiência
 struct Audience {

@@ -1,3 +1,15 @@
+//===---- common.hpp - Cabeçalho de Valores Comuns ------------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Definição de valores alguns valores comuns utilizados nas demais regiões de
+// código.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef COMMON_HPP
 #define COMMON_HPP
 

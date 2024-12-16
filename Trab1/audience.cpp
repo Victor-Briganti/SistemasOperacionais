@@ -1,9 +1,21 @@
+//===---- audience.cpp - Implementação das funções da Audiência -----------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Implementação das ações que a Audiência irá realizar ao longo da sessão de
+// testes
+//
+//===----------------------------------------------------------------------===//
+
 #include "audience.hpp"
 
-#include <cstdio>
-#include <cstdlib>
-#include <pthread.h>
-#include <unistd.h>
+#include <cstdio>  // printf(), perror(), size_t
+#include <cstdlib> // rand()
+#include <pthread.h> // pthread_t, pthread_create(), pthread_mutex_lock(), pthread_mutex_unlock()
+#include <unistd.h> // usleep()
 
 namespace {
 

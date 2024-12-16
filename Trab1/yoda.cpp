@@ -1,10 +1,22 @@
+//===---- yoda.cpp - Implementação das funções do Yoda --------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Implementação das ações que o Yoda irá realizar ao longo da sessão de
+// testes
+//
+//===----------------------------------------------------------------------===//
+
 #include "yoda.hpp"
 #include "common.hpp"
 
-#include <chrono>
-#include <cstdio>
-#include <cstdlib>
-#include <pthread.h>
+#include <chrono>  // duration_cast(), milliseconds(), steady_clock()
+#include <cstdio>  // perror(), printf(), size_t
+#include <cstdlib> // rand()
+#include <pthread.h> // pthread_create(), pthread_mutex_lock(), pthread_mutex_unlock()
 
 namespace {
 
@@ -73,6 +85,7 @@ void libera_entrada(Yoda *yoda) {
  * @param yoda Ponteiro para estrutura Yoda
  */
 void avalia(Yoda *yoda) {
+  // Libera a audiência para assistir os testes acontecendo
   pthread_mutex_lock(yoda->audience->mutexCount);
   for (int i = 0; i < *yoda->audience->countInside; i++) {
     sem_post(yoda->audience->semTest);
@@ -80,12 +93,14 @@ void avalia(Yoda *yoda) {
   pthread_mutex_unlock(yoda->audience->mutexCount);
 
   pthread_mutex_lock(yoda->padawan->mutex);
+  // Mostra todos os padawans que estão esperando ser avaliados
   for (auto a : (*yoda->padawan->testQueue)) {
     std::printf("[Padawan %d] aguarda avaliação\n", a);
   }
 
   std::printf("[Yoda] realiza avaliação\n");
 
+  // Remove os padawans da fila de teste e os coloca na fila de resultado.
   size_t queueTestSize = yoda->padawan->testQueue->size();
   for (size_t i = 0; i < queueTestSize; i++) {
     int idPadawan = yoda->padawan->testQueue->front();
