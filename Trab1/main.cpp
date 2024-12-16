@@ -272,6 +272,9 @@ int create_yoda() {
  * @return 0 se tudo ocorreu bem, -1 se algo deu errado
  */
 int join_yoda() {
+  std::printf("[Yoda] Finaliza sessão\n");
+  std::printf("[Yoda] Faz discurso\n");
+
   if (pthread_join(*yodaThread, nullptr)) {
     std::printf("[Yoda] ");
     std::perror("pthread_join");
@@ -304,11 +307,11 @@ int main() {
     exit(-1);
   }
 
-  if (join_yoda()) {
+  if (join_padawan()) {
     exit(-1);
   }
 
-  // if (join_padawan()) {
-  //   exit(-1);
-  // }
+  if (join_yoda()) {
+    exit(-1);
+  }
 }

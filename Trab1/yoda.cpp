@@ -51,7 +51,7 @@ void libera_entrada(Yoda *yoda) {
     // Pega o número máximo de padawans que podem entrar no salão
     pthread_mutex_lock(yoda->padawan->mutex);
     while (yoda->padawan->waitQueue->empty() == false &&
-           yoda->padawan->testQueue->size() <= PADAWAN_MAX_ENTRY) {
+           yoda->padawan->testQueue->size() < PADAWAN_MAX_ENTRY) {
 
       // Remove os padawans da fila de espera e coloca na de teste
       yoda->padawan->testQueue->push_back(yoda->padawan->waitQueue->front());
@@ -76,7 +76,9 @@ void avalia(Yoda *yoda) {
   }
 
   std::printf("[Yoda] realiza avaliação\n");
-  for (int i = 0; i < yoda->padawan->testQueue->size(); i++) {
+
+  size_t queueTestSize = yoda->padawan->testQueue->size();
+  for (int i = 0; i < queueTestSize; i++) {
     int idPadawan = yoda->padawan->testQueue->front();
     yoda->padawan->testQueue->pop_front();
 
@@ -131,8 +133,6 @@ void anuncia_resultados(Yoda *yoda) {
  * @return nullptr
  */
 void finaliza_sessao(Yoda *yoda) {
-  std::printf("[Yoda] finaliza sessão\n");
-
   pthread_mutex_lock(yoda->audience->mutexSessionOver);
   (*yoda->audience->sessionOver) = true;
   pthread_mutex_unlock(yoda->audience->mutexSessionOver);
