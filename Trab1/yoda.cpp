@@ -78,7 +78,7 @@ void avalia(Yoda *yoda) {
   std::printf("[Yoda] realiza avaliação\n");
 
   size_t queueTestSize = yoda->padawan->testQueue->size();
-  for (int i = 0; i < queueTestSize; i++) {
+  for (size_t i = 0; i < queueTestSize; i++) {
     int idPadawan = yoda->padawan->testQueue->front();
     yoda->padawan->testQueue->pop_front();
 
@@ -101,7 +101,7 @@ void avalia(Yoda *yoda) {
 void anuncia_resultados(Yoda *yoda) {
   pthread_mutex_lock(yoda->padawan->mutex);
   // Armazena o tamanho total da fila de resultados
-  int resultQueueSize = yoda->padawan->resultQueue->size();
+  int resultQueueSize = static_cast<int>(yoda->padawan->resultQueue->size());
 
   // Anuncia os resultados individuais de cada Padawan
   for (auto pwd : (*yoda->padawan->resultQueue)) {

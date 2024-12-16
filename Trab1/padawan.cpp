@@ -9,7 +9,7 @@ namespace {
 void entra_salao(Padawan *padawan) {
   pthread_mutex_lock(padawan->mutex);
   // Salva o ID do Padawan na fila de espera
-  int idPadawan = padawan->waitQueue->size() + 1;
+  int idPadawan = static_cast<int>(padawan->waitQueue->size()) + 1;
   padawan->waitQueue->push_back(idPadawan);
 
   std::printf("[Padawan %d] aguardando entrada\n", idPadawan);
@@ -71,9 +71,9 @@ void *start(void *arg) {
 } // namespace
 
 int init_padawan(std::vector<pthread_t *> padawanThreads, Padawan *padawan) {
-  for (int i = 0; i < padawanThreads.size(); i++) {
+  for (size_t i = 0; i < padawanThreads.size(); i++) {
     if (pthread_create(padawanThreads[i], nullptr, start, padawan)) {
-      std::printf("[Padawan %d] ", i);
+      std::printf("[Padawan %zu] ", i);
       std::perror("pthread_create");
       return -1;
     }
