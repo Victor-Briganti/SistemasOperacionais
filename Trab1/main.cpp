@@ -1,4 +1,4 @@
-//===---- main.cpp - Cabeçalho do Yoda ------------------------------===//
+//===---- main.cpp - Arquivo principal de incialização --------------------===//
 //
 // Autor: João Victor Briganti de Oliveira
 // Data: 15/12/2024
