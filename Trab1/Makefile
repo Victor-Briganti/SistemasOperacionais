@@ -22,7 +22,7 @@ check-thread:
 	$(CXX) -o debug $(CXFLAGS) $(LDFLAGS) $(THREAD) padawan.cpp yoda.cpp audience.cpp main.cpp
 
 check-valgrind: debug
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./debug 6
+	valgrind --leak-check=full --max-threads=500 --show-leak-kinds=all --track-origins=yes --verbose ./debug 6
 
 check-helgrind: debug
 	valgrind --tool=helgrind --max-threads=10500 --verbose ./debug 6
