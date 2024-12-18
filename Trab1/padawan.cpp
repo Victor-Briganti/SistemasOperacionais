@@ -18,6 +18,9 @@
 
 namespace {
 
+// Contador para identificar Padawans
+int countPadawan = 0;
+
 /**
  * @brief Entra no salão
  *
@@ -28,9 +31,13 @@ namespace {
  * Padawan
  */
 void entra_salao(Padawan *padawan) {
+
   pthread_mutex_lock(padawan->mutex);
+  // Incrementa o contador do id
+  countPadawan++;
+
   // Salva o ID do Padawan na fila de espera
-  int idPadawan = static_cast<int>(padawan->waitQueue->size()) + 1;
+  int idPadawan = countPadawan;
   padawan->waitQueue->push_back(idPadawan);
 
   std::printf("[Padawan %d] aguardando entrada\n", idPadawan);
