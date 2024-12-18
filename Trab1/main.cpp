@@ -1,199 +1,365 @@
-#include "aluno.hpp"
+//===---- main.cpp - Arquivo principal de incialização --------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Início do programa. Inicializa as estruturas necessárias e então coloca cada
+// uma das threads para executar.
+//
+//===----------------------------------------------------------------------===//
+
+#include "audience.hpp"
 #include "common.hpp"
-#include "professor.hpp"
+#include "padawan.hpp"
+#include "yoda.hpp"
 
-#include <cstdio>
-#include <cstdlib>
-#include <pthread.h>
-#include <semaphore.h>
-#include <unistd.h>
+#include <cstdio>      // perror(), printf(), size_t
+#include <cstdlib>     // exit()
+#include <pthread.h>   // pthread_join(), pthread_mutex_init()
+#include <semaphore.h> // sem_init(), sem_t
 
-// Primitivos de sincronização
-static pthread_barrier_t *barrier = nullptr;
-static sem_t *semaphoreAtividade1 = nullptr;
-static sem_t *semaphoreAtividade2 = nullptr;
+//===------------------------------------------------------------------------===
+// Audiência
+//===------------------------------------------------------------------------===
 
-// Threads
-static pthread_t *threadProfessor = nullptr;
-static pthread_t *threadsAluno1 = nullptr;
-static pthread_t *threadsAluno2 = nullptr;
+namespace {
 
-// Estruturas de Dados
-static Turma *turma = nullptr;
-static Aluno *alunos1 = nullptr;
-static Aluno *alunos2 = nullptr;
+// Vetor de threads da audiência
+std::vector<pthread_t *> audienceThreads;
+
+// Estrutura global que armazena informações sobre a audiência
+Audience *audience = nullptr;
 
 /**
- * @brief Aloca recursos necessários para aplicação.
+ * @brief Cria a estrutura da audiência e inicializa suas threads
  *
- * Inicializa cada uma das estruturas que serão usadas durante a aplicação.
- *
- * @param numAlunos1 Quantidade de alunos para a primeira atividade
- * @param numAlunos2 Quantidade de alunos para a segunda atividade
- *
- * @return 0 se tudo ocorreu bem, -1 caso contrário.
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado
  */
-static int allocResources(int numAlunos1, int numAlunos2) {
-  threadsAluno1 = new pthread_t[numAlunos1];
-  if (threadsAluno1 == nullptr) {
-    goto alunos1;
-  }
-
-  threadsAluno2 = new pthread_t[numAlunos2];
-  if (threadsAluno2 == nullptr) {
-    goto alunos2;
-  }
-
-  threadProfessor = new pthread_t;
-  if (threadProfessor == nullptr) {
-    goto professor;
-  }
-
-  barrier = new pthread_barrier_t;
-  if (barrier == nullptr || pthread_barrier_init(barrier, nullptr, 4) < 0) {
-    goto barrier;
-  }
-
-  semaphoreAtividade1 = new sem_t;
-  if (semaphoreAtividade1 == nullptr ||
-      sem_init(semaphoreAtividade1, 0, 2) < 0) {
-    goto atividade1;
-  }
-
-  semaphoreAtividade2 = new sem_t;
-  if (semaphoreAtividade2 == nullptr ||
-      sem_init(semaphoreAtividade2, 0, 1) < 0) {
-    goto atividade2;
-  }
-
-  alunos1 = new Aluno[numAlunos1];
-  if (semaphoreAtividade2 == nullptr) {
-    goto alunos1;
-  }
-
-  alunos2 = new Aluno[numAlunos2];
-  if (semaphoreAtividade2 == nullptr) {
-    goto alunos2;
-  }
-
-  turma = new Turma;
-  if (turma == nullptr) {
-    goto turma;
-  }
-
-  return 0;
-
-turma:
-  delete turma;
-alunos2:
-  delete[] alunos2;
-alunos1:
-  delete[] alunos1;
-atividade2:
-  sem_destroy(semaphoreAtividade2);
-  delete semaphoreAtividade2;
-atividade1:
-  sem_destroy(semaphoreAtividade1);
-  delete semaphoreAtividade1;
-barrier:
-  pthread_barrier_destroy(barrier);
-  delete barrier;
-professor:
-  delete threadProfessor;
-threads2:
-  delete[] threadsAluno2;
-threads1:
-  delete[] threadsAluno1;
-  return -1;
-}
-
-/**
- * @brief Inicializa a thread do professor
- *
- * @param numAlunos Quantidade de alunos na turma
- *
- * @return 0 se tudo ocorreu bem, -1 caso contrário
- */
-static int criaThreadProfessor(int numAlunos) {
-  turma->numAlunos = numAlunos;
-  turma->barrier = barrier;
-
-  if (iniciaProfessor(threadProfessor, turma) < 0) {
+int create_audience() {
+  // Inicializa a estrutura
+  audience = new Audience;
+  if (audience == nullptr) {
     return -1;
   }
 
-  return 0;
-}
-
-/**
- * @brief Inicializa as threads dos alunos
- *
- * @param numAlunos Quantidade de alunos que irão realizar a primeira atividade
- *
- * @return 0 se tudo ocorreu bem, -1 caso contrário
- */
-static int criaThreadAlunos1(int numAlunos) {
-  for (int i = 0; i < numAlunos; i++) {
-    alunos1[i].tipo = ATIVIDADE_1;
-    alunos1[i].barrier = barrier;
-    alunos1[i].semaphore = semaphoreAtividade1;
-  }
-
-  if (iniciaAlunosAtividade1(threadsAluno1, numAlunos, alunos1) < 0) {
+  audience->sessionOver = new bool(false);
+  if (audience->sessionOver == nullptr) {
+    std::printf("Erro ao alocar sessionOver\n");
     return -1;
   }
 
-  return 0;
-}
-
-/**
- * @brief Inicializa as threads dos alunos
- *
- * @param numAlunos Quantidade de alunos que irão realizar a segunda atividade
- *
- * @return 0 se tudo ocorreu bem, -1 caso contrário
- */
-static int criaThreadAlunos2(int numAlunos) {
-  for (int i = 0; i < numAlunos; i++) {
-    alunos2[i].tipo = ATIVIDADE_2;
-    alunos2[i].barrier = barrier;
-    alunos2[i].semaphore = semaphoreAtividade2;
-  }
-
-  if (iniciaAlunosAtividade2(threadsAluno2, numAlunos, alunos2) < 0) {
+  audience->countWait = new int(0);
+  if (audience->countWait == nullptr) {
+    std::printf("Erro ao alocar countWait\n");
     return -1;
   }
 
-  return 0;
+  audience->countInside = new int(0);
+  if (audience->countInside == nullptr) {
+    std::printf("Erro ao alocar countInside\n");
+    return -1;
+  }
+
+  audience->mutexSessionOver = new pthread_mutex_t;
+  if (audience->mutexSessionOver == nullptr) {
+    std::printf("Erro ao alocar mutexSessionOver\n");
+    return -1;
+  }
+
+  if (pthread_mutex_init(audience->mutexSessionOver, nullptr)) {
+    std::printf("Erro ao inicializar mutexSessionOver\n");
+    return -1;
+  }
+
+  audience->mutexCount = new pthread_mutex_t;
+  if (audience->mutexCount == nullptr) {
+    std::printf("Erro ao alocar mutexWaitAudience\n");
+    return -1;
+  }
+
+  if (pthread_mutex_init(audience->mutexCount, nullptr)) {
+    std::printf("Erro ao inicializar mutexWaitAudience\n");
+    return -1;
+  }
+
+  audience->semWait = new sem_t;
+  if (audience->semWait == nullptr) {
+    std::printf("Erro ao alocar semWaitAudience\n");
+    return -1;
+  }
+
+  if (sem_init(audience->semWait, 0, 0)) {
+    std::printf("Erro ao inicializar semWaitAudience\n");
+    return -1;
+  }
+
+  audience->semTest = new sem_t;
+  if (audience->semTest == nullptr) {
+    std::printf("Erro ao alocar semTestAudience\n");
+    return -1;
+  }
+
+  if (sem_init(audience->semTest, 0, 0)) {
+    std::printf("Erro ao inicializar semTestAudience\n");
+    return -1;
+  }
+
+  // Inicializa a thread
+  for (int i = 0; i < AUDIENCE_NUM; i++) {
+    pthread_t *audience = new pthread_t;
+    if (audience == nullptr) {
+      std::printf("Erro ao alocar threads de audiência\n");
+      return -1;
+    }
+
+    audienceThreads.push_back(audience);
+  }
+
+  return init_audience(audienceThreads, audience);
 }
 
 /**
- * @brief Realiza um join entre todas as threads do sistema
+ * @brief Realiza o join nas threads de audiência
  *
- * @param numAlunos1 Quantidade de alunos com atividade 1
- * @param numAlunos1 Quantidade de alunos com atividade 2
- *
- * @return 0 se tudo ocorreu bem, -1 caso contrário
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado
  */
-static int threadJoin(int numAlunos1, int numAlunos2) {
-  for (int i = 0; i < numAlunos1; i++) {
-    if (pthread_join(threadsAluno1[i], nullptr)) {
-      std::printf("[Alunos1] ");
-      std::perror("pthread_join");
+int join_audience() {
+  for (size_t i = 0; i < AUDIENCE_NUM; i++) {
+    if (pthread_join(*audienceThreads[i], nullptr)) {
+      std::printf("[Audience %zu] ", i);
+      perror("pthread_join");
       return -1;
     }
   }
 
-  for (int i = 0; i < numAlunos2; i++) {
-    if (pthread_join(threadsAluno2[i], nullptr)) {
-      std::printf("[Alunos2] ");
-      std::perror("pthread_join");
+  return 0;
+}
+
+/**
+ * @brief Destrói todas as estruturas alocadas para inicializar a audiência
+ */
+void destroy_audience() {
+  // Destroi todos os mutexes
+  pthread_mutex_destroy(audience->mutexSessionOver);
+  pthread_mutex_destroy(audience->mutexCount);
+
+  // Destroi todos os semáforos
+  sem_destroy(audience->semTest);
+  sem_destroy(audience->semWait);
+
+  // Desaloca demais estruturas alocadas
+  delete audience->sessionOver;
+  delete audience->countWait;
+  delete audience->countInside;
+  delete audience->mutexSessionOver;
+  delete audience->mutexCount;
+  delete audience->semTest;
+  delete audience->semWait;
+  delete audience;
+
+  // Desaloca cada uma das threads
+  for (int i = 0; i < AUDIENCE_NUM; i++) {
+    delete audienceThreads[i];
+  }
+}
+
+//===------------------------------------------------------------------------===
+// Padawan
+//===------------------------------------------------------------------------===
+
+// Vetor de threads da audiência
+std::vector<pthread_t *> padawanThreads;
+
+// Estrutura global que armazena informações sobre a audiência
+Padawan *padawan = nullptr;
+
+/**
+ * @brief Cria a estrutura padawan e inicializa suas threads
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado
+ */
+int create_padawan() {
+  // Inicializa a estrutura
+  padawan = new Padawan;
+  if (padawan == nullptr) {
+    return -1;
+  }
+
+  padawan->waitQueue = new std::list<int>;
+  if (padawan->waitQueue == nullptr) {
+    std::printf("Erro não foi possível alocar waitQueue\n");
+    return -1;
+  }
+
+  padawan->testQueue = new std::list<int>;
+  if (padawan->testQueue == nullptr) {
+    std::printf("Erro não foi possível alocar testQueue\n");
+    return -1;
+  }
+
+  padawan->resultQueue = new std::list<std::pair<int, bool>>;
+  if (padawan->resultQueue == nullptr) {
+    std::printf("Erro não foi possível alocar resultQueue\n");
+    return -1;
+  }
+
+  padawan->mutex = new pthread_mutex_t;
+  if (padawan->mutex == nullptr) {
+    std::printf("Erro não foi possível alocar mutex\n");
+    return -1;
+  }
+
+  if (pthread_mutex_init(padawan->mutex, nullptr)) {
+    std::printf("Erro ao iniciar mutex\n");
+    std::perror("pthread_mutex_init\n");
+    return -1;
+  }
+
+  padawan->semWait = new sem_t;
+  if (padawan->semWait == nullptr) {
+    std::printf("Erro não foi possível alocar semWait\n");
+    return -1;
+  }
+
+  if (sem_init(padawan->semWait, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semWait\n");
+    std::perror("sem_init\n");
+    return -1;
+  }
+
+  padawan->semFinish = new sem_t;
+  if (padawan->semFinish == nullptr) {
+    std::printf("Erro não foi possível alocar semFinish\n");
+    return -1;
+  }
+
+  if (sem_init(padawan->semFinish, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semFinish\n");
+    std::perror("sem_init\n");
+    return -1;
+  }
+
+  padawan->semResult = new sem_t;
+  if (padawan->semResult == nullptr) {
+    std::printf("Erro não foi possível alocar semResult\n");
+    return -1;
+  }
+
+  if (sem_init(padawan->semResult, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semResult\n");
+    std::perror("sem_init\n");
+    return -1;
+  }
+
+  // Inicializa a thread
+  for (int i = 0; i < PADAWAN_NUM; i++) {
+    pthread_t *thread = new pthread_t;
+    if (thread == nullptr) {
+      std::printf("Erro ao iniciar a thread de Padawans\n");
+      return -1;
+    }
+
+    padawanThreads.push_back(thread);
+  }
+
+  return init_padawan(padawanThreads, padawan);
+}
+
+/**
+ * @brief Realiza o join nas threads dos padawanss
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado
+ */
+int join_padawan() {
+  for (size_t i = 0; i < PADAWAN_NUM; i++) {
+    if (pthread_join(*padawanThreads[i], nullptr)) {
+      std::printf("[Padawan %zu] ", i);
+      perror("pthread_join");
       return -1;
     }
   }
 
-  if (pthread_join(*threadProfessor, nullptr)) {
-    std::printf("[Professor] ");
+  return 0;
+}
+
+/**
+ * @brief Destrói todas as estruturas alocadas para inicializar os padawans
+ */
+void destroy_padawan() {
+  // Destroi o mutex
+  pthread_mutex_destroy(padawan->mutex);
+
+  // Destroi todos os semáforos
+  sem_destroy(padawan->semWait);
+  sem_destroy(padawan->semResult);
+  sem_destroy(padawan->semFinish);
+
+  // Desaloca demais estruturas alocadas
+  delete padawan->waitQueue;
+  delete padawan->testQueue;
+  delete padawan->resultQueue;
+  delete padawan->mutex;
+  delete padawan->semWait;
+  delete padawan->semResult;
+  delete padawan->semFinish;
+  delete padawan;
+
+  // Desaloca cada uma das threads
+  for (int i = 0; i < PADAWAN_NUM; i++) {
+    delete padawanThreads[i];
+  }
+}
+
+//===------------------------------------------------------------------------===
+// Yoda
+//===------------------------------------------------------------------------===
+
+// Thread do Yoda
+pthread_t *yodaThread;
+
+// Estrutura global que armazena informações sobre o Yoda
+Yoda *yoda = nullptr;
+
+/**
+ * @brief Cria a estrutura do Yoda e inicializa sua thread
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado
+ */
+int create_yoda() {
+  // Inicializa a estrutura
+  yoda = new Yoda;
+  if (yoda == nullptr) {
+    std::printf("Erro ao alocar Yoda\n");
+    return -1;
+  }
+
+  // Salva as estruturas
+  yoda->audience = audience;
+  yoda->padawan = padawan;
+
+  // Inicializa a thread
+  yodaThread = new pthread_t;
+  if (yoda == nullptr) {
+    std::printf("Erro ao alocar thread Yodas\n");
+    return -1;
+  }
+
+  return init_yoda(yodaThread, yoda);
+}
+
+/**
+ * @brief Realiza o join na thread do Yoda
+ *
+ * @return 0 se tudo ocorreu bem, -1 se algo deu errado
+ */
+int join_yoda() {
+  std::printf("[Yoda] Faz discurso\n");
+  std::printf("[Yoda] Finaliza sessão\n");
+
+  if (pthread_join(*yodaThread, nullptr)) {
+    std::printf("[Yoda] ");
     std::perror("pthread_join");
     return -1;
   }
@@ -201,72 +367,49 @@ static int threadJoin(int numAlunos1, int numAlunos2) {
   return 0;
 }
 
-int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    std::printf("%s <num_alunos>", argv[0]);
-    return 1;
+/**
+ * @brief Destrói as estruturas alocadas para inicializar o Yoda
+ */
+void destroy_yoda() {
+  // Desaloca estrutura alocada
+  delete yoda;
+
+  // Desaloca sua thread
+  delete yodaThread;
+}
+
+} // namespace
+
+//===------------------------------------------------------------------------===
+// Main
+//===------------------------------------------------------------------------===
+
+int main() {
+  if (create_audience()) {
+    exit(-1);
   }
 
-  int numAlunos = std::atoi(argv[1]);
-
-  if (numAlunos % 3 != 0) {
-    std::printf("O número de alunos deve ser múltiplo de 3.\nExemplo: 9\n");
-    return 1;
+  if (create_padawan()) {
+    exit(-1);
   }
 
-  int numAlunos2 = numAlunos / 3;
-  int numAlunos1 = numAlunos2 * 2;
-
-  srand(static_cast<unsigned int>(time(NULL)));
-
-  // Define a variável de retorno
-  int res = EXIT_SUCCESS;
-
-  // Aloca as threas que serão usadas
-  if (allocResources(numAlunos1, numAlunos2) < 0) {
-    res = EXIT_FAILURE;
-    goto alloc;
+  if (create_yoda()) {
+    exit(-1);
   }
 
-  if (criaThreadProfessor(numAlunos) < 0) {
-    res = EXIT_FAILURE;
-    goto error;
+  if (join_audience()) {
+    exit(-1);
   }
 
-  if (criaThreadAlunos1(numAlunos1) < 0) {
-    res = EXIT_FAILURE;
-    goto error;
+  if (join_padawan()) {
+    exit(-1);
   }
 
-  if (criaThreadAlunos2(numAlunos2) < 0) {
-    res = EXIT_FAILURE;
-    goto error;
+  if (join_yoda()) {
+    exit(-1);
   }
 
-  if (threadJoin(numAlunos1, numAlunos2) < 0) {
-    res = EXIT_FAILURE;
-  }
-
-error:
-  // Destroi primitivos de sincronização
-  pthread_barrier_destroy(barrier);
-  sem_destroy(semaphoreAtividade1);
-  sem_destroy(semaphoreAtividade2);
-
-  // Libera Memória de primitivos de sincronização
-  delete barrier;
-  delete semaphoreAtividade1;
-  delete semaphoreAtividade2;
-
-  // Libera Memória de threads alocadas
-  delete threadProfessor;
-  delete[] threadsAluno1;
-  delete[] threadsAluno2;
-
-  // Libera Memória de estrutura de dados
-  delete turma;
-  delete[] alunos1;
-  delete[] alunos2;
-alloc:
-  return res;
+  destroy_audience();
+  destroy_padawan();
+  destroy_yoda();
 }

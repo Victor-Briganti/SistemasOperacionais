@@ -10,22 +10,22 @@ THREAD = -fsanitize=thread
 all: main
 
 main:
-	$(CXX) -o $@ $(CXFLAGS) $(LDFLAGS) common.cpp professor.cpp aluno.cpp main.cpp
+	$(CXX) -o $@ $(CXFLAGS) $(LDFLAGS) padawan.cpp yoda.cpp audience.cpp main.cpp
 
 debug:
-	$(CXX) -o $@ $(CXFLAGS) $(DEBUG) $(LDFLAGS) common.cpp professor.cpp aluno.cpp main.cpp
+	$(CXX) -o $@ $(CXFLAGS) $(DEBUG) $(LDFLAGS) padawan.cpp yoda.cpp audience.cpp main.cpp
 
 check-address:
-	$(CXX) -o debug $(CXFLAGS) $(LDFLAGS) $(ADDRESS) common.cpp professor.cpp aluno.cpp main.cpp
+	$(CXX) -o debug $(CXFLAGS) $(LDFLAGS) $(ADDRESS) padawan.cpp yoda.cpp audience.cpp main.cpp
 
 check-thread:
-	$(CXX) -o debug $(CXFLAGS) $(LDFLAGS) $(THREAD) common.cpp professor.cpp aluno.cpp main.cpp
+	$(CXX) -o debug $(CXFLAGS) $(LDFLAGS) $(THREAD) padawan.cpp yoda.cpp audience.cpp main.cpp
 
 check-valgrind: debug
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./debug 6
 
 check-helgrind: debug
-	valgrind --tool=helgrind --verbose ./debug 6
+	valgrind --tool=helgrind --max-threads=10500 --verbose ./debug 6
 
 clean:
-	rm -rf main debug
+	rm -rf main debug ouput.log

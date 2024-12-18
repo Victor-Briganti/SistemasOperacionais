@@ -1,29 +1,36 @@
+//===---- common.hpp - Cabeçalho de Valores Comuns ------------------------===//
+//
+// Autor: João Victor Briganti de Oliveira
+// Data: 15/12/2024
+//
+//===----------------------------------------------------------------------===//
+//
+// Definição de valores alguns valores comuns utilizados nas demais regiões de
+// código.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#include <pthread.h>
+//===------------------------------------------------------------------------===
+// Audiência
+//===------------------------------------------------------------------------===
 
-#define ID static_cast<int>(pthread_self() % 1000)
+// Define a quantidade de pessoas na audiência
+#define AUDIENCE_NUM 10000
 
-// Definição dos tipos de alunos. Especifica a entrega que ele devera fazer
-#define ATIVIDADE_1 1
-#define ATIVIDADE_2 2
+// Define a quantidade máxima de pessoas que pode estar na sala
+#define AUDIENCE_MAX_ENTRY 100
 
-// Definição dos tipos de pessoa, que estarão na sala de entrega.
-#define ALUNO_1 1
-#define ALUNO_2 2
-#define PROFESSOR 3
+//===------------------------------------------------------------------------===
+// Padawan
+//===------------------------------------------------------------------------===
 
-/**
- * @brief Local onde ocorre comunicação entre alunos e professor.
- *
- * Está função tem como objetivo representar o momento da entrega entre os
- * alunos e o professor, a sincronização entre as threads irá ocorrer nesta
- * função.
- *
- * @param pessoa Recebe o tipo de pessoa que está na entrega.
- * @param barrier Barreira para sincronização de threads.
- */
-void entrega(int pessoa, pthread_barrier_t *barrier);
+// Define a quantidade de padawans
+#define PADAWAN_NUM 4000
+
+// Define a quantidade máxima de padawans que podem estar na sala
+#define PADAWAN_MAX_ENTRY 50
 
 #endif // COMMON_HPP
