@@ -21,7 +21,7 @@
 #define AUDIENCE_NUM 300
 
 // Define a quantidade máxima de pessoas que pode estar na sala
-#define AUDIENCE_MAX_ENTRY 6
+#define AUDIENCE_MAX_ENTRY 15
 
 //===------------------------------------------------------------------------===
 // Padawan
