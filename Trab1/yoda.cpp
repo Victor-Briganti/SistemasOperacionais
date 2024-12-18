@@ -1,6 +1,6 @@
 //===---- yoda.cpp - Implementação das funções do Yoda --------------------===//
 //
-// Autor: João Victor Briganti de Oliveira
+// Autores: Hendrick Felipe Scheifer e João Victor Briganti de Oliveira
 // Data: 15/12/2024
 //
 //===----------------------------------------------------------------------===//
