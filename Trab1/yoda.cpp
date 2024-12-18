@@ -130,7 +130,31 @@ void anuncia_resultados(Yoda *yoda) {
 
   // Aguarda todos os padawans terminarem de ver o resultado
   sem_wait(yoda->padawan->semResultFinish);
-  std::printf("[Yoda] Testes finalizados\n");
+}
+
+/**
+ * @brief Corta a trança de cada Padawan
+ *
+ * @param yoda Ponteiro para estrutura Yoda
+ */
+void corta_tranca(Yoda *yoda) {
+  pthread_mutex_lock(yoda->padawan->mutex);
+  // Corta a trança dos padawans que passaram
+  for (auto a : (*yoda->padawan->cutQueue)) {
+    std::printf("[Yoda] corta trança de %d\n", a);
+  }
+
+  size_t cutQueueSize = yoda->padawan->cutQueue->size();
+  while (cutQueueSize) {
+    // Remove o padawan que teve a trança cortada da fila e libera o mesmo para
+    // ir embora.
+    yoda->padawan->cutQueue->pop_front();
+    sem_post(yoda->padawan->semCut);
+    cutQueueSize--;
+  }
+
+  pthread_mutex_unlock(yoda->padawan->mutex);
+  std::printf("[Yoda] testes finalizados\n");
 }
 
 /**
@@ -179,6 +203,7 @@ void *start(void *arg) {
     libera_entrada(yoda);
     anuncia_avaliacao(yoda);
     anuncia_resultados(yoda);
+    corta_tranca(yoda);
   }
 
   finaliza_sessao(yoda);

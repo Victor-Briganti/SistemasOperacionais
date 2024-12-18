@@ -28,6 +28,9 @@ struct Padawan {
   // Fila de padawans esperando resultado
   std::list<std::pair<int, bool>> *resultQueue;
 
+  // Fila de padawans esperando corte de trança
+  std::list<int> *cutQueue;
+
   // Mutex para acesso da estrutura
   pthread_mutex_t *mutex;
 
@@ -48,6 +51,9 @@ struct Padawan {
 
   // Semáforo para padawans que terminaram de ver seus resultados
   sem_t *semResultFinish;
+
+  // Semáforo para padawans que estão aguardando corte na trança
+  sem_t *semCut;
 };
 
 /**

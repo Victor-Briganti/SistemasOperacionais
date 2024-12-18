@@ -118,18 +118,23 @@ void aguarda_resultado(Padawan *padawan) {
 
   if (pwd.second) {
     std::printf("[Padawan %d] aguarda corte trança\n", pwd.first);
-    std::printf("[Yoda] corta trança de %d\n", pwd.first);
+    padawan->cutQueue->push_back(pwd.first);
   } else {
     std::printf("[Padawan %d] cumprimenta Yoda\n", pwd.first);
   }
-
-  std::printf("[Padawan %d] sai do salão\n", pwd.first);
 
   // Se este é o último padawan na sala sinaliza
   if (padawan->resultQueue->empty() == true) {
     sem_post(padawan->semResultFinish);
   }
   pthread_mutex_unlock(padawan->mutex);
+
+  if (pwd.second) {
+    // Aguarda corte na trança
+    sem_wait(padawan->semCut);
+  }
+
+  std::printf("[Padawan %d] sai do salão\n", pwd.first);
 }
 
 /**

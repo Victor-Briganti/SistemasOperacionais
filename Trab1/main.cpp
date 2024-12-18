@@ -205,6 +205,12 @@ int create_padawan() {
     return -1;
   }
 
+  padawan->cutQueue = new std::list<int>;
+  if (padawan->cutQueue == nullptr) {
+    std::printf("Erro não foi possível alocar cutQueue\n");
+    return -1;
+  }
+
   padawan->mutex = new pthread_mutex_t;
   if (padawan->mutex == nullptr) {
     std::printf("Erro não foi possível alocar mutex\n");
@@ -289,6 +295,18 @@ int create_padawan() {
     return -1;
   }
 
+  padawan->semCut = new sem_t;
+  if (padawan->semCut == nullptr) {
+    std::printf("Erro não foi possível alocar semCut\n");
+    return -1;
+  }
+
+  if (sem_init(padawan->semCut, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semCut\n");
+    std::perror("sem_init\n");
+    return -1;
+  }
+
   // Inicializa a thread
   for (int i = 0; i < PADAWAN_NUM; i++) {
     pthread_t *thread = new pthread_t;
@@ -334,11 +352,13 @@ void destroy_padawan() {
   sem_destroy(padawan->semTestFinish);
   sem_destroy(padawan->semResult);
   sem_destroy(padawan->semResultFinish);
+  sem_destroy(padawan->semCut);
 
   // Desaloca demais estruturas alocadas
   delete padawan->waitQueue;
   delete padawan->testQueue;
   delete padawan->resultQueue;
+  delete padawan->cutQueue;
   delete padawan->mutex;
   delete padawan->semWait;
   delete padawan->semPosition;
@@ -346,6 +366,7 @@ void destroy_padawan() {
   delete padawan->semTestFinish;
   delete padawan->semResult;
   delete padawan->semResultFinish;
+  delete padawan->semCut;
   delete padawan;
 
   // Desaloca cada uma das threads
