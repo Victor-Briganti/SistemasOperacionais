@@ -61,7 +61,6 @@ void aguarda_resultado(Padawan *padawan) {
   pthread_mutex_lock(padawan->mutex);
   auto pwd = padawan->resultQueue->front();
   padawan->resultQueue->pop_front();
-  pthread_mutex_unlock(padawan->mutex);
 
   if (pwd.second) {
     std::printf("[Padawan %d] aguarda corte trança\n", pwd.first);
@@ -73,7 +72,6 @@ void aguarda_resultado(Padawan *padawan) {
   std::printf("[Padawan %d] sai do salão\n", pwd.first);
 
   // Se este é o último padawan na sala sinaliza
-  pthread_mutex_lock(padawan->mutex);
   if (padawan->resultQueue->empty() == true) {
     sem_post(padawan->semFinish);
   }

@@ -137,6 +137,34 @@ int join_audience() {
   return 0;
 }
 
+/**
+ * @brief Destrói todas as estruturas alocadas para inicializar a audiência
+ */
+void destroy_audience() {
+  // Destroi todos os mutexes
+  pthread_mutex_destroy(audience->mutexSessionOver);
+  pthread_mutex_destroy(audience->mutexCount);
+
+  // Destroi todos os semáforos
+  sem_destroy(audience->semTest);
+  sem_destroy(audience->semWait);
+
+  // Desaloca demais estruturas alocadas
+  delete audience->sessionOver;
+  delete audience->countWait;
+  delete audience->countInside;
+  delete audience->mutexSessionOver;
+  delete audience->mutexCount;
+  delete audience->semTest;
+  delete audience->semWait;
+  delete audience;
+
+  // Desaloca cada uma das threads
+  for (int i = 0; i < AUDIENCE_NUM; i++) {
+    delete audienceThreads[i];
+  }
+}
+
 //===------------------------------------------------------------------------===
 // Padawan
 //===------------------------------------------------------------------------===
@@ -256,6 +284,34 @@ int join_padawan() {
   return 0;
 }
 
+/**
+ * @brief Destrói todas as estruturas alocadas para inicializar os padawans
+ */
+void destroy_padawan() {
+  // Destroi o mutex
+  pthread_mutex_destroy(padawan->mutex);
+
+  // Destroi todos os semáforos
+  sem_destroy(padawan->semWait);
+  sem_destroy(padawan->semResult);
+  sem_destroy(padawan->semFinish);
+
+  // Desaloca demais estruturas alocadas
+  delete padawan->waitQueue;
+  delete padawan->testQueue;
+  delete padawan->resultQueue;
+  delete padawan->mutex;
+  delete padawan->semWait;
+  delete padawan->semResult;
+  delete padawan->semFinish;
+  delete padawan;
+
+  // Desaloca cada uma das threads
+  for (int i = 0; i < PADAWAN_NUM; i++) {
+    delete padawanThreads[i];
+  }
+}
+
 //===------------------------------------------------------------------------===
 // Yoda
 //===------------------------------------------------------------------------===
@@ -311,6 +367,17 @@ int join_yoda() {
   return 0;
 }
 
+/**
+ * @brief Destrói as estruturas alocadas para inicializar o Yoda
+ */
+void destroy_yoda() {
+  // Desaloca estrutura alocada
+  delete yoda;
+
+  // Desaloca sua thread
+  delete yodaThread;
+}
+
 } // namespace
 
 //===------------------------------------------------------------------------===
@@ -341,4 +408,8 @@ int main() {
   if (join_yoda()) {
     exit(-1);
   }
+
+  destroy_audience();
+  destroy_padawan();
+  destroy_yoda();
 }
