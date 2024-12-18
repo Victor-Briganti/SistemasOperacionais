@@ -229,14 +229,38 @@ int create_padawan() {
     return -1;
   }
 
-  padawan->semFinish = new sem_t;
-  if (padawan->semFinish == nullptr) {
-    std::printf("Erro não foi possível alocar semFinish\n");
+  padawan->semPosition = new sem_t;
+  if (padawan->semPosition == nullptr) {
+    std::printf("Erro não foi possível alocar semPosition\n");
     return -1;
   }
 
-  if (sem_init(padawan->semFinish, 0, 0)) {
-    std::printf("Erro ao iniciar o semáforo semFinish\n");
+  if (sem_init(padawan->semPosition, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semPosition\n");
+    std::perror("sem_init\n");
+    return -1;
+  }
+
+  padawan->semTest = new sem_t;
+  if (padawan->semTest == nullptr) {
+    std::printf("Erro não foi possível alocar semTest\n");
+    return -1;
+  }
+
+  if (sem_init(padawan->semTest, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semTest\n");
+    std::perror("sem_init\n");
+    return -1;
+  }
+
+  padawan->semTestFinish = new sem_t;
+  if (padawan->semTestFinish == nullptr) {
+    std::printf("Erro não foi possível alocar semTestFinish\n");
+    return -1;
+  }
+
+  if (sem_init(padawan->semTestFinish, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semTestFinish\n");
     std::perror("sem_init\n");
     return -1;
   }
@@ -249,6 +273,18 @@ int create_padawan() {
 
   if (sem_init(padawan->semResult, 0, 0)) {
     std::printf("Erro ao iniciar o semáforo semResult\n");
+    std::perror("sem_init\n");
+    return -1;
+  }
+
+  padawan->semResultFinish = new sem_t;
+  if (padawan->semResultFinish == nullptr) {
+    std::printf("Erro não foi possível alocar semResultFinish\n");
+    return -1;
+  }
+
+  if (sem_init(padawan->semResultFinish, 0, 0)) {
+    std::printf("Erro ao iniciar o semáforo semResultFinish\n");
     std::perror("sem_init\n");
     return -1;
   }
@@ -293,8 +329,11 @@ void destroy_padawan() {
 
   // Destroi todos os semáforos
   sem_destroy(padawan->semWait);
+  sem_destroy(padawan->semPosition);
+  sem_destroy(padawan->semTest);
+  sem_destroy(padawan->semTestFinish);
   sem_destroy(padawan->semResult);
-  sem_destroy(padawan->semFinish);
+  sem_destroy(padawan->semResultFinish);
 
   // Desaloca demais estruturas alocadas
   delete padawan->waitQueue;
@@ -302,8 +341,11 @@ void destroy_padawan() {
   delete padawan->resultQueue;
   delete padawan->mutex;
   delete padawan->semWait;
+  delete padawan->semPosition;
+  delete padawan->semTest;
+  delete padawan->semTestFinish;
   delete padawan->semResult;
-  delete padawan->semFinish;
+  delete padawan->semResultFinish;
   delete padawan;
 
   // Desaloca cada uma das threads

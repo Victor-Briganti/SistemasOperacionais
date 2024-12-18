@@ -18,7 +18,7 @@
 //===------------------------------------------------------------------------===
 
 // Define a quantidade de pessoas na audiência
-#define AUDIENCE_NUM 300
+#define AUDIENCE_NUM 15
 
 // Define a quantidade máxima de pessoas que pode estar na sala
 #define AUDIENCE_MAX_ENTRY 15

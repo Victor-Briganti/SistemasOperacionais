@@ -12,7 +12,8 @@
 
 #include "padawan.hpp"
 
-#include <cstdio> // perror(), printf(), size_t
+#include <cstdio>  // rand()
+#include <cstdlib> // perror(), printf(), size_t
 #include <pthread.h> // pthread_create(), pthread_mutex_lock(), pthread_mutex_unlock()
 #include <unistd.h> // usleep()
 
@@ -52,6 +53,52 @@ void entra_salao(Padawan *padawan) {
 }
 
 /**
+ * @brief Aguarda a avaliação
+ *
+ * Aguarda o Yoda chamar o padawan para realizar o teste.
+ *
+ * @param padawan Estrutura que armazena variavéis globais utilizadas pelo
+ */
+void avaliacao(Padawan *padawan) {
+  pthread_mutex_lock(padawan->mutex);
+  // Verifica quem está na fila esperando ser avaliado.
+  int pwd = padawan->testQueue->front();
+  padawan->testQueue->pop_front();
+  padawan->testQueue->push_back(pwd);
+
+  std::printf("[Padawan %d] aguardando avaliação\n", pwd);
+
+  // Se está na ordem certa acorda o Yoda
+  if (padawan->testQueue->front() < padawan->testQueue->back()) {
+    sem_post(padawan->semPosition);
+  }
+  pthread_mutex_unlock(padawan->mutex);
+
+  // Espera o Yoda chamar
+  sem_wait(padawan->semTest);
+
+  pthread_mutex_lock(padawan->mutex);
+  // Remove o primeiro da fila
+  pwd = padawan->testQueue->front();
+  padawan->testQueue->pop_front();
+
+  printf("[Padawan %d] realiza avaliação\n", pwd);
+
+  // Coloca o padawan na de resultados
+  if (std::rand() % 2) {
+    padawan->resultQueue->push_back({pwd, 0});
+  } else {
+    padawan->resultQueue->push_back({pwd, 1});
+  }
+
+  // Se este é o último padawan na sala sinaliza
+  if (padawan->testQueue->empty() == true) {
+    sem_post(padawan->semTestFinish);
+  }
+  pthread_mutex_unlock(padawan->mutex);
+}
+
+/**
  * @brief Aguarda o resultado e realiza a ação conforme o resultado obtido
  *
  * Aguarda os resultados dos testes. Após liberado verifica se passou ou não e
@@ -80,7 +127,7 @@ void aguarda_resultado(Padawan *padawan) {
 
   // Se este é o último padawan na sala sinaliza
   if (padawan->resultQueue->empty() == true) {
-    sem_post(padawan->semFinish);
+    sem_post(padawan->semResultFinish);
   }
   pthread_mutex_unlock(padawan->mutex);
 }
@@ -96,6 +143,7 @@ void *start(void *arg) {
   Padawan *padawan = static_cast<Padawan *>(arg);
 
   entra_salao(padawan);
+  avaliacao(padawan);
   aguarda_resultado(padawan);
 
   return nullptr;

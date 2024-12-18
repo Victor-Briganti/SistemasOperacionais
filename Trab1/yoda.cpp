@@ -20,6 +20,8 @@
 
 namespace {
 
+size_t testQueueSize = 0;
+
 /**
  * @brief Libera o público e os padawans para entrarem na sala
  *
@@ -54,12 +56,12 @@ void libera_entrada(Yoda *yoda) {
       yoda->padawan->testQueue->push_back(yoda->padawan->waitQueue->front());
       yoda->padawan->waitQueue->pop_front();
 
+      // Aumenta a quantidade de padawans na fila de teste
+      testQueueSize++;
+
       // Libera todos os padawans da audiência que estavam esperando na fila
       sem_post(yoda->padawan->semWait);
     }
-
-    // Salva a quantidade de padawans na fila de teste
-    size_t testSize = yoda->padawan->testQueue->size();
     pthread_mutex_unlock(yoda->padawan->mutex);
 
     // Pega o número máximo de pessoas que podem estar dentro do salão
@@ -84,7 +86,10 @@ void libera_entrada(Yoda *yoda) {
  *
  * @param yoda Ponteiro para estrutura Yoda
  */
-void avalia(Yoda *yoda) {
+void anuncia_avaliacao(Yoda *yoda) {
+  // Espera padawans se posicionarem
+  sem_wait(yoda->padawan->semPosition);
+
   // Libera a audiência para assistir os testes acontecendo
   pthread_mutex_lock(yoda->audience->mutexCount);
   for (int i = 0; i < *yoda->audience->countInside; i++) {
@@ -93,28 +98,17 @@ void avalia(Yoda *yoda) {
   pthread_mutex_unlock(yoda->audience->mutexCount);
 
   pthread_mutex_lock(yoda->padawan->mutex);
-  // Mostra todos os padawans que estão esperando ser avaliados
-  for (auto a : (*yoda->padawan->testQueue)) {
-    std::printf("[Padawan %d] aguarda avaliação\n", a);
-  }
-
   std::printf("[Yoda] realiza avaliação\n");
 
-  // Remove os padawans da fila de teste e os coloca na fila de resultado.
-  size_t queueTestSize = yoda->padawan->testQueue->size();
-  for (size_t i = 0; i < queueTestSize; i++) {
-    int idPadawan = yoda->padawan->testQueue->front();
-    yoda->padawan->testQueue->pop_front();
-
-    std::printf("[Padawan %d] realiza avaliação\n", idPadawan);
-
-    if (std::rand() % 2) {
-      yoda->padawan->resultQueue->push_back({idPadawan, true});
-    } else {
-      yoda->padawan->resultQueue->push_back({idPadawan, false});
-    }
+  // Libera os Padawans aguardando o resultado
+  while (testQueueSize) {
+    testQueueSize--;
+    sem_post(yoda->padawan->semTest);
   }
   pthread_mutex_unlock(yoda->padawan->mutex);
+
+  // Aguarda todos os padawans serem avaliados
+  sem_wait(yoda->padawan->semTestFinish);
 }
 
 /**
@@ -127,15 +121,6 @@ void anuncia_resultados(Yoda *yoda) {
   // Armazena o tamanho total da fila de resultados
   int resultQueueSize = static_cast<int>(yoda->padawan->resultQueue->size());
 
-  // Anuncia os resultados individuais de cada Padawan
-  for (auto pwd : (*yoda->padawan->resultQueue)) {
-    if (pwd.second) {
-      std::printf("[Yoda] %d aceito\n", pwd.first);
-    } else {
-      std::printf("[Yoda] %d rejeitado\n", pwd.first);
-    }
-  }
-
   // Libera os Padawans aguardando o resultado
   while (resultQueueSize) {
     resultQueueSize--;
@@ -144,7 +129,7 @@ void anuncia_resultados(Yoda *yoda) {
   pthread_mutex_unlock(yoda->padawan->mutex);
 
   // Aguarda todos os padawans terminarem de ver o resultado
-  sem_wait(yoda->padawan->semFinish);
+  sem_wait(yoda->padawan->semResultFinish);
   std::printf("[Yoda] Testes finalizados\n");
 }
 
@@ -192,7 +177,7 @@ void *start(void *arg) {
     }
 
     libera_entrada(yoda);
-    avalia(yoda);
+    anuncia_avaliacao(yoda);
     anuncia_resultados(yoda);
   }
 
