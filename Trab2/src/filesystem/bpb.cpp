@@ -27,19 +27,6 @@ inline DWORD rootDirSectors()
   return (countOfDirEntries + (bpb.BytsPerSec - 1)) / bpb.BytsPerSec;
 }
 
-/**
- * @brief Determinar o tamanho das tabelas FAT
- *
- * @return O tamanho das tabelas com base no tipo do FS.
- */
-inline DWORD fatSz()
-{
-  if (bpb.FATSz16 != 0) {
-    return bpb.FATSz16;
-  }
-
-  return bpb.FATSz32;
-}
 
 /**
  * @brief Determinar o total de setores no FS
@@ -53,17 +40,6 @@ inline DWORD totSec()
   }
 
   return bpb.TotSec32;
-}
-
-/**
- * @brief Total de setores na região de dados
- *
- * @return O total de setores na região de dados
- */
-inline DWORD dataSecTotal()
-{
-  DWORD fatTotSz = bpb.NumFATs * fatSz();
-  return totSec() - (bpb.RsvdSecCnt + fatTotSz + rootDirSectors());
 }
 
 /**
@@ -162,3 +138,24 @@ DWORD fat_sector(int num)
 
   return (bpb.RsvdSecCnt + fatSz() * static_cast<DWORD>(num));
 }
+
+BYTE num_fats() { return bpb.NumFATs; }
+
+DWORD fatSz()
+{
+  if (bpb.FATSz16 != 0) {
+    return bpb.FATSz16;
+  }
+
+  return bpb.FATSz32;
+}
+
+DWORD bytesPerSec() { return bpb.BytsPerSec; }
+
+DWORD dataSecTotal()
+{
+  DWORD fatTotSz = bpb.NumFATs * fatSz();
+  return totSec() - (bpb.RsvdSecCnt + fatTotSz + rootDirSectors());
+}
+
+DWORD secPerCluster() { return bpb.SecPerClus; }

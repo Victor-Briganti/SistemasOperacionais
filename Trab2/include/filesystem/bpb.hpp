@@ -73,4 +73,40 @@ int bpb_print();
  */
 DWORD fat_sector(int num);
 
+
+/**
+ * @brief Retorna a quantidade de FATs no FS
+ *
+ * @return A quantidade de FATs.
+ */
+BYTE num_fats();
+
+/**
+ * @brief Determinar o tamanho das tabelas FAT
+ *
+ * @return O tamanho das tabelas com base no tipo do FS.
+ */
+DWORD fatSz();
+
+/**
+ * @brief Retorna o tamanho a quantidade de bytes por setor
+ *
+ * @return O tamanho de um setor em bytes.
+ */
+DWORD bytesPerSec();
+
+/**
+ * @brief Total de setores na região de dados
+ *
+ * @return O total de setores na região de dados
+ */
+DWORD dataSecTotal();
+
+/**
+ * @brief Setores por cluster
+ *
+ * @return Total de setores por cluster
+ */
+DWORD secPerCluster();
+
 #endif// BPB_HPP
