@@ -12,6 +12,10 @@
 
 #include <string>
 
+#define ERROR "\033[31mERROR\033[0m"
+
+#define RED(str) "\033[31m"(str) "\033[0m"
+
 /**
  * @brief Retorna uma string em vermelho para mostrar no shell
  *

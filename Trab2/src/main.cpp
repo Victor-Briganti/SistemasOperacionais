@@ -4,16 +4,16 @@
  * Autores: João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  *
- * Data: 15/11/2024
+ * Data: 26/12/2024
  */
 
+#include "filesystem/bpb.hpp"
 #include "io/image.hpp"
 
 #include <cstring>
 #include <exception>
 #include <iostream>
 
-void *buffer;
 
 int main(int argc, char **argv)
 {
@@ -24,23 +24,10 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  buffer = malloc(sizeof(char) * 512);
-  if (buffer == nullptr) {
-    std::cerr << "Não foi possível alocar\n";
-    return -1;
-  }
-
   try {
     Image image(argv[1]);
-    image.read(505, buffer, 512);
-    for (size_t i = 0; i < 512; i++) {
-      std::cout << static_cast<char *>(buffer)[i];
-      static_cast<char *>(buffer)[i] = 'a';
-    }
-    std::cout << std::endl;
-
-    image.write(505, buffer, 512);
-
+    bpb_init(image);
+    bpb_print();
   } catch (const std::exception &error) {
     std::cout << error.what();
   }
