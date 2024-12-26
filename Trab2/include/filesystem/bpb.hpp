@@ -13,100 +13,157 @@
 #include "io/image.hpp"
 #include "utils/types.hpp"
 
-struct __attribute__((packed)) BPB
+// Classe para lidar com a estrutura BPB do FAT filesystem
+class BiosBlock
 {
-  // BPB comum para todos os FATs
-  BYTE jmpBoot[3]; /* Instrução para código de boot */
-  BYTE OEMName[8]; /* Indica o sistema que realizou a formatação do disco */
-  WORD BytsPerSec; /* Quantidade de bytes por sector */
-  BYTE SecPerClus; /* Número de setores por cluster */
-  WORD RsvdSecCnt; /* Número de setores reservados no inicio do volume */
-  BYTE NumFATs; /* Quantidade de estruturas FAT */
-  WORD RootEntCnt; /* Quantidade de entradas no dir raiz */
-  WORD TotSec16; /* Total de setores no volume. Usado em FAT12/FAT16 */
-  BYTE Media; /* Tipo de mídia */
-  WORD FATSz16; /* Tamanho da estrutura FAT. Usado em FAT12/FAT16 */
-  WORD SecPerTrk; /* Setores por cilindro */
-  WORD NumHeads; /* Quantidade de cabeças do dispositivo */
-  DWORD HiddSec; /* Quantidade de setores escondidos */
-  DWORD TotSec32; /* Total de setores no volume. Usado em FAT32 */
+private:
+  struct __attribute__((packed)) BPB
+  {
+    // BPB comum para todos os FATs
+    BYTE jmpBoot[3]; /* Instrução para código de boot */
+    BYTE OEMName[8]; /* Indica o sistema que realizou a formatação do disco */
+    WORD BytsPerSec; /* Quantidade de bytes por sector */
+    BYTE SecPerClus; /* Número de setores por cluster */
+    WORD RsvdSecCnt; /* Número de setores reservados no inicio do volume */
+    BYTE NumFATs; /* Quantidade de estruturas FAT */
+    WORD RootEntCnt; /* Quantidade de entradas no dir raiz */
+    WORD TotSec16; /* Total de setores no volume. Usado em FAT12/FAT16 */
+    BYTE Media; /* Tipo de mídia */
+    WORD FATSz16; /* Tamanho da estrutura FAT. Usado em FAT12/FAT16 */
+    WORD SecPerTrk; /* Setores por cilindro */
+    WORD NumHeads; /* Quantidade de cabeças do dispositivo */
+    DWORD HiddSec; /* Quantidade de setores escondidos */
+    DWORD TotSec32; /* Total de setores no volume. Usado em FAT32 */
 
-  // BPB para FAT32
-  DWORD FATSz32; /* Tamanho da estrutura FAT. Usado em FAT32 */
-  WORD ExtFlags; /* Informações adicionais para a estrutura FAT */
-  WORD FSVer; /* Define a versão do FAT32 */
-  DWORD RootClus; /* Número do cluster raiz. */
-  WORD FSInfo; /* Geralmente tem valor 1 */
-  WORD BkBootSec; /* Deve ser 6 */
-  BYTE Reserved[12]; /* Reservado */
-  BYTE DrvNum; /* Define o driver para o tipo do dispositivo */
-  BYTE Reserved1; /* Reservado */
-  BYTE BootSig; /* Assinatura do boot */
-  DWORD VolID; /* Determina um ID para o volume */
-  BYTE VolLab[11]; /* Nome do volume */
-  BYTE FilSysType[8]; /* String com o tipo do sistema */
+    // BPB para FAT32
+    DWORD FATSz32; /* Tamanho da estrutura FAT. Usado em FAT32 */
+    WORD ExtFlags; /* Informações adicionais para a estrutura FAT */
+    WORD FSVer; /* Define a versão do FAT32 */
+    DWORD RootClus; /* Número do cluster raiz. */
+    WORD FSInfo; /* Geralmente tem valor 1 */
+    WORD BkBootSec; /* Deve ser 6 */
+    BYTE Reserved[12]; /* Reservado */
+    BYTE DrvNum; /* Define o driver para o tipo do dispositivo */
+    BYTE Reserved1; /* Reservado */
+    BYTE BootSig; /* Assinatura do boot */
+    DWORD VolID; /* Determina um ID para o volume */
+    BYTE VolLab[11]; /* Nome do volume */
+    BYTE FilSysType[8]; /* String com o tipo do sistema */
+  };
+
+  // Estrutura do BPB
+  BPB bpb;
+
+  // Primeiro setor de dados
+  DWORD firstDataSector;
+
+  // Total de setores no diretório raiz
+  DWORD rootDirSectors;
+
+  // Total de setores no sistema de arquivos
+  DWORD totSec;
+
+  // Número de FATs no sistema
+  DWORD numFATs;
+
+  // Tamanho da FAT
+  DWORD fatSz;
+
+  // Total de setores de dados
+  DWORD dataSecTotal;
+
+  // Total de clusters no sistema
+  DWORD countOfClusters;
+
+  /**
+   * @brief Inicializa a estrutura do BPB e demais estruturas.
+   *
+   * @return 0 se foi possível inicializar a estrutura, -1 caso contrário.
+   */
+  int bpbInit();
+
+  /**
+   * @brief Determinar o tipo de FAT do sistema.
+   *
+   * @return 12 se for FAT12, 16 se for FAT16 e 32 se for FAT32.
+   */
+  [[nodiscard]] inline int fatType() const;
+
+public:
+  /**
+   * @brief Inicia a estrutura BPB
+   *
+   * Lê a estrutura BPB em memória e inicializa informações necessárias para o
+   * funcionamento dos sistema de arquivos.
+   *
+   * @param image Interface para fazer a leitura do sistema.
+   *
+   * @exception Gera uma exceção se não for possível ler a estrutura BPB, ou o
+   * sistema de arquivos não ser do tipo FAT32.
+   */
+  explicit BiosBlock(Image &image);
+  ~BiosBlock() = default;
+
+  /**
+   * @brief Imprime as informações do BPB
+   *
+   * @return 0 se foi possível imprimir, -1 se algo deu errado.
+   */
+  void bpbPrint() const;
+
+  /**
+   * @brief Retorna o endereço do FAT especificado
+   *
+   * @param num Número do FAT. Não pode ser maior do que o valor salvo em
+   * NumFATs
+   *
+   * @exception Gera uma exceção no caso do número especificado não ser válido.
+   * @return O setor do FAT especificado.
+   */
+  [[nodiscard]] inline DWORD fatSector(int num) const;
+
+  /**
+   * @brief Quantidade de FATs do sistema
+   *
+   * @return Retorna o valor de numFATs
+   */
+  [[nodiscard]] inline DWORD getNumFATs() const;
+
+  /**
+   * @brief Tamanho da FAT do sistema em setores
+   *
+   * @return Retorna o valor de fatSz
+   */
+  [[nodiscard]] inline DWORD getFATSz() const;
+
+  /**
+   * @brief Quantidades de bytes por setor
+   *
+   * @return Retorna o valor de bpb.BytsPerSec
+   */
+  [[nodiscard]] inline DWORD getBytesPerSec() const;
+
+  /**
+   * @brief Quantidades de setores por cluster
+   *
+   * @return Retorna o valor de bpb.SecPerCluster
+   */
+  [[nodiscard]] inline DWORD getSecPerCluster() const;
+
+  /**
+   * @brief Total de setores na região de dados
+   *
+   * @return Retorna o valor de dataSecTotal
+   */
+  [[nodiscard]] inline DWORD getDataSecTotal() const;
+
+  /**
+   * @brief Total de cluster no sistema de arquivos
+   *
+   * @return Retorna o valor de countOfClusters
+   */
+  [[nodiscard]] inline DWORD getCountOfClusters() const;
 };
 
-/**
- * @brief Lê a estrutura BPB em memória
- *
- * @param image Imagem que armazena o BPB a ser lido
- *
- * @return 0 se foi possível ler, -1 se algo deu errado.
- */
-int bpb_init(Image &image);
-
-/**
- * @brief Imprime as informações do BPB
- *
- * @return 0 se foi possível imprimir, -1 se algo deu errado.
- */
-int bpb_print();
-
-/**
- * @brief Retorna o endereço do FAT especificado
- *
- * @param num Número do FAT. Não pode ser maior do que o valor salvo em NumFATs
- *
- * @exception Gera uma exceção no caso do número especificado não ser válido.
- * @return O setor do FAT especificado.
- */
-DWORD fat_sector(int num);
-
-
-/**
- * @brief Retorna a quantidade de FATs no FS
- *
- * @return A quantidade de FATs.
- */
-BYTE num_fats();
-
-/**
- * @brief Determinar o tamanho das tabelas FAT
- *
- * @return O tamanho das tabelas com base no tipo do FS.
- */
-DWORD fatSz();
-
-/**
- * @brief Retorna o tamanho a quantidade de bytes por setor
- *
- * @return O tamanho de um setor em bytes.
- */
-DWORD bytesPerSec();
-
-/**
- * @brief Total de setores na região de dados
- *
- * @return O total de setores na região de dados
- */
-DWORD dataSecTotal();
-
-/**
- * @brief Setores por cluster
- *
- * @return Total de setores por cluster
- */
-DWORD secPerCluster();
 
 #endif// BPB_HPP

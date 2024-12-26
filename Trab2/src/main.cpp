@@ -8,7 +8,6 @@
  */
 
 #include "filesystem/bpb.hpp"
-#include "filesystem/fat_table.hpp"
 #include "io/image.hpp"
 
 #include <cstring>
@@ -27,10 +26,8 @@ int main(int argc, char **argv)
 
   try {
     Image image(argv[1]);
-    bpb_init(image);
-    FatTable fat(&image);
-    bpb_print();
-    fat.print_info();
+    BiosBlock bios(image);
+    bios.bpbPrint();
   } catch (const std::exception &error) {
     std::cout << error.what();
   }
