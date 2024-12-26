@@ -1,7 +1,7 @@
 /*
  * Descrição: Tipos descritos pelo white paper da microsoft
  *
- * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  *
  * Data: 15/11/2024

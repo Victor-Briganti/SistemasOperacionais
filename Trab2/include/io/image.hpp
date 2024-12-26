@@ -1,10 +1,10 @@
 /*
  * Descrição: Definição da classe para a leitura da imagem do FAT 32
  *
- * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  *
- * Data: 15/11/2024
+ * Data: 26/12/2024
  */
 
 #ifndef IMAGE_HPP
@@ -19,17 +19,19 @@ class Image
   std::fstream image;
 
 public:
-  Image() = default;
-  ~Image();
-
   /**
-   * @brief Abre uma imagem para leitura e escrita
+   * @brief Construtor para a imagem
+   *
+   * Abre a imagem especificada pelo caminho.
    *
    * @param path Caminho para a imagem
    *
-   * @return true se foi possível abrir, false caso contrário
+   * @exception Argumento inválido, quando o caminho não é válido
+   * @exception Runtime error, quando não é possível abrir o arquivo
    */
-  bool open(const std::string &path);
+  Image(const std::string &path);
+
+  ~Image();
 
   /**
    * @brief Fecha o arquivo aberto
