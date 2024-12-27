@@ -11,6 +11,7 @@
 #define FAT_FS_HPP
 
 #include "filesystem/bpb.hpp"
+#include "filesystem/dentry.hpp"
 #include "filesystem/fat_table.hpp"
 #include "io/image.hpp"
 
@@ -37,6 +38,18 @@ private:
    * @return true se foi possível ler, false caso contrário
    */
   bool readCluster(void *buffer, DWORD num);
+
+  /**
+   * @brief Lista de entradas de um determinado diretório
+   *
+   * @param num Número do cluster do diretório que será listado
+   *
+   * @exception Exceções podem ocorrer durante a leitura das informações das
+   * entradas.
+   *
+   * @return Um vetor com todos as entradas se foi possível ler.
+   */
+  std::vector<Dentry> listEntry(DWORD num);
 
 public:
   /**
@@ -67,6 +80,13 @@ public:
    * @param num Número do cluster no qual as informações serão mostradas
    */
   void cluster(DWORD num);
+
+  /**
+   * @brief Lista todos os diretórios/arquivos de um caminho especificado
+   *
+   * @param path Caminho a ser listado
+   */
+  void ls(std::string &path);
 };
 
 #endif// FAT_FS_HPP

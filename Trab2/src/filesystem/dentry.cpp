@@ -44,7 +44,7 @@ Dentry::Dentry(Dir dir, std::vector<LongDir> &ldir)
     longName = name + longName;
   }
 
-  for (int i = 0; i < 11; i++) {
+  for (size_t i = 0; i < 11; i++) {
     shortName[i] = static_cast<char>(dir.name[i]);
   }
 }
