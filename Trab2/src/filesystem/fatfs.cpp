@@ -17,6 +17,21 @@
 // PRIVATE
 //===------------------------------------------------------------------------===
 
+bool FatFS::readCluster(void *buffer, DWORD num)
+{
+  if (num >= bios->getCountOfClusters()) {
+    std::fprintf(stderr, "[" ERROR "] %d número inváldo de cluster\n", num);
+    return false;
+  }
+
+  DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
+  if (!image->read(offset, buffer, bios->totClusByts())) {
+    std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+    return false;
+  }
+  return true;
+}
+
 //===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
@@ -55,31 +70,22 @@ void FatFS::info()
   fatTable->printInfo();
 }
 
-void FatFS::cluster(int num)
+void FatFS::cluster(DWORD num)
 {
-  if (static_cast<DWORD>(num) >= bios->getCountOfClusters() || num < 0) {
-    std::fprintf(stderr, "[" ERROR "] %d número inváldo de cluster\n", num);
-    return;
-  }
-
-  size_t bufferSize = bios->getSecPerCluster() * bios->getBytesPerSec();
-
-  void *buffer = new char[bufferSize];
+  void *buffer = new char[bios->totClusByts()];
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return;
   }
 
-  if (!image->read(bios->firstSectorOfCluster(num) * bios->getBytesPerSec(),
-        buffer,
-        bufferSize)) {
+  if (!readCluster(buffer, num)) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
     delete[] static_cast<char *>(buffer);
     return;
   }
 
   char *bufferChar = static_cast<char *>(buffer);
-  for (size_t i = 0; i < bufferSize * sizeof(char); i++) {
+  for (size_t i = 0; i < bios->totClusByts() * sizeof(char); i++) {
     std::fprintf(stdout, "%c", bufferChar[i]);
   }
 

@@ -176,9 +176,27 @@ public:
    *
    * @return Retorna o valor de bpb.RsvdSecCnt
    */
-  [[nodiscard]] inline DWORD firstSectorOfCluster(int num) const
+  [[nodiscard]] inline DWORD firstSectorOfCluster(DWORD num) const
   {
-    return ((static_cast<DWORD>(num) - 2) * bpb.SecPerClus) + firstDataSector;
+    return (num - 2) * bpb.SecPerClus + firstDataSector;
+  }
+
+  /**
+   * @brief Valor do cluster raiz
+   *
+   * @return Retorna o valor de bpb.RootClus
+   */
+  [[nodiscard]] inline DWORD getRootClus() const { return bpb.RootClus; }
+
+  /**
+   * @brief Tamanho do cluster em bytes
+   *
+   * @return A quantidade de bytes por setor do clsuter
+
+   */
+  [[nodiscard]] inline size_t totClusByts() const
+  {
+    return static_cast<size_t>(getSecPerCluster()) * getBytesPerSec();
   }
 };
 

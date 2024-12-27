@@ -13,6 +13,9 @@
 #include "filesystem/bpb.hpp"
 #include "io/image.hpp"
 
+/* Define o final da cadeia de clusters */
+#define EOC 0x0FFFFFFF
+
 class FatTable
 {
   // Interface usada para ler e escrever a FAT

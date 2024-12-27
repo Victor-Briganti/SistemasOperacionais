@@ -28,6 +28,16 @@ private:
   // Interface para lidar com a tabela FAT
   FatTable *fatTable;
 
+  /**
+   * @brief Lê um cluster da memória em um buffer
+   *
+   * @param buffer Ponteiro que irá receber as informações a serem lidas
+   * @param num Número do cluster que será lido
+   *
+   * @return true se foi possível ler, false caso contrário
+   */
+  bool readCluster(void *buffer, DWORD num);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo
@@ -56,7 +66,7 @@ public:
    *
    * @param num Número do cluster no qual as informações serão mostradas
    */
-  void cluster(int num);
+  void cluster(DWORD num);
 };
 
 #endif// FAT_FS_HPP
