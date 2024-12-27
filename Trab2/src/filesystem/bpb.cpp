@@ -74,9 +74,9 @@ int BiosBlock::bpbInit()
 // PUBLIC
 //===------------------------------------------------------------------------===
 
-BiosBlock::BiosBlock(Image &image)
+BiosBlock::BiosBlock(Image *image)
 {
-  if (!image.read(0, static_cast<void *>(&bpb), sizeof(bpb))) {
+  if (!image->read(0, static_cast<void *>(&bpb), sizeof(bpb))) {
     std::string error = "[" ERROR "] Não foi possível ler o BPB\n";
     throw std::runtime_error(error);
   }
@@ -126,7 +126,7 @@ void BiosBlock::bpbPrint() const
   std::fprintf(stdout, "\n");
 }
 
-inline DWORD BiosBlock::fatSector(int num) const
+DWORD BiosBlock::fatSector(int num) const
 {
   if (num >= bpb.NumFATs || num < 0) {
     std::string numStr = std::to_string(num);
@@ -136,15 +136,3 @@ inline DWORD BiosBlock::fatSector(int num) const
 
   return (bpb.RsvdSecCnt + this->fatSz * static_cast<DWORD>(num));
 }
-
-inline DWORD BiosBlock::getNumFATs() const { return numFATs; }
-
-inline DWORD BiosBlock::getFATSz() const { return fatSz; }
-
-inline DWORD BiosBlock::getBytesPerSec() const { return bpb.BytsPerSec; }
-
-inline DWORD BiosBlock::getSecPerCluster() const { return bpb.SecPerClus; }
-
-inline DWORD BiosBlock::getDataSecTotal() const { return dataSecTotal; }
-
-inline DWORD BiosBlock::getCountOfClusters() const { return countOfClusters; }

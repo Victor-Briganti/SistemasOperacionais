@@ -7,8 +7,7 @@
  * Data: 26/12/2024
  */
 
-#include "filesystem/bpb.hpp"
-#include "io/image.hpp"
+#include "filesystem/fatfs.hpp"
 
 #include <cstring>
 #include <exception>
@@ -25,9 +24,9 @@ int main(int argc, char **argv)
   }
 
   try {
-    Image image(argv[1]);
-    BiosBlock bios(image);
-    bios.bpbPrint();
+    std::string path(argv[1]);
+    FatFS fat(path);
+    fat.info();
   } catch (const std::exception &error) {
     std::cout << error.what();
   }

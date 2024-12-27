@@ -14,26 +14,64 @@
 #include <cstdlib>
 #include <stdexcept>
 
-FatTable::FatTable(Image *image)
-  : image(image), numFATs(num_fats()), tableSize(fatSz() * bytesPerSec())
+//===------------------------------------------------------------------------===
+// PRIVATE
+//===------------------------------------------------------------------------===
+
+
+bool FatTable::readTable(int num)
 {
-  table = calloc(this->tableSize, sizeof(void *));
-  if (table == nullptr) {
-    throw std::runtime_error(
-      "[" ERROR "] Não foi possível alocar a FAT table\n");
+  if (num < 0 || num >= bios->getNumFATs()) {
+    return false;
   }
 
-  if (!read_table(1)) {
-    throw std::runtime_error("[" ERROR "] Não foi possível ler a FAT table\n");
+  DWORD fatOffset = bios->fatSector(num) * bios->getBytesPerSec();
+  DWORD fatSize = bios->getFATSz() * bios->getBytesPerSec();
+
+  return this->image->read(fatOffset, table, fatSize);
+}
+
+
+size_t FatTable::inUse() const
+{
+  auto *dwordTable = static_cast<DWORD *>(table);
+
+  size_t count = 0;
+  for (DWORD i = 0; i < bios->getFATSz(); i++) {
+    if (dwordTable[i] != 0) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
+
+//===------------------------------------------------------------------------===
+// PUBLIC
+//===------------------------------------------------------------------------===
+
+
+FatTable::FatTable(Image *image, BiosBlock *bios) : image(image), bios(bios)
+{
+  table = new char[sizeof(void *) * bios->getFATSz() * bios->getBytesPerSec()];
+  if (table == nullptr) {
+    std::string error = "[" ERROR "] Não foi possível alocar a FAT table\n";
+    throw std::runtime_error(error);
+  }
+
+  if (!readTable(0)) {
+    std::string error = "[" ERROR "] Não foi possível ler a FAT table\n";
+    throw std::runtime_error(error);
   }
 }
 
-FatTable::~FatTable() { free(table); }
+FatTable::~FatTable() { delete[] static_cast<char *>(this->table); }
 
-void FatTable::print_table()
+void FatTable::printTable()
 {
   BYTE *byteTable = static_cast<BYTE *>(table);
-  for (int i = 0; i < tableSize; i++) {
+  for (DWORD i = 0; i < bios->getFATSz(); i++) {
 
     std::fprintf(stdout, "%02x", byteTable[i]);
 
@@ -49,33 +87,20 @@ void FatTable::print_table()
   std::fprintf(stdout, "\n");
 }
 
-void FatTable::print_info()
+void FatTable::printInfo()
 {
-  DWORD totalSec = dataSecTotal() / secPerCluster();
-  std::fprintf(stdout, "Free clusters: %u/%u\n", totalSec - used(), totalSec);
-  std::fprintf(stdout, "Free space: %u\n", (totalSec - used()) * bytesPerSec());
-  std::fprintf(stdout, "Used space: %u\n", used() * bytesPerSec());
-}
+  DWORD totalSec = bios->getDataSecTotal() / bios->getSecPerCluster();
 
-bool FatTable::read_table(int num)
-{
-  if (num < 0 || num >= numFATs) {
-    return false;
-  }
+  std::fprintf(stdout,
+    "Free clusters: %u/%u\n",
+    totalSec - static_cast<DWORD>(inUse()),
+    totalSec);
 
-  return this->image->read(fat_sector(1) * bytesPerSec(), table, tableSize);
-}
+  std::fprintf(stdout,
+    "Free space: %u\n",
+    (totalSec - static_cast<DWORD>(inUse())) * bios->getBytesPerSec());
 
-DWORD FatTable::used()
-{
-  DWORD *dwordTable = static_cast<DWORD *>(table);
-
-  DWORD count = 0;
-  for (int i = 0; i < tableSize; i++) {
-    if (dwordTable[i] != 0) {
-      count++;
-    }
-  }
-
-  return count;
+  std::fprintf(stdout,
+    "Used space: %u\n",
+    static_cast<DWORD>(inUse()) * bios->getBytesPerSec());
 }

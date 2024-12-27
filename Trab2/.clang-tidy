@@ -22,6 +22,7 @@ Checks: "*,
         -hicpp-avoid-c-arrays,
         -cppcoreguidelines-avoid-c-arrays,
         -modernize-avoid-c-arrays,
+        -cppcoreguidelines-prefer-member-initializer,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''

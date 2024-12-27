@@ -63,9 +63,6 @@ private:
   // Total de setores no sistema de arquivos
   DWORD totSec;
 
-  // Número de FATs no sistema
-  DWORD numFATs;
-
   // Tamanho da FAT
   DWORD fatSz;
 
@@ -101,7 +98,7 @@ public:
    * @exception Gera uma exceção se não for possível ler a estrutura BPB, ou o
    * sistema de arquivos não ser do tipo FAT32.
    */
-  explicit BiosBlock(Image &image);
+  explicit BiosBlock(Image *image);
   ~BiosBlock() = default;
 
   /**
@@ -120,49 +117,59 @@ public:
    * @exception Gera uma exceção no caso do número especificado não ser válido.
    * @return O setor do FAT especificado.
    */
-  [[nodiscard]] inline DWORD fatSector(int num) const;
+  [[nodiscard]] DWORD fatSector(int num) const;
 
   /**
    * @brief Quantidade de FATs do sistema
    *
    * @return Retorna o valor de numFATs
    */
-  [[nodiscard]] inline DWORD getNumFATs() const;
+  [[nodiscard]] inline BYTE getNumFATs() const { return bpb.NumFATs; }
 
   /**
    * @brief Tamanho da FAT do sistema em setores
    *
    * @return Retorna o valor de fatSz
    */
-  [[nodiscard]] inline DWORD getFATSz() const;
+  [[nodiscard]] inline DWORD getFATSz() const { return fatSz; }
 
   /**
    * @brief Quantidades de bytes por setor
    *
    * @return Retorna o valor de bpb.BytsPerSec
    */
-  [[nodiscard]] inline DWORD getBytesPerSec() const;
+  [[nodiscard]] inline WORD getBytesPerSec() const { return bpb.BytsPerSec; }
 
   /**
    * @brief Quantidades de setores por cluster
    *
    * @return Retorna o valor de bpb.SecPerCluster
    */
-  [[nodiscard]] inline DWORD getSecPerCluster() const;
+  [[nodiscard]] inline BYTE getSecPerCluster() const { return bpb.SecPerClus; }
 
   /**
    * @brief Total de setores na região de dados
    *
    * @return Retorna o valor de dataSecTotal
    */
-  [[nodiscard]] inline DWORD getDataSecTotal() const;
+  [[nodiscard]] inline DWORD getDataSecTotal() const { return dataSecTotal; }
 
   /**
    * @brief Total de cluster no sistema de arquivos
    *
    * @return Retorna o valor de countOfClusters
    */
-  [[nodiscard]] inline DWORD getCountOfClusters() const;
+  [[nodiscard]] inline DWORD getCountOfClusters() const
+  {
+    return countOfClusters;
+  }
+
+  /**
+   * @brief Total de setores reservados
+   *
+   * @return Retorna o valor de bpb.RsvdSecCnt
+   */
+  [[nodiscard]] inline WORD getRsvdSecCnt() const { return bpb.RsvdSecCnt; }
 };
 
 
