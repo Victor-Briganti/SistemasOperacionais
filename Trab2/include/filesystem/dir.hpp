@@ -19,39 +19,44 @@
 // Atributos de um arquivo
 
 /* Arquivo somente leitura */
-#define ATTR_READ_ONLY 0x01
+#define ATTR_READ_ONLY (0x01)
 /* Arquivo escondido */
-#define ATTR_HIDDEN 0x02
+#define ATTR_HIDDEN (0x02)
 /* Arquivo do sistema operacional */
-#define ATTR_SYSTEM 0x04
+#define ATTR_SYSTEM (0x04)
 /* Deve ser usado somente no diretório raiz */
-#define ATTR_VOLUME_ID 0x08
+#define ATTR_VOLUME_ID (0x08)
 /* Define um diretório */
-#define ATTR_DIRECTORY 0x10
+#define ATTR_DIRECTORY (0x10)
 /* Usado por ferramentas de backup */
-#define ATTR_ARCHIVE 0x20
+#define ATTR_ARCHIVE (0x20)
 /* Define um nome longo */
 #define ATTR_LONG_NAME \
-  ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID
+  (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID)
+
+/* Mascára para detectar se o arquivo faz parte do nome longo */
+#define ATTR_LONG_NAME_MASK                                    \
+  (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID \
+    | ATTR_DIRECTORY | ATTR_ARCHIVE)
 
 // Definição de entrada de um arquivo
 
 /* Entrada livre. Existia algo e foi apagado */
-#define FREE_ENTRY 0xE5
+#define FREE_ENTRY (0xE5)
 /* Entrada livre. Marca o inicio das entrads não usadas */
-#define EOD_ENTRY 0x00
+#define EOD_ENTRY (0x00)
 
 // Definição para nomes longos
 
 /* Valor da última entrada do nome longo */
-#define LAST_LONG_ENTRY 0x40
+#define LAST_LONG_ENTRY (0x40)
 
 // Nomes dos diretórios dot
 
 /* Referência ao diretório atual */
-#define DOT ".          "
+#define DOT (".          ")
 /* Referência ao diretório anterior */
-#define DOTDOT "..         "
+#define DOTDOT ("..         ")
 
 // Macro para verificação
 

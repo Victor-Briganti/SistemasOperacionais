@@ -14,7 +14,7 @@
 #include "io/image.hpp"
 
 /* Define o final da cadeia de clusters */
-#define EOC 0x0FFFFFFF
+#define EOC (0x0FFFFFFF)
 
 class FatTable
 {
