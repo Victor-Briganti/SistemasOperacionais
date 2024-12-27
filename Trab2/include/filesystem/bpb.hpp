@@ -170,7 +170,16 @@ public:
    * @return Retorna o valor de bpb.RsvdSecCnt
    */
   [[nodiscard]] inline WORD getRsvdSecCnt() const { return bpb.RsvdSecCnt; }
-};
 
+  /**
+   * @brief Total de setores reservados
+   *
+   * @return Retorna o valor de bpb.RsvdSecCnt
+   */
+  [[nodiscard]] inline DWORD firstSectorOfCluster(int num) const
+  {
+    return ((static_cast<DWORD>(num) - 2) * bpb.SecPerClus) + firstDataSector;
+  }
+};
 
 #endif// BPB_HPP

@@ -50,6 +50,13 @@ public:
    * @brief Mostra as informações sobre o sistema de arquivos
    */
   void info();
+
+  /**
+   * @brief Mostra as informações de um cluster no formato texto
+   *
+   * @param num Número do cluster no qual as informações serão mostradas
+   */
+  void cluster(int num);
 };
 
 #endif// FAT_FS_HPP

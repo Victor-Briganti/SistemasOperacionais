@@ -26,7 +26,7 @@ int main(int argc, char **argv)
   try {
     std::string path(argv[1]);
     FatFS fat(path);
-    fat.info();
+    fat.cluster(std::atoi(argv[2]));
   } catch (const std::exception &error) {
     std::cout << error.what();
   }

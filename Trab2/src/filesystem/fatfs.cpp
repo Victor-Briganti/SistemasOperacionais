@@ -54,3 +54,34 @@ void FatFS::info()
   bios->bpbPrint();
   fatTable->printInfo();
 }
+
+void FatFS::cluster(int num)
+{
+  if (static_cast<DWORD>(num) >= bios->getCountOfClusters() || num < 0) {
+    std::fprintf(stderr, "[" ERROR "] %d número inváldo de cluster\n", num);
+    return;
+  }
+
+  size_t bufferSize = bios->getSecPerCluster() * bios->getBytesPerSec();
+
+  void *buffer = new char[bufferSize];
+  if (buffer == nullptr) {
+    std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
+    return;
+  }
+
+  if (!image->read(bios->firstSectorOfCluster(num) * bios->getBytesPerSec(),
+        buffer,
+        bufferSize)) {
+    std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+    delete[] static_cast<char *>(buffer);
+    return;
+  }
+
+  char *bufferChar = static_cast<char *>(buffer);
+  for (size_t i = 0; i < bufferSize * sizeof(char); i++) {
+    std::fprintf(stdout, "%c", bufferChar[i]);
+  }
+
+  delete[] static_cast<char *>(buffer);
+}

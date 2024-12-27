@@ -29,7 +29,7 @@ public:
    * @exception Argumento inválido, quando o caminho não é válido
    * @exception Runtime error, quando não é possível abrir o arquivo
    */
-  Image(const std::string &path);
+  explicit Image(const std::string &path);
 
   ~Image();
 
