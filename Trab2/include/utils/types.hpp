@@ -1,10 +1,10 @@
-/*
+/**
  * Descrição: Tipos descritos pelo white paper da microsoft
  *
  * Autores: João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  *
- * Data: 15/11/2024
+ * Data: 26/12/2024
  */
 
 #ifndef TYPES_HPP

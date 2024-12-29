@@ -27,13 +27,13 @@ class Dentry
   std::array<char, 11> shortName;
 
   /* Define se a entrada está escondida */
-  bool isHidden;
+  bool hidden;
 
   /* Define se a entrada é um diretório */
-  bool isDirectory;
+  bool directory;
 
   /* Define se a entrada é somente leitura */
-  bool isReadOnly;
+  bool readOnly;
 
   /* Cluster em que este arquivo/diretório se encontra */
   DWORD cluster;
@@ -69,7 +69,7 @@ class Dentry
    *
    * @return O dia armazenado no datestamp
    */
-  static inline DWORD day(DWORD date) { return date & 0x1F; }
+  static inline WORD day(WORD date) { return date & 0x1F; }
 
   /**
    * @brief Retorna o mês com base em um datestamp
@@ -78,7 +78,7 @@ class Dentry
    *
    * @return O mês armazenado no datestamp
    */
-  static inline DWORD month(DWORD date) { return (date >> 5) & 0x0F; }
+  static inline WORD month(WORD date) { return (date >> 5) & 0x0F; }
 
   /**
    * @brief Retorna o ano com base em um datestamp
@@ -87,7 +87,7 @@ class Dentry
    *
    * @return O ano armazenado no datestamp
    */
-  static inline DWORD year(DWORD date) { return ((date >> 9) & 0xFF) + 1980; }
+  static inline WORD year(WORD date) { return ((date >> 9) & 0xFF) + 1980; }
 
   /**
    * @brief Cria um datestamp com base no dia, mês e ano atual
@@ -110,7 +110,7 @@ class Dentry
    *
    * @return A hora armazenada no datestamp
    */
-  static inline DWORD hour(DWORD time) { return (time >> 11) & 0xFF; }
+  static inline WORD hour(WORD time) { return (time >> 11) & 0xFF; }
 
   /**
    * @brief Retorna os minutos com base em um timestamp
@@ -119,19 +119,16 @@ class Dentry
    *
    * @return Os minutos armazenado no timestamp
    */
-  static inline DWORD minutes(DWORD time) { return (time >> 5) & 0x3F; }
+  static inline WORD minutes(WORD time) { return (time >> 5) & 0x3F; }
 
   /**
    * @brief Retorna os segundos com base em um timestamp
    *
-   * @param date Data para ser extraida
+   * @param time Data para ser extraida
    *
    * @return Os segundos armazenados no timestamp
    */
-  static inline DWORD seconds(DWORD date)
-  {
-    return ((date >> 9) & 0xFF) + 1980;
-  }
+  static inline WORD seconds(WORD time) { return ((time >> 9) & 0xFF) + 1980; }
 
   /**
    * @brief Cria um timestamp com base no hora, minutos e segundos
@@ -181,6 +178,129 @@ public:
    * @return retorna o cluster da entrada
    */
   [[nodiscard]] inline DWORD getCluster() const { return cluster; }
+
+  /**
+   * @brief Tamanho do arquivo
+   *
+   * @return retorna o tamanho do arquivo
+   */
+  [[nodiscard]] inline DWORD getFileSize() const { return fileSize; }
+
+  /**
+   * @brief Retorna verdadeiro se é um diretório
+   *
+   * @return retorna o valor de directory
+   */
+  [[nodiscard]] inline bool isDirectory() const { return directory; }
+
+  /**
+   * @brief Retorna verdadeiro se é uma entrada escondida
+   *
+   * @return retorna o valor de hidden
+   */
+  [[nodiscard]] inline bool isHidden() const { return hidden; }
+
+  /**
+   * @brief Retorna verdadeiro se é somente leitura
+   *
+   * @return retorna o valor de readOnly
+   */
+  [[nodiscard]] inline bool isReadOnly() const { return readOnly; }
+
+  /**
+   * @brief Retorna o dia de criação do arquivo
+   *
+   * @return retorna o dia do datestamp crtDate
+   */
+  [[nodiscard]] inline WORD getCreationDay() const { return day(crtDate); }
+
+  /**
+   * @brief Retorna o mês de criação do arquivo
+   *
+   * @return retorna o mês do datestamp crtDate
+   */
+  [[nodiscard]] inline WORD getCreationMonth() const { return month(crtDate); }
+
+  /**
+   * @brief Retorna o ano de criação do arquivo
+   *
+   * @return retorna o ano do datestamp crtDate
+   */
+  [[nodiscard]] inline WORD getCreationYear() const { return year(crtDate); }
+
+  /**
+   * @brief Retorna a hora de criação do arquivo
+   *
+   * @return retorna a hora do timestamp crtTime
+   */
+  [[nodiscard]] inline WORD getCreationHour() const { return hour(crtTime); }
+
+  /**
+   * @brief Retorna o mês de criação do arquivo
+   *
+   * @return retorna o mês do timestamp crtTime
+   */
+  [[nodiscard]] inline WORD getCreationMinute() const
+  {
+    return minutes(crtTime);
+  }
+
+  /**
+   * @brief Retorna o ano de criação do arquivo
+   *
+   * @return retorna o ano do timestamp crtTime
+   */
+  [[nodiscard]] inline WORD getCreationSeconds() const
+  {
+    return seconds(crtTime);
+  }
+
+  /**
+   * @brief Retorna o dia de criação do arquivo
+   *
+   * @return retorna o dia do datestamp wrtDate
+   */
+  [[nodiscard]] inline WORD getWriteDay() const { return day(wrtDate); }
+
+  /**
+   * @brief Retorna o mês de criação do arquivo
+   *
+   * @return retorna o mês do datestamp wrtDate
+   */
+  [[nodiscard]] inline WORD getWriteMonth() const { return month(wrtDate); }
+
+  /**
+   * @brief Retorna o ano de criação do arquivo
+   *
+   * @return retorna o ano do datestamp wrtDate
+   */
+  [[nodiscard]] inline WORD getWriteYear() const { return year(wrtDate); }
+
+  /**
+   * @brief Retorna a hora de criação do arquivo
+   *
+   * @return retorna a hora do timestamp wrtTime
+   */
+  [[nodiscard]] inline WORD getWriteHour() const { return hour(wrtTime); }
+
+  /**
+   * @brief Retorna o mês de criação do arquivo
+   *
+   * @return retorna o mês do timestamp wrtTime
+   */
+  [[nodiscard]] inline WORD getWriteMinute() const { return minutes(wrtTime); }
+
+  /**
+   * @brief Retorna o ano de criação do arquivo
+   *
+   * @return retorna o ano do timestamp wrtTime
+   */
+  [[nodiscard]] inline WORD getWriteSeconds() const { return seconds(wrtTime); }
+
+  /**
+   * @brief Imprime as informações sobre a entrada
+   */
+  void printInfo() const;
 };
 
 #endif// DENTRY_HPP

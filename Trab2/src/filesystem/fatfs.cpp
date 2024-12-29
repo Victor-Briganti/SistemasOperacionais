@@ -155,6 +155,6 @@ void FatFS::ls(std::string &path)
   std::vector<Dentry> dentries = listEntry(bios->getRootClus());
 
   for (const auto &a : dentries) {
-    std::fprintf(stdout, "%s\n", a.getLongName().c_str());
+    a.printInfo();
   }
 }
