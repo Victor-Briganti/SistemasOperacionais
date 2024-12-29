@@ -62,6 +62,12 @@ class Dentry
   /* Tamanho do arquivo. 0 no caso de diretórios */
   DWORD fileSize;
 
+  /* Posição inicial no buffer do diretório */
+  DWORD initPos;
+
+  /* Posição final no buffer do diretório */
+  DWORD endPos;
+
   /**
    * @brief Retorna o dia com base em um datestamp
    *
@@ -150,10 +156,15 @@ public:
    *
    * @param dir Entrada curta, que possui os atributos do arquivo em si
    * @param ldir Vetor que contém todos as partes do nome longo
+   * @param initPost Posição inicial na entrada do buffer
+   * @param endPos Posição final na entrada do buffer
    *
    * @exception Gera uma exceção no caso de haver algum erro no dir ou ldir.
    */
-  explicit Dentry(Dir dir, std::vector<LongDir> &ldir);
+  explicit Dentry(Dir dir,
+    std::vector<LongDir> &ldir,
+    DWORD initPos,
+    DWORD endPos);
 
   /**
    * @brief Nome longo da entrada

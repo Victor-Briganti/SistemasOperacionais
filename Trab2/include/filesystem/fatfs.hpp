@@ -40,7 +40,7 @@ private:
   bool readCluster(void *buffer, DWORD num);
 
   /**
-   * @brief Lista de entradas de um determinado diretório
+   * @brief Retorna uma lista com todas as entradas de um diretório
    *
    * @param num Número do cluster do diretório que será listado
    *
@@ -49,7 +49,7 @@ private:
    *
    * @return Um vetor com todos as entradas se foi possível ler.
    */
-  std::vector<Dentry> listEntry(DWORD num);
+  std::vector<Dentry> getDirEntries(DWORD num);
 
 public:
   /**

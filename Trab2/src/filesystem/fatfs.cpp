@@ -11,6 +11,7 @@
 #include "filesystem/bpb.hpp"
 #include "filesystem/dentry.hpp"
 #include "filesystem/dir.hpp"
+#include "path/parser.hpp"
 #include "utils/color.hpp"
 
 #include <cstring>
@@ -37,7 +38,7 @@ bool FatFS::readCluster(void *buffer, DWORD num)
   return true;
 }
 
-std::vector<Dentry> FatFS::listEntry(DWORD num)
+std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 {
   // Aloca o buffer do diretório
   void *buffer = new char[bios->totClusByts()];
@@ -62,6 +63,9 @@ std::vector<Dentry> FatFS::listEntry(DWORD num)
   // Vetor com todas as entradas
   std::vector<Dentry> dentries;
 
+  // Define a posição da entrada no buffer
+  DWORD bufferPos = 0;
+
   // Caminha por todo o buffer até encontrar o FREE_ENTRY ou alcançar o limite
   // de tamanho do cluster.
   for (size_t i = 0; i < (bios->totClusByts() / sizeof(Dir)); i++) {
@@ -76,13 +80,22 @@ std::vector<Dentry> FatFS::listEntry(DWORD num)
     }
 
     if (bufferDir[i].attr == ATTR_LONG_NAME) {
+      if (bufferPos == 0) {
+        bufferPos = static_cast<DWORD>(i);
+      }
+
       LongDir ldir;
       memcpy(&ldir, &bufferDir[i], sizeof(ldir));
       longDirs.push_back(ldir);
     } else {
-      Dentry entry(bufferDir[i], longDirs);
+      Dentry entry(bufferDir[i],
+        longDirs,
+        static_cast<DWORD>(bufferPos),
+        static_cast<DWORD>(i));
+
       dentries.push_back(entry);
       longDirs.clear();
+      bufferPos = 0;
     }
   }
 
@@ -152,9 +165,57 @@ void FatFS::cluster(DWORD num)
 
 void FatFS::ls(std::string &path)
 {
-  std::vector<Dentry> dentries = listEntry(bios->getRootClus());
+  std::vector<std::string> listPath = split(path, '/');
+  std::vector<Dentry> dentries;
 
-  for (const auto &a : dentries) {
-    a.printInfo();
+  // Lista o diretório raiz
+  if (listPath.size() == 1 && listPath[0] == "img") {
+    dentries = getDirEntries(bios->getRootClus());
+    for (const auto &a : dentries) {
+      a.printInfo();
+    }
+
+    return;
   }
+
+  // Caminho completo
+  if (listPath.size() != 1 && listPath[0] == "img") {
+    DWORD clt = bios->getRootClus();
+    bool found = false;
+
+    dentries = getDirEntries(clt);
+    for (size_t i = 1; i < listPath.size(); i++, found = false) {
+      for (const auto &a : dentries) {
+        if (listPath[i] == a.getLongName()) {
+          if (!a.isDirectory()) {
+            goto notDir;
+          }
+
+          clt = a.getCluster();
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        goto notFound;
+      }
+
+      dentries = getDirEntries(clt);
+    }
+
+    for (const auto &a : dentries) {
+      a.printInfo();
+    }
+
+    return;
+  }
+
+  // TODO: Fazer caminho relativo
+
+notFound:
+  std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
+  return;
+notDir:
+  std::fprintf(stderr, "[" ERROR "] %s não é um diretório\n", path.c_str());
 }

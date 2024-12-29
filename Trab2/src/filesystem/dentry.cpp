@@ -9,8 +9,10 @@
 
 #include "filesystem/dentry.hpp"
 #include "filesystem/dir.hpp"
+#include <cctype>
 
-Dentry::Dentry(Dir dir, std::vector<LongDir> &ldir)
+Dentry::Dentry(Dir dir, std::vector<LongDir> &ldir, DWORD initPos, DWORD endPos)
+  : initPos(initPos), endPos(endPos)
 {
   // Inicialização de metadados
   this->hidden = ((dir.attr & ATTR_HIDDEN) != 0);
@@ -29,16 +31,25 @@ Dentry::Dentry(Dir dir, std::vector<LongDir> &ldir)
   for (auto a : ldir) {
     std::string name;
 
-    for (int i = 0; i < 10; i += 2) {
-      name += static_cast<char>(a.name1[i]);
+    for (int i = 0; i < 10; i++) {
+      char chr = static_cast<char>(a.name1[i]);
+      if (std::isprint(chr)) {
+        name += chr;
+      }
     }
 
-    for (int i = 0; i < 12; i += 2) {
-      name += static_cast<char>(a.name2[i]);
+    for (int i = 0; i < 12; i++) {
+      char chr = static_cast<char>(a.name2[i]);
+      if (std::isprint(chr)) {
+        name += chr;
+      }
     }
 
-    for (int i = 0; i < 4; i += 2) {
-      name += static_cast<char>(a.name3[i]);
+    for (int i = 0; i < 4; i++) {
+      char chr = static_cast<char>(a.name3[i]);
+      if (std::isprint(chr)) {
+        name += chr;
+      }
     }
 
     longName = name + longName;
