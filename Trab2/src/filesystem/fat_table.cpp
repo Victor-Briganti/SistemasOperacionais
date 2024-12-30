@@ -128,6 +128,11 @@ void FatTable::printInfo() const
 
 bool FatTable::removeChain(const DWORD start)
 {
+  // Arquivo recém criado que não tem nada escrito
+  if (start == 0) {
+    return true;
+  }
+
   std::vector<DWORD> chain;
   chain.push_back(start);
 

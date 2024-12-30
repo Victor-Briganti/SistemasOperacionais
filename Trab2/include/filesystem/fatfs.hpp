@@ -17,6 +17,11 @@
 
 #include <string>
 
+// Definições para os tipos de arquivos
+#define DIR_ENTRY 1
+#define ARCH_ENTRY 0
+#define ALL_ENTRY -1
+
 class FatFS
 {
 private:
@@ -108,29 +113,27 @@ private:
    * @brief Realiza o parser de um caminho
    *
    * @param path Caminho a ser dividido e verificado
-   * @param expectDir Diz ao parser se o última parte do caminho deveria ser um
-   * arquivo ou não.
+   * @param expectDir Diz ao parser  qual o tipo de arquivo sendo buscado.
    *
    * @exception Gera um exceção se houver algum problema durante a verificação
    * do caminho.
    * @return Um vetor com o caminho devidamente dividido.
    */
-  std::vector<std::string> pathParser(const std::string &path, bool expectDir);
+  std::vector<std::string> pathParser(const std::string &path, int expectDir);
 
   /**
    * @brief Busca a entrada e o cluster do diretório onde essa entrada se
    * encontra
    *
    * @param path Caminho para buscar a entrada
-   * @param expectDir Flag para verificar se a entrada deve ser um diretório ou
-   * não.
+   * @param expectDir Diz ao parser  qual o tipo de arquivo sendo buscado.
    *
    * @exception Gera um exceção se houver algum problema durante a busca da
    * entrada do caminho.
    * @return Um par com a entrada e o número do cluster
    */
   std::pair<Dentry, DWORD> searchEntry(const std::vector<std::string> &listPath,
-    bool expectDir);
+    int expectDir);
 
 public:
   /**
@@ -194,6 +197,13 @@ public:
    * @param path Novo caminho base do sistema
    */
   void cd(const std::string &path);
+
+  /**
+   * @brief Imprime os atributos de uma entrada
+   *
+   * @param path Caminho para a entrada a ser apresentada
+   */
+  void attr(const std::string &path);
 };
 
 #endif// FAT_FS_HPP

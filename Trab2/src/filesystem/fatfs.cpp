@@ -169,7 +169,11 @@ bool FatFS::setDirEntries(DWORD num,
 bool FatFS::removeEntry(Dentry &entry, DWORD num)
 {
   entry.markFree();
+
+  // Remove as entradas da tabela FAT
   bool fatRm = fatTable->removeChain(entry.getCluster());
+
+  // Remove a entrada do diretório
   bool entryRm = setDirEntries(num,
     entry.getInitPos(),
     entry.getEndPos(),
@@ -180,7 +184,7 @@ bool FatFS::removeEntry(Dentry &entry, DWORD num)
 }
 
 std::vector<std::string> FatFS::pathParser(const std::string &path,
-  bool expectDir)
+  int expectDir)
 {
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath = split(path, '/');
@@ -213,9 +217,16 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
     // Caminha por todas as entradas até encontrar o diretório
     for (const auto &a : dentries) {
       if (listPath[i] == a.getLongName()) {
-        if (i == listPath.size() - 1 && (expectDir != a.isDirectory())) {
+        if (i == listPath.size() - 1 && expectDir != ALL_ENTRY
+            && expectDir != static_cast<int>(a.isDirectory())) {
           std::string error = "[" ERROR "] " + path + " esperava um ";
-          error += expectDir ? "diretório\n" : "arquivo\n";
+
+          if (DIR_ENTRY) {
+            error += "diretório\n";
+          } else {
+            error += "arquivo\n";
+          }
+
           throw std::runtime_error(error);
         }
 
@@ -261,7 +272,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
 }
 
 std::pair<Dentry, DWORD>
-  FatFS::searchEntry(const std::vector<std::string> &listPath, bool expectDir)
+  FatFS::searchEntry(const std::vector<std::string> &listPath, int expectDir)
 {
   // Começa a busca pelo "/"
   DWORD clt = bios->getRootClus();
@@ -279,7 +290,8 @@ std::pair<Dentry, DWORD>
       if (listPath[i] == a.getLongName()) {
 
         // Última parte do caminho está de acordo com o tipo de arquivo
-        if (i == listPath.size() - 1 && expectDir != a.isDirectory()) {
+        if (i == listPath.size() - 1 && expectDir != ALL_ENTRY
+            && expectDir != static_cast<int>(a.isDirectory())) {
           std::string error = "[" ERROR "] esperava um ";
           error += a.isDirectory() ? "diretório\n" : "arquivo\n";
           throw std::runtime_error(error);
@@ -384,7 +396,7 @@ void FatFS::ls(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, true);
+    listPath = pathParser(path, DIR_ENTRY);
   } catch (const std::exception &error) {
     std::cout << error.what();
     return;
@@ -405,7 +417,7 @@ void FatFS::ls(const std::string &path)
 
   try {
     // Busca pela entrada
-    std::pair<Dentry, DWORD> entry = searchEntry(listPath, true);
+    std::pair<Dentry, DWORD> entry = searchEntry(listPath, DIR_ENTRY);
 
     // Lista de entradas
     std::vector<Dentry> dentries = getDirEntries(entry.first.getCluster());
@@ -425,7 +437,7 @@ void FatFS::rm(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, false);
+    listPath = pathParser(path, ARCH_ENTRY);
   } catch (const std::exception &error) {
     std::cout << error.what();
     return;
@@ -439,7 +451,7 @@ void FatFS::rm(const std::string &path)
 
   try {
     // Busca pela entrada
-    std::pair<Dentry, DWORD> entry = searchEntry(listPath, false);
+    std::pair<Dentry, DWORD> entry = searchEntry(listPath, ARCH_ENTRY);
 
     if (!removeEntry(entry.first, entry.second)) {
       std::fprintf(stderr, "[" ERROR "] rm %s operação falhou\n", path.c_str());
@@ -456,7 +468,7 @@ void FatFS::rmdir(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, true);
+    listPath = pathParser(path, DIR_ENTRY);
   } catch (const std::exception &error) {
     std::cout << error.what();
     return;
@@ -470,7 +482,7 @@ void FatFS::rmdir(const std::string &path)
 
   try {
     // Busca pela entrada
-    std::pair<Dentry, DWORD> entry = searchEntry(listPath, true);
+    std::pair<Dentry, DWORD> entry = searchEntry(listPath, DIR_ENTRY);
 
     if (!removeEntry(entry.first, entry.second)) {
       std::fprintf(
@@ -488,8 +500,10 @@ void FatFS::pwd() { std::fprintf(stdout, "%s\n", curPath.c_str()); }
 void FatFS::cd(const std::string &path)
 {
   try {
-    curPath = merge(pathParser(path, true));
+    curPath = merge(pathParser(path, DIR_ENTRY));
   } catch (const std::exception &error) {
     std::cout << error.what();
   }
 }
+
+void FatFS::attr(const std::string &path) {}
