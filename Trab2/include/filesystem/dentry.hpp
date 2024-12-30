@@ -39,6 +39,12 @@ class Dentry
   /* Define qual o tipo de nome que a entrada possui */
   int nameType;
 
+  /* Posição inicial no buffer do diretório */
+  DWORD initPos;
+
+  /* Posição final no buffer do diretório */
+  DWORD endPos;
+
   /**
    * @brief Retorna o dia com base em um datestamp
    *
@@ -136,12 +142,6 @@ public:
     const std::vector<LongDir> &ldir,
     const DWORD initPos,
     const DWORD endPos);
-
-  /* Posição inicial no buffer do diretório */
-  const DWORD initPos;
-
-  /* Posição final no buffer do diretório */
-  const DWORD endPos;
 
   /**
    * @brief Nome longo da entrada
@@ -338,6 +338,20 @@ public:
   {
     return longDirs;
   }
+
+  /**
+   * @brief Retorna a posição inicial dessa entrada no cluster
+   *
+   * @return retorna o valor de initPos
+   */
+  [[nodiscard]] inline DWORD getInitPos() const { return initPos; }
+
+  /**
+   * @brief Retorna a posição final dessa entrada no cluster
+   *
+   * @return retorna o valor de endPos
+   */
+  [[nodiscard]] inline DWORD getEndPos() const { return endPos; }
 
   /**
    * @brief Tipo do arquivo

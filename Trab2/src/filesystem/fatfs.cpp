@@ -301,8 +301,8 @@ void FatFS::rm(const std::string &path)
             a.markFree();
             if (!fatTable->removeChain(a.getCluster())
                 || !setDirEntries(clt,
-                  a.initPos,
-                  a.endPos,
+                  a.getInitPos(),
+                  a.getEndPos(),
                   a.getDirectory(),
                   a.getLongDirectories())) {
               goto fail;
@@ -343,4 +343,82 @@ notArchive:
   return;
 fail:
   std::fprintf(stderr, "[" ERROR "] rm %s operação falhou\n", path.c_str());
+}
+
+void FatFS::rmdir(const std::string &path)
+{
+  std::vector<std::string> listPath = split(path, '/');
+  if (listPath.size() == 1) {
+    goto invalidPath;
+  }
+
+  // Caminho completo
+  if (listPath.size() != 1 && listPath[0] == "img") {
+    bool found = false;
+    DWORD clt = bios->getRootClus();
+    std::vector<Dentry> dentries = getDirEntries(clt);
+    std::pair<Dentry, DWORD> rmEntry = { dentries[0], 0 };
+
+    for (size_t i = 1; i < listPath.size(); i++, found = false) {
+      for (size_t j = 0; j < dentries.size(); j++) {
+        if (listPath[i] == dentries[j].getLongName()) {
+          // Se a última parte do caminho for um arquivo gera um erro
+          if (i == listPath.size() - 1 && !dentries[j].isDirectory()) {
+            goto notDir;
+          }
+
+          if (!dentries[j].isDirectory()) {
+            goto invalidPath;
+          }
+
+          if (listPath[i] == "." && dentries[j].getLongName() == ".") {
+            found = true;
+            continue;
+          }
+
+          rmEntry.first = dentries[j];
+          rmEntry.second = clt;
+          clt = getEntryClus(dentries[j]);
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        goto notFound;
+      }
+
+      dentries = getDirEntries(clt);
+    }
+
+    std::vector<Dentry> entries = getDirEntries(rmEntry.first.getCluster());
+    if (entries.size() > 2 || rmEntry.first.getNameType() == DOTDOT_NAME) {
+      goto notEmpty;
+    }
+
+    rmEntry.first.markFree();
+    if (fatTable->removeChain(rmEntry.first.getCluster())
+        && setDirEntries(rmEntry.second,
+          rmEntry.first.getInitPos(),
+          rmEntry.first.getEndPos(),
+          rmEntry.first.getDirectory(),
+          rmEntry.first.getLongDirectories())) {
+      return;
+    }
+  }
+
+fail:
+  std::fprintf(stderr, "[" ERROR "] rmdir %s operação falhou\n", path.c_str());
+  return;
+invalidPath:
+  std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+  return;
+notFound:
+  std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
+  return;
+notEmpty:
+  std::fprintf(stderr, "[" ERROR "] %s não está vazio\n", path.c_str());
+  return;
+notDir:
+  std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
 }

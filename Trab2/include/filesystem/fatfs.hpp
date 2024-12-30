@@ -134,6 +134,13 @@ public:
    * @param path Caminho do arquivo a ser removido
    */
   void rm(const std::string &path);
+
+  /**
+   * @brief Remove um diretório vazio do sistema
+   *
+   * @param path Caminho do diretório vazio a ser removido
+   */
+  void rmdir(const std::string &path);
 };
 
 #endif// FAT_FS_HPP
