@@ -455,93 +455,82 @@ fail:
 void FatFS::rmdir(const std::string &path)
 {
   // Lista de nomes nos caminhos
-  std::vector<std::string> listPath = split(path, '/');
-
-  // O diretório img/ não pode ser deletado
-  if (listPath.size() == 1) {
-    goto invalidPath;
+  std::vector<std::string> listPath;
+  try {
+    listPath = pathParser(path, false);
+  } catch (const std::runtime_error &error) {
+    std::cout << error.what();
+    return;
   }
 
-  // Caminho completo
-  if (listPath.size() != 1 && listPath[0] == "img") {
-    // Começa a busca pelo "/"
-    DWORD clt = bios->getRootClus();
-    bool found = false;
+  // Começa a busca pelo "/"
+  DWORD clt = bios->getRootClus();
+  bool found = false;
 
-    // Lista de entradas
-    std::vector<Dentry> dentries = getDirEntries(clt);
+  // Lista de entradas
+  std::vector<Dentry> dentries = getDirEntries(clt);
 
-    // Entrada e cluster que precisam ser removidos
-    std::pair<Dentry, DWORD> rmEntry = { dentries[0], 0 };
+  // Entrada e cluster que precisam ser removidos
+  std::pair<Dentry, DWORD> rmEntry = { dentries[0], 0 };
 
-    // Caminha pela lista de nomes
-    for (size_t i = 1; i < listPath.size(); i++, found = false) {
-      for (size_t j = 0; j < dentries.size(); j++) {
-        if (listPath[i] == dentries[j].getLongName()) {
-          // Se a última parte do caminho for um arquivo gera um erro
-          if (i == listPath.size() - 1 && !dentries[j].isDirectory()) {
-            goto notDir;
-          }
-
-          // Se no meio do caminho temos um arquivo, gera um erro
-          if (!dentries[j].isDirectory()) {
-            goto invalidPath;
-          }
-
-          // Se o caminho é um "." não atualiza a entrada
-          if (listPath[i] == "." && dentries[j].getLongName() == ".") {
-            found = true;
-            continue;
-          }
-
-          // Atualiza a entrada a ser removida
-          rmEntry.first = dentries[j];
-          rmEntry.second = clt;
-
-          // Altera o cluster em que ocorre a busca
-          clt = getEntryClus(dentries[j]);
-          found = true;
-          break;
+  // Caminha pela lista de nomes
+  for (size_t i = 1; i < listPath.size(); i++, found = false) {
+    for (size_t j = 0; j < dentries.size(); j++) {
+      if (listPath[i] == dentries[j].getLongName()) {
+        // Se a última parte do caminho for um arquivo gera um erro
+        if (i == listPath.size() - 1 && !dentries[j].isDirectory()) {
+          std::fprintf(
+            stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+          return;
         }
-      }
 
-      // Se não foi encontrado, gera um erro
-      if (!found) {
-        goto notFound;
-      }
+        // Se no meio do caminho temos um arquivo, gera um erro
+        if (!dentries[j].isDirectory()) {
+          std::fprintf(
+            stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+          return;
+        }
 
-      // Atualiza a lista de entradas
-      dentries = getDirEntries(clt);
+        // Se o caminho é um "." não atualiza a entrada
+        if (listPath[i] == "." && dentries[j].getLongName() == ".") {
+          found = true;
+          continue;
+        }
+
+        // Atualiza a entrada a ser removida
+        rmEntry.first = dentries[j];
+        rmEntry.second = clt;
+
+        // Altera o cluster em que ocorre a busca
+        clt = getEntryClus(dentries[j]);
+        found = true;
+        break;
+      }
     }
 
-    // Carrega a entrada e verifica se ela está vazia
-    std::vector<Dentry> entries = getDirEntries(rmEntry.first.getCluster());
-    if (entries.size() > 2 || rmEntry.first.getNameType() == DOTDOT_NAME) {
-      goto notEmpty;
-    }
-
-    // Remove a entrada do sistema
-    if (removeEntry(rmEntry.first, rmEntry.second)) {
+    // Se não foi encontrado, gera um erro
+    if (!found) {
+      std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
       return;
     }
+
+    // Atualiza a lista de entradas
+    dentries = getDirEntries(clt);
   }
 
-  // TODO: Fazer caminho relativo
+  // Carrega a entrada e verifica se ela está vazia
+  std::vector<Dentry> entries = getDirEntries(rmEntry.first.getCluster());
+  if (entries.size() > 2 || rmEntry.first.getNameType() == DOTDOT_NAME) {
+    std::fprintf(stderr, "[" ERROR "] %s não está vazio\n", path.c_str());
+    return;
+  }
 
-fail:
+  // Remove a entrada do sistema
+  if (removeEntry(rmEntry.first, rmEntry.second)) {
+    return;
+  }
+
   std::fprintf(stderr, "[" ERROR "] rmdir %s operação falhou\n", path.c_str());
-  return;
-invalidPath:
-  std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
-  return;
-notFound:
-  std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
-  return;
-notEmpty:
-  std::fprintf(stderr, "[" ERROR "] %s não está vazio\n", path.c_str());
-  return;
-notDir:
-  std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
 }
 
 
