@@ -25,9 +25,11 @@ int main(int argc, char **argv)
 
   try {
     std::string image(argv[1]);
-    std::string path(argv[2]);
+    std::string path1(argv[2]);
+    std::string path2(argv[3]);
     FatFS fat(image);
-    fat.rm(path);
+    fat.cd(path1);
+    fat.rm(path2);
   } catch (const std::exception &error) {
     std::cout << error.what();
   }

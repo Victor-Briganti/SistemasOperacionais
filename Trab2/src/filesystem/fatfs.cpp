@@ -384,71 +384,67 @@ notDir:
 void FatFS::rm(const std::string &path)
 {
   // Lista de nomes nos caminhos
-  std::vector<std::string> listPath = split(path, '/');
-
-  // Caminho completo
-  if (listPath.size() != 1 && listPath[0] == "img") {
-    // Começa a busca pelo "/"
-    DWORD clt = bios->getRootClus();
-    bool found = false;
-
-    // Lista de entradas
-    std::vector<Dentry> dentries = getDirEntries(clt);
-
-    // Caminha pela lista de nomes
-    for (size_t i = 1; i < listPath.size(); i++, found = false) {
-      for (auto &a : dentries) {
-        if (listPath[i] == a.getLongName()) {
-          // Se a última parte do caminho for um diretório gera um erro
-          if (i == listPath.size() - 1 && a.isDirectory()) {
-            goto notArchive;
-          }
-
-          // Se o arquivo foi encontrado deleta suas entradas.
-          if (i == listPath.size() - 1 && !a.isDirectory()) {
-            if (!removeEntry(a, clt)) {
-              goto fail;
-            }
-
-            return;
-          }
-
-          // Se no meio do caminho temos um arquivo, gera um erro
-          if (!a.isDirectory()) {
-            goto invalidPath;
-          }
-
-          // Altera o cluster em que ocorre a busca
-          clt = getEntryClus(a);
-          found = true;
-          break;
-        }
-      }
-
-      // Se não foi encontrado, gera um erro
-      if (!found) {
-        goto notFound;
-      }
-
-      // Atualiza a lista de entradas
-      dentries = getDirEntries(clt);
-    }
-
+  std::vector<std::string> listPath;
+  try {
+    listPath = pathParser(path, false);
+  } catch (const std::runtime_error &error) {
+    std::cout << error.what();
     return;
   }
 
-  // TODO: Fazer caminho relativo
+  // Começa a busca pelo "/"
+  DWORD clt = bios->getRootClus();
+  bool found = false;
 
-invalidPath:
-  std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
-  return;
-notFound:
-  std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
-  return;
-notArchive:
-  std::fprintf(stderr, "[" ERROR "] %s não é um arquivo\n", path.c_str());
-  return;
-fail:
+  // Lista de entradas
+  std::vector<Dentry> dentries = getDirEntries(clt);
+
+  // Caminha pela lista de nomes
+  for (size_t i = 1; i < listPath.size(); i++, found = false) {
+    for (auto &a : dentries) {
+      if (listPath[i] == a.getLongName()) {
+        // Se a última parte do caminho for um diretório gera um erro
+        if (i == listPath.size() - 1 && a.isDirectory()) {
+          std::fprintf(
+            stderr, "[" ERROR "] %s não é um arquivo\n", path.c_str());
+          return;
+        }
+
+        // Se o arquivo foi encontrado deleta suas entradas.
+        if (i == listPath.size() - 1 && !a.isDirectory()) {
+          if (!removeEntry(a, clt)) {
+            std::fprintf(
+              stderr, "[" ERROR "] rm %s operação falhou\n", path.c_str());
+            return;
+          }
+
+          return;
+        }
+
+        // Se no meio do caminho temos um arquivo, gera um erro
+        if (!a.isDirectory()) {
+          std::fprintf(
+            stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+          return;
+        }
+
+        // Altera o cluster em que ocorre a busca
+        clt = getEntryClus(a);
+        found = true;
+        break;
+      }
+    }
+
+    // Se não foi encontrado, gera um erro
+    if (!found) {
+      std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
+      return;
+    }
+
+    // Atualiza a lista de entradas
+    dentries = getDirEntries(clt);
+  }
+
   std::fprintf(stderr, "[" ERROR "] rm %s operação falhou\n", path.c_str());
 }
 
@@ -457,7 +453,7 @@ void FatFS::rmdir(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, false);
+    listPath = pathParser(path, true);
   } catch (const std::runtime_error &error) {
     std::cout << error.what();
     return;
