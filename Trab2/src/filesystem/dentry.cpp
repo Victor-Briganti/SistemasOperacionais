@@ -9,7 +9,11 @@
 
 #include "filesystem/dentry.hpp"
 #include "filesystem/dir.hpp"
+#include "utils/color.hpp"
+
 #include <cctype>
+#include <cstring>
+#include <stdexcept>
 
 Dentry::Dentry(const Dir &dir,
   const std::vector<LongDir> &ldir,
@@ -17,6 +21,33 @@ Dentry::Dentry(const Dir &dir,
   const DWORD endPos)
   : dir(dir), longDirs(ldir), initPos(initPos), endPos(endPos)
 {
+
+  for (size_t i = 0; i < NAME_MAIN_SIZE + NAME_EXT_SIZE; i++) {
+    shortName[i] = static_cast<char>(dir.name[i]);
+  }
+  shortName[NAME_MAIN_SIZE + NAME_EXT_SIZE] = '\0';
+
+  int isDot = strncmp(shortName.data(), DOT, NAME_MAIN_SIZE + NAME_EXT_SIZE);
+  int isDotDot =
+    strncmp(shortName.data(), DOTDOT, NAME_MAIN_SIZE + NAME_EXT_SIZE);
+
+  if ((!isDot || !isDotDot) && !ldir.empty()) {
+    std::string error = "[" ERROR "] Nome da entrada está errado\n";
+    throw std::runtime_error(error);
+  }
+
+  if (!isDot) {
+    nameType = DOT_NAME;
+    return;
+  }
+
+  if (!isDotDot) {
+    nameType = DOTDOT_NAME;
+    return;
+  }
+
+  nameType = LONG_NAME;
+
   for (auto a : ldir) {
     std::string name;
 
@@ -43,11 +74,6 @@ Dentry::Dentry(const Dir &dir,
 
     longName = name + longName;
   }
-
-  for (size_t i = 0; i < NAME_MAIN_SIZE + NAME_EXT_SIZE; i++) {
-    shortName[i] = static_cast<char>(dir.name[i]);
-  }
-  shortName[NAME_MAIN_SIZE + NAME_EXT_SIZE] = '\0';
 }
 
 void Dentry::printInfo() const

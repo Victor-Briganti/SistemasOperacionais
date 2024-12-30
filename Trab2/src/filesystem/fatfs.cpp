@@ -221,30 +221,29 @@ void FatFS::ls(const std::string &path)
   std::vector<std::string> listPath = split(path, '/');
   std::vector<Dentry> dentries;
 
-  // Lista o diretório raiz
-  if (listPath.size() == 1 && listPath[0] == "img") {
-    dentries = getDirEntries(bios->getRootClus());
-    for (const auto &a : dentries) {
-      a.printInfo();
-    }
-
-    return;
-  }
-
-  // Caminho completo
-  if (listPath.size() != 1 && listPath[0] == "img") {
+  // Lista caminhos longos
+  if (listPath[0] == "img") {
     DWORD clt = bios->getRootClus();
     bool found = false;
 
     dentries = getDirEntries(clt);
     for (size_t i = 1; i < listPath.size(); i++, found = false) {
+      // Caminha por todas as entradas até encontrar o diretório
       for (const auto &a : dentries) {
+        // Se a última parte do caminho não for um diretório gera um erro.
         if (listPath[i] == a.getLongName()) {
           if (!a.isDirectory()) {
             goto notDir;
           }
 
-          clt = a.getCluster();
+          // No caso de uma entrada ".." que está logo abaixo do "/", seu
+          // cluster é salvo como 0.
+          if (a.getNameType() == DOTDOT_NAME && a.getCluster() == 0) {
+            clt = bios->getRootClus();
+          } else {
+            clt = a.getCluster();
+          }
+
           found = true;
           break;
         }
@@ -256,6 +255,7 @@ void FatFS::ls(const std::string &path)
 
       dentries = getDirEntries(clt);
     }
+
 
     for (const auto &a : dentries) {
       a.printInfo();
@@ -289,10 +289,12 @@ void FatFS::rm(const std::string &path)
     for (size_t i = 1; i < listPath.size(); i++, found = false) {
       for (auto &a : dentries) {
         if (listPath[i] == a.getLongName()) {
+          // Se a última parte do caminho for um diretório gera um erro
           if (i == listPath.size() - 1 && a.isDirectory()) {
             goto notArchive;
           }
 
+          // Se o arquivo foi encontrado deleta suas entradas.
           if (i == listPath.size() - 1 && !a.isDirectory()) {
             a.markFree();
             if (!fatTable->removeChain(a.getCluster())
@@ -303,8 +305,6 @@ void FatFS::rm(const std::string &path)
                   a.getLongDirectories())) {
               goto fail;
             }
-
-            std::fprintf(stderr, "removido\n");
             return;
           }
 
@@ -312,7 +312,14 @@ void FatFS::rm(const std::string &path)
             goto invalidPath;
           }
 
-          clt = a.getCluster();
+          // No caso de uma entrada ".." que está logo abaixo do "/", seu
+          // cluster é salvo como 0.
+          if (a.getNameType() == DOTDOT_NAME && a.getCluster() == 0) {
+            clt = bios->getRootClus();
+          } else {
+            clt = a.getCluster();
+          }
+
           found = true;
           break;
         }
@@ -325,7 +332,6 @@ void FatFS::rm(const std::string &path)
       dentries = getDirEntries(clt);
     }
 
-    std::fprintf(stdout, "%d\n", clt);
     return;
   }
 

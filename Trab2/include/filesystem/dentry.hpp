@@ -17,6 +17,11 @@
 #include <string>
 #include <vector>
 
+// Define os tipos de nomes que a entrada pode ter
+#define DOT_NAME (0)
+#define DOTDOT_NAME (1)
+#define LONG_NAME (2)
+
 class Dentry
 {
   /* Estrutura de metadados */
@@ -30,6 +35,9 @@ class Dentry
 
   /* Nome curto da entrada */
   std::array<char, NAME_MAIN_SIZE + NAME_EXT_SIZE + 1> shortName;
+
+  /* Define qual o tipo de nome que a entrada possui */
+  int nameType;
 
   /**
    * @brief Retorna o dia com base em um datestamp
@@ -140,7 +148,17 @@ public:
    *
    * @return retorna o nome longo da entrada
    */
-  [[nodiscard]] inline std::string getLongName() const { return longName; }
+  [[nodiscard]] inline std::string getLongName() const
+  {
+    switch (nameType) {
+    case DOT_NAME:
+      return ".";
+    case DOTDOT_NAME:
+      return "..";
+    default:
+      return longName;
+    }
+  }
 
   /**
    * @brief Nome curto da entrada
@@ -320,6 +338,16 @@ public:
   {
     return longDirs;
   }
+
+  /**
+   * @brief Tipo do arquivo
+   *
+   * Função usada para identificar se o arquivo é do tipo DOT ou um nome longo
+   * comum.
+   *
+   * @return retorna o valor de nameType
+   */
+  [[nodiscard]] inline int getNameType() const { return nameType; }
 
   /**
    * @brief Imprime as informações sobre a entrada
