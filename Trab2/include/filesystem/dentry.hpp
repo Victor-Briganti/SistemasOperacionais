@@ -296,6 +296,33 @@ public:
   [[nodiscard]] inline WORD getWriteYear() const { return year(dir.wrtDate); }
 
   /**
+   * @brief Retorna o dia de criação do arquivo
+   *
+   * @return retorna o dia do datestamp lstAccDate
+   */
+  [[nodiscard]] inline WORD getLstAccDay() const { return day(dir.lstAccDate); }
+
+  /**
+   * @brief Retorna o mês de criação do arquivo
+   *
+   * @return retorna o mês do datestamp lstAccDate
+   */
+  [[nodiscard]] inline WORD getLstAccMonth() const
+  {
+    return month(dir.lstAccDate);
+  }
+
+  /**
+   * @brief Retorna o ano de criação do arquivo
+   *
+   * @return retorna o ano do datestamp lstAccDate
+   */
+  [[nodiscard]] inline WORD getLstAccYear() const
+  {
+    return year(dir.lstAccDate);
+  }
+
+  /**
    * @brief Retorna a hora de criação do arquivo
    *
    * @return retorna a hora do timestamp wrtTime

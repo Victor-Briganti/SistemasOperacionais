@@ -506,4 +506,78 @@ void FatFS::cd(const std::string &path)
   }
 }
 
-void FatFS::attr(const std::string &path) {}
+void FatFS::attr(const std::string &path)
+{
+  // Lista de nomes nos caminhos
+  std::vector<std::string> listPath;
+  try {
+    listPath = pathParser(path, ALL_ENTRY);
+  } catch (const std::exception &error) {
+    std::cout << error.what();
+    return;
+  }
+
+  // Diretório raiz
+  if (listPath.back() == "img") {
+    std::fprintf(stderr, "[" ERROR "] operação não permitida\n");
+    return;
+  }
+
+  try {
+    // Busca pela entrada
+    std::pair<Dentry, DWORD> entry = searchEntry(listPath, ALL_ENTRY);
+
+    std::fprintf(stdout,
+      "Entrada: %s (%s)\n",
+      entry.first.getLongName().c_str(),
+      entry.first.getShortName());
+
+    std::fprintf(stdout,
+      "Tamanho=%-8d Cluster=%-4d\n",
+      entry.first.getFileSize(),
+      entry.first.getCluster());
+
+    std::fprintf(stdout,
+      "Data Criação: %02d-%02d-%02d\n",
+      entry.first.getCreationDay(),
+      entry.first.getCreationMonth(),
+      entry.first.getCreationYear());
+
+    std::fprintf(stdout,
+      "Hora Criação: %02d:%02d:%04d\n",
+      entry.first.getCreationHour(),
+      entry.first.getCreationMinute(),
+      entry.first.getCreationSeconds());
+
+    std::fprintf(stdout,
+      "Data Escrita: %02d-%02d-%02d\n",
+      entry.first.getWriteDay(),
+      entry.first.getWriteMonth(),
+      entry.first.getWriteYear());
+
+    std::fprintf(stdout,
+      "Hora Escrita: %02d:%02d:%04d\n",
+      entry.first.getWriteHour(),
+      entry.first.getWriteMinute(),
+      entry.first.getWriteSeconds());
+
+    std::fprintf(stdout,
+      "Última Data de Acesso: %02d-%02d-%02d\n",
+      entry.first.getLstAccDay(),
+      entry.first.getLstAccMonth(),
+      entry.first.getLstAccYear());
+
+    std::fprintf(
+      stdout, "Tipo: %s", entry.first.isDirectory() ? "diretório" : "arquivo");
+
+    std::fprintf(stdout,
+      "%s",
+      entry.first.isReadOnly() ? "Atributo: Somente leitura\n" : "");
+    std::fprintf(
+      stdout, "%s", entry.first.isHidden() ? "Atributo: Escondido\n" : "");
+
+  } catch (const std::exception &error) {
+    std::cout << error.what();
+    return;
+  }
+}
