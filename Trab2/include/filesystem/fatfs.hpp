@@ -104,6 +104,19 @@ private:
    */
   bool removeEntry(Dentry &entry, DWORD num);
 
+  /**
+   * @brief Realiza o parser de um caminho
+   *
+   * @param path Caminho a ser dividido e verificado
+   * @param expectDir Diz ao parser se o última parte do caminho deveria ser um
+   * arquivo ou não.
+   *
+   * @exception Gera um exceção se houver algum problema durante a verificação
+   * do caminho.
+   * @return Um vetor com o caminho devidamente dividido.
+   */
+  std::vector<std::string> pathParser(const std::string &path, bool expectDir);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo
