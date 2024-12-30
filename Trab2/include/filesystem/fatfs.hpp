@@ -117,6 +117,21 @@ private:
    */
   std::vector<std::string> pathParser(const std::string &path, bool expectDir);
 
+  /**
+   * @brief Busca a entrada e o cluster do diretório onde essa entrada se
+   * encontra
+   *
+   * @param path Caminho para buscar a entrada
+   * @param expectDir Flag para verificar se a entrada deve ser um diretório ou
+   * não.
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca da
+   * entrada do caminho.
+   * @return Um par com a entrada e o número do cluster
+   */
+  std::pair<Dentry, DWORD> searchEntry(const std::vector<std::string> &listPath,
+    bool expectDir);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo

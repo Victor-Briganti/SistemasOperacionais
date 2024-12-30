@@ -15,6 +15,7 @@
 #include "utils/color.hpp"
 
 #include <cstring>
+#include <exception>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -233,7 +234,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
           throw std::runtime_error(error);
         }
 
-        if (a.getNameType() == DOTDOT_NAME && newPath.size() > 1) {
+        if (a.getNameType() == DOTDOT_NAME && newPath.back() != "img") {
           newPath.pop_back();
         } else {
           newPath.push_back(a.getLongName());
@@ -259,6 +260,62 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
   return newPath;
 }
 
+std::pair<Dentry, DWORD>
+  FatFS::searchEntry(const std::vector<std::string> &listPath, bool expectDir)
+{
+  // Começa a busca pelo "/"
+  DWORD clt = bios->getRootClus();
+  bool found = false;
+
+  // Lista de entradas
+  std::vector<Dentry> dentries = getDirEntries(clt);
+
+  // Entrada e cluster a ser retornado
+  std::pair<Dentry, DWORD> entry = { dentries[0], 0 };
+
+  // Caminha pela lista de nomes
+  for (size_t i = 1; i < listPath.size(); i++, found = false) {
+    for (auto &a : dentries) {
+      if (listPath[i] == a.getLongName()) {
+
+        // Última parte do caminho está de acordo com o tipo de arquivo
+        if (i == listPath.size() - 1 && expectDir != a.isDirectory()) {
+          std::string error = "[" ERROR "] esperava um ";
+          error += a.isDirectory() ? "diretório\n" : "arquivo\n";
+          throw std::runtime_error(error);
+        }
+
+        // Se no meio do caminho temos um arquivo gera um erro
+        if (i == listPath.size() - 1 && !a.isDirectory()) {
+          std::string error =
+            "[" ERROR "] " + merge(listPath) + " caminho inválido\n";
+          throw std::runtime_error(error);
+        }
+
+        // Atualiza a entrada
+        entry.first = a;
+        entry.second = clt;
+
+        // Altera o cluster em que ocorre a busca
+        clt = getEntryClus(a);
+        found = true;
+        break;
+      }
+    }
+
+    // Se não foi encontrado gera um erro
+    if (!found) {
+      std::string error =
+        "[" ERROR "] " + merge(listPath) + " não encontrado\n";
+      throw std::runtime_error(error);
+    }
+
+    // Atualiza a lista de entradas
+    dentries = getDirEntries(clt);
+  }
+
+  return entry;
+}
 
 //===------------------------------------------------------------------------===
 // PUBLIC
@@ -322,57 +379,44 @@ void FatFS::cluster(DWORD num)
   delete[] static_cast<char *>(buffer);
 }
 
-// TODO: Ajustar está função para aceitar o raiz como se fosse um dir normal
 void FatFS::ls(const std::string &path)
 {
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
     listPath = pathParser(path, true);
-  } catch (const std::runtime_error &error) {
+  } catch (const std::exception &error) {
     std::cout << error.what();
     return;
   }
 
-  // Começa a busca pelo "/"
-  DWORD clt = bios->getRootClus();
-  bool found = false;
+  // Diretório raiz
+  if (listPath.back() == "img") {
+    // Lista de entradas
+    std::vector<Dentry> dentries = getDirEntries(bios->getRootClus());
 
-  // Lista de entradas
-  std::vector<Dentry> dentries = getDirEntries(clt);
-
-  // Caminha pela lista de nomes
-  for (size_t i = 1; i < listPath.size(); i++, found = false) {
-    // Caminha por todas as entradas até encontrar o diretório
+    // Mostra todas as entradas
     for (const auto &a : dentries) {
-      if (listPath[i] == a.getLongName()) {
-        // Se no meio do caminho tivermos um arquivo gera um erro
-        if (!a.isDirectory()) {
-          std::fprintf(
-            stderr, "[" ERROR "] %s não é um diretório\n", path.c_str());
-          return;
-        }
-
-        // Altera o cluster em que ocorre a busca
-        clt = getEntryClus(a);
-        found = true;
-        break;
-      }
+      a.printInfo();
     }
 
-    // Se não foi encontrado, gera um erro
-    if (!found) {
-      std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
-      return;
-    }
-
-    // Atualiza a lista de entradas
-    dentries = getDirEntries(clt);
+    return;
   }
 
-  // Mostra todas as entradas
-  for (const auto &a : dentries) {
-    a.printInfo();
+  try {
+    // Busca pela entrada
+    std::pair<Dentry, DWORD> entry = searchEntry(listPath, true);
+
+    // Lista de entradas
+    std::vector<Dentry> dentries = getDirEntries(entry.first.getCluster());
+
+    // Mostra todas as entradas
+    for (const auto &a : dentries) {
+      a.printInfo();
+    }
+  } catch (const std::exception &error) {
+    std::cout << error.what();
+    return;
   }
 }
 
