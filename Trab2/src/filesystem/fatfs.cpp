@@ -53,6 +53,15 @@ bool FatFS::writeCluster(const void *buffer, DWORD num)
   return true;
 }
 
+DWORD FatFS::getEntryClus(const Dentry &entry)
+{
+  if (entry.getNameType() == DOTDOT_NAME && entry.getCluster() == 0) {
+    return bios->getRootClus();
+  }
+
+  return entry.getCluster();
+}
+
 std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 {
   // Aloca o buffer do diretório
@@ -236,14 +245,7 @@ void FatFS::ls(const std::string &path)
             goto notDir;
           }
 
-          // No caso de uma entrada ".." que está logo abaixo do "/", seu
-          // cluster é salvo como 0.
-          if (a.getNameType() == DOTDOT_NAME && a.getCluster() == 0) {
-            clt = bios->getRootClus();
-          } else {
-            clt = a.getCluster();
-          }
-
+          clt = getEntryClus(a);
           found = true;
           break;
         }
@@ -312,14 +314,7 @@ void FatFS::rm(const std::string &path)
             goto invalidPath;
           }
 
-          // No caso de uma entrada ".." que está logo abaixo do "/", seu
-          // cluster é salvo como 0.
-          if (a.getNameType() == DOTDOT_NAME && a.getCluster() == 0) {
-            clt = bios->getRootClus();
-          } else {
-            clt = a.getCluster();
-          }
-
+          clt = getEntryClus(a);
           found = true;
           break;
         }

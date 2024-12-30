@@ -50,6 +50,19 @@ private:
   bool writeCluster(const void *buffer, DWORD num);
 
   /**
+   * @brief Retorna o cluster da entrada corrente
+   *
+   * No caso da entrada que é um "..", ao tentar retornar seu cluster o valor 0
+   * será retornado. Para evitar problemas aqui retornamos o valor do
+   * RootClus.
+   *
+   * @param entry Entrada que terá seu cluster extraído.
+   *
+   * @return O valor do cluster da entrada
+   */
+  DWORD getEntryClus(const Dentry &entry);
+
+  /**
    * @brief Retorna uma lista com todas as entradas de um diretório
    *
    * @param num Número do cluster do diretório que será listado
