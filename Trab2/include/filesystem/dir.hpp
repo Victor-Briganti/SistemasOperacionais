@@ -51,6 +51,14 @@
 /* Valor da última entrada do nome longo */
 #define LAST_LONG_ENTRY (0x40)
 
+// Definições para nome curto
+
+/* Tamanho do nome principal */
+#define NAME_MAIN_SIZE 8
+
+/* Tamanho da extensão */
+#define NAME_EXT_SIZE 3
+
 // Nomes dos diretórios dot
 
 /* Referência ao diretório atual */

@@ -30,9 +30,24 @@ bool FatFS::readCluster(void *buffer, DWORD num)
     return false;
   }
 
-  DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
+  const DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
   if (!image->read(offset, buffer, bios->totClusByts())) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+    return false;
+  }
+  return true;
+}
+
+bool FatFS::writeCluster(const void *buffer, DWORD num)
+{
+  if (num >= bios->getCountOfClusters()) {
+    std::fprintf(stderr, "[" ERROR "] %d número inváldo de cluster\n", num);
+    return false;
+  }
+
+  DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
+  if (!image->write(offset, buffer, bios->totClusByts())) {
+    std::fprintf(stderr, "[" ERROR "] Não foi possível escrever cluster\n");
     return false;
   }
   return true;
@@ -41,7 +56,7 @@ bool FatFS::readCluster(void *buffer, DWORD num)
 std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 {
   // Aloca o buffer do diretório
-  void *buffer = new char[bios->totClusByts()];
+  void *buffer = calloc(sizeof(char), bios->totClusByts());
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return {};
@@ -103,11 +118,48 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
   return dentries;
 }
 
+bool FatFS::setDirEntries(DWORD num,
+  DWORD startPos,
+  DWORD endPos,
+  const Dir &dir,
+  const std::vector<LongDir> &ldir)
+{
+  // Aloca o buffer do diretório
+  void *buffer = calloc(sizeof(char), bios->totClusByts());
+  if (buffer == nullptr) {
+    std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
+    return {};
+  }
+
+  // Lê o cluster no qual o diretório se encontra
+  if (!readCluster(buffer, num)) {
+    std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+    delete[] static_cast<char *>(buffer);
+    return {};
+  }
+
+  // Cast para facilitar manuseio do buffer
+  Dir *bufferDir = static_cast<Dir *>(buffer);
+
+  // Caminha pelo buffer escrevendo os novos valores.
+  for (size_t i = startPos, j = 0; i <= endPos; i++, j++) {
+    if (j < ldir.size()) {
+      memcpy(&bufferDir[i], &ldir[j], sizeof(dir));
+    } else {
+      memcpy(&bufferDir[i], &dir, sizeof(dir));
+    }
+  }
+
+  bool result = writeCluster(buffer, num);
+  delete[] static_cast<char *>(buffer);
+  return result;
+}
+
 //===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
 
-FatFS::FatFS(std::string &path)
+FatFS::FatFS(const std::string &path)
 {
   image = new Image(path);
   if (image == nullptr) {
@@ -163,7 +215,8 @@ void FatFS::cluster(DWORD num)
   delete[] static_cast<char *>(buffer);
 }
 
-void FatFS::ls(std::string &path)
+// TODO: Ajustar está função para aceitar o raiz como se fosse um dir normal
+void FatFS::ls(const std::string &path)
 {
   std::vector<std::string> listPath = split(path, '/');
   std::vector<Dentry> dentries;
@@ -218,4 +271,75 @@ notFound:
   return;
 notDir:
   std::fprintf(stderr, "[" ERROR "] %s não é um diretório\n", path.c_str());
+}
+
+void FatFS::rm(const std::string &path)
+{
+  std::vector<std::string> listPath = split(path, '/');
+  if (listPath.size() == 1) {
+    goto notArchive;
+  }
+
+  // Caminho completo
+  if (listPath.size() != 1 && listPath[0] == "img") {
+    bool found = false;
+    DWORD clt = bios->getRootClus();
+    std::vector<Dentry> dentries = getDirEntries(clt);
+
+    for (size_t i = 1; i < listPath.size(); i++, found = false) {
+      for (auto &a : dentries) {
+        if (listPath[i] == a.getLongName()) {
+          if (i == listPath.size() - 1 && a.isDirectory()) {
+            goto notArchive;
+          }
+
+          if (i == listPath.size() - 1 && !a.isDirectory()) {
+            a.markFree();
+            if (!fatTable->removeChain(a.getCluster())
+                || !setDirEntries(clt,
+                  a.initPos,
+                  a.endPos,
+                  a.getDirectory(),
+                  a.getLongDirectories())) {
+              goto fail;
+            }
+
+            std::fprintf(stderr, "removido\n");
+            return;
+          }
+
+          if (!a.isDirectory()) {
+            goto invalidPath;
+          }
+
+          clt = a.getCluster();
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        goto notFound;
+      }
+
+      dentries = getDirEntries(clt);
+    }
+
+    std::fprintf(stdout, "%d\n", clt);
+    return;
+  }
+
+  // TODO: Fazer caminho relativo
+
+invalidPath:
+  std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+  return;
+notFound:
+  std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
+  return;
+notArchive:
+  std::fprintf(stderr, "[" ERROR "] %s não é um arquivo\n", path.c_str());
+  return;
+fail:
+  std::fprintf(stderr, "[" ERROR "] rm %s operação falhou\n", path.c_str());
 }

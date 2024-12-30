@@ -40,6 +40,16 @@ private:
   bool readCluster(void *buffer, DWORD num);
 
   /**
+   * @brief Escreve um cluster na imagem
+   *
+   * @param buffer Ponteiro com as informações que serão escritas
+   * @param num Número do cluster que será escrito
+   *
+   * @return true se foi possível escrever, false caso contrário
+   */
+  bool writeCluster(const void *buffer, DWORD num);
+
+  /**
    * @brief Retorna uma lista com todas as entradas de um diretório
    *
    * @param num Número do cluster do diretório que será listado
@@ -50,6 +60,23 @@ private:
    * @return Um vetor com todos as entradas se foi possível ler.
    */
   std::vector<Dentry> getDirEntries(DWORD num);
+
+  /**
+   * @brief Retorna uma lista com todas as entradas de um diretório
+   *
+   * @param num Número do cluster a ser lido
+   * @param startPos Posição inicial no cluster
+   * @param endPos Posição final no cluster
+   * @param dir Entrada curta que será escrita
+   * @param ldir Entrada longa que será escrita
+   *
+   * @return true se foi possível escrever, false caso contrário.
+   */
+  bool setDirEntries(DWORD num,
+    DWORD startPos,
+    DWORD endPos,
+    const Dir &dir,
+    const std::vector<LongDir> &ldir);
 
 public:
   /**
@@ -62,7 +89,7 @@ public:
    * @exception Gera uma exceção se não for possível alocar ou inicializar as
    * estruturas.
    */
-  explicit FatFS(std::string &path);
+  explicit FatFS(const std::string &path);
 
   /**
    * @brief Desaloca as estruturas na ordem correta
@@ -86,7 +113,14 @@ public:
    *
    * @param path Caminho a ser listado
    */
-  void ls(std::string &path);
+  void ls(const std::string &path);
+
+  /**
+   * @brief Remove um arquivo do sistema
+   *
+   * @param path Caminho do arquivo a ser removido
+   */
+  void rm(const std::string &path);
 };
 
 #endif// FAT_FS_HPP

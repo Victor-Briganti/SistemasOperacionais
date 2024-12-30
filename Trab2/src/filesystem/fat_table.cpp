@@ -13,28 +13,39 @@
 
 #include <cstdlib>
 #include <stdexcept>
+#include <vector>
 
 //===------------------------------------------------------------------------===
 // PRIVATE
 //===------------------------------------------------------------------------===
 
-
-bool FatTable::readTable(int num)
+bool FatTable::readFatTable(const int num)
 {
   if (num < 0 || num >= bios->getNumFATs()) {
     return false;
   }
 
-  DWORD fatOffset = bios->fatSector(num) * bios->getBytesPerSec();
-  DWORD fatSize = bios->getFATSz() * bios->getBytesPerSec();
+  const DWORD fatOffset = bios->fatSector(num) * bios->getBytesPerSec();
+  const DWORD fatSize = bios->getFATSz() * bios->getBytesPerSec();
 
   return this->image->read(fatOffset, table, fatSize);
 }
 
+bool FatTable::writeFatTable(const int num)
+{
+  if (num < 0 || num >= bios->getNumFATs()) {
+    return false;
+  }
+
+  const DWORD fatOffset = bios->fatSector(num) * bios->getBytesPerSec();
+  const DWORD fatSize = bios->getFATSz() * bios->getBytesPerSec();
+
+  return this->image->write(fatOffset, table, fatSize);
+}
 
 size_t FatTable::inUse() const
 {
-  auto *dwordTable = static_cast<DWORD *>(table);
+  const auto *dwordTable = static_cast<DWORD *>(table);
 
   size_t count = 0;
   for (DWORD i = 0; i < bios->getFATSz(); i++) {
@@ -46,6 +57,16 @@ size_t FatTable::inUse() const
   return count;
 }
 
+DWORD FatTable::readFromTable(const DWORD offset) const
+{
+  return static_cast<DWORD *>(table)[offset] & LSB_MASK;
+}
+
+void FatTable::writeInTable(const DWORD offset, const DWORD value)
+{
+  static_cast<DWORD *>(table)[offset] &= MSB_MASK;
+  static_cast<DWORD *>(table)[offset] |= (value & LSB_MASK);
+}
 
 //===------------------------------------------------------------------------===
 // PUBLIC
@@ -60,7 +81,7 @@ FatTable::FatTable(Image *image, BiosBlock *bios) : image(image), bios(bios)
     throw std::runtime_error(error);
   }
 
-  if (!readTable(0)) {
+  if (!readFatTable(0)) {
     std::string error = "[" ERROR "] Não foi possível ler a FAT table\n";
     throw std::runtime_error(error);
   }
@@ -68,9 +89,9 @@ FatTable::FatTable(Image *image, BiosBlock *bios) : image(image), bios(bios)
 
 FatTable::~FatTable() { delete[] static_cast<char *>(this->table); }
 
-void FatTable::printTable()
+void FatTable::printTable() const
 {
-  BYTE *byteTable = static_cast<BYTE *>(table);
+  const BYTE *byteTable = static_cast<BYTE *>(table);
   for (DWORD i = 0; i < bios->getFATSz(); i++) {
 
     std::fprintf(stdout, "%02x", byteTable[i]);
@@ -87,9 +108,9 @@ void FatTable::printTable()
   std::fprintf(stdout, "\n");
 }
 
-void FatTable::printInfo()
+void FatTable::printInfo() const
 {
-  DWORD totalSec = bios->getDataSecTotal() / bios->getSecPerCluster();
+  const DWORD totalSec = bios->getDataSecTotal() / bios->getSecPerCluster();
 
   std::fprintf(stdout,
     "Free clusters: %u/%u\n",
@@ -103,4 +124,28 @@ void FatTable::printInfo()
   std::fprintf(stdout,
     "Used space: %u\n",
     static_cast<DWORD>(inUse()) * bios->getBytesPerSec());
+}
+
+bool FatTable::removeChain(const DWORD start)
+{
+  std::vector<DWORD> chain;
+  chain.push_back(start);
+
+  DWORD value = readFromTable(start);
+  while (value < EOC) {
+    chain.push_back(value);
+    value = readFromTable(value);
+  }
+
+  for (const auto &a : chain) {
+    writeInTable(a, FREE_CLUSTER);
+  }
+
+  for (int i = 0; i < bios->getNumFATs(); i++) {
+    if (!writeFatTable(i)) {
+      return false;
+    }
+  }
+
+  return true;
 }

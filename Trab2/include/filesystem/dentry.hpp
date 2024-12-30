@@ -17,56 +17,19 @@
 #include <string>
 #include <vector>
 
-
 class Dentry
 {
+  /* Estrutura de metadados */
+  Dir dir;
+
+  /* Lista de nomes longos */
+  std::vector<LongDir> longDirs;
+
   /* Nome longo da entrada */
   std::string longName;
 
   /* Nome curto da entrada */
-  std::array<char, 11> shortName;
-
-  /* Define se a entrada está escondida */
-  bool hidden;
-
-  /* Define se a entrada é um diretório */
-  bool directory;
-
-  /* Define se a entrada é somente leitura */
-  bool readOnly;
-
-  /* Cluster em que este arquivo/diretório se encontra */
-  DWORD cluster;
-
-  /* Tempo de criação do arquivo em ms */
-  BYTE crtTimeTenth;
-
-  /* Tempo que o arquivo foi criado */
-  WORD crtTime;
-
-  /* Data em que o arquivo foi criado */
-  WORD crtDate;
-
-  /* Última data de acesso */
-  WORD lstAccDate;
-
-  /* Bits mais significativos do cluster */
-  WORD fstClusHI;
-
-  /* Tempo em que o arquivo foi escrito */
-  WORD wrtTime;
-
-  /* Data em que o arquivo foi escrito */
-  WORD wrtDate;
-
-  /* Tamanho do arquivo. 0 no caso de diretórios */
-  DWORD fileSize;
-
-  /* Posição inicial no buffer do diretório */
-  DWORD initPos;
-
-  /* Posição final no buffer do diretório */
-  DWORD endPos;
+  std::array<char, NAME_MAIN_SIZE + NAME_EXT_SIZE + 1> shortName;
 
   /**
    * @brief Retorna o dia com base em um datestamp
@@ -161,10 +124,16 @@ public:
    *
    * @exception Gera uma exceção no caso de haver algum erro no dir ou ldir.
    */
-  explicit Dentry(Dir dir,
-    std::vector<LongDir> &ldir,
-    DWORD initPos,
-    DWORD endPos);
+  explicit Dentry(const Dir &dir,
+    const std::vector<LongDir> &ldir,
+    const DWORD initPos,
+    const DWORD endPos);
+
+  /* Posição inicial no buffer do diretório */
+  const DWORD initPos;
+
+  /* Posição final no buffer do diretório */
+  const DWORD endPos;
 
   /**
    * @brief Nome longo da entrada
@@ -188,63 +157,84 @@ public:
    *
    * @return retorna o cluster da entrada
    */
-  [[nodiscard]] inline DWORD getCluster() const { return cluster; }
+  [[nodiscard]] inline DWORD getCluster() const
+  {
+    return static_cast<DWORD>(dir.fstClusHI << 16) | dir.fstClusLO;
+  }
 
   /**
    * @brief Tamanho do arquivo
    *
    * @return retorna o tamanho do arquivo
    */
-  [[nodiscard]] inline DWORD getFileSize() const { return fileSize; }
+  [[nodiscard]] inline DWORD getFileSize() const { return dir.fileSize; }
 
   /**
    * @brief Retorna verdadeiro se é um diretório
    *
    * @return retorna o valor de directory
    */
-  [[nodiscard]] inline bool isDirectory() const { return directory; }
+  [[nodiscard]] inline bool isDirectory() const
+  {
+    return ((dir.attr & ATTR_DIRECTORY) != 0);
+  }
 
   /**
    * @brief Retorna verdadeiro se é uma entrada escondida
    *
    * @return retorna o valor de hidden
    */
-  [[nodiscard]] inline bool isHidden() const { return hidden; }
+  [[nodiscard]] inline bool isHidden() const
+  {
+    return ((dir.attr & ATTR_HIDDEN) != 0);
+  }
 
   /**
    * @brief Retorna verdadeiro se é somente leitura
    *
    * @return retorna o valor de readOnly
    */
-  [[nodiscard]] inline bool isReadOnly() const { return readOnly; }
+  [[nodiscard]] inline bool isReadOnly() const
+  {
+    return ((dir.attr & ATTR_READ_ONLY) != 0);
+  }
 
   /**
    * @brief Retorna o dia de criação do arquivo
    *
    * @return retorna o dia do datestamp crtDate
    */
-  [[nodiscard]] inline WORD getCreationDay() const { return day(crtDate); }
+  [[nodiscard]] inline WORD getCreationDay() const { return day(dir.crtDate); }
 
   /**
    * @brief Retorna o mês de criação do arquivo
    *
    * @return retorna o mês do datestamp crtDate
    */
-  [[nodiscard]] inline WORD getCreationMonth() const { return month(crtDate); }
+  [[nodiscard]] inline WORD getCreationMonth() const
+  {
+    return month(dir.crtDate);
+  }
 
   /**
    * @brief Retorna o ano de criação do arquivo
    *
    * @return retorna o ano do datestamp crtDate
    */
-  [[nodiscard]] inline WORD getCreationYear() const { return year(crtDate); }
+  [[nodiscard]] inline WORD getCreationYear() const
+  {
+    return year(dir.crtDate);
+  }
 
   /**
    * @brief Retorna a hora de criação do arquivo
    *
    * @return retorna a hora do timestamp crtTime
    */
-  [[nodiscard]] inline WORD getCreationHour() const { return hour(crtTime); }
+  [[nodiscard]] inline WORD getCreationHour() const
+  {
+    return hour(dir.crtTime);
+  }
 
   /**
    * @brief Retorna o mês de criação do arquivo
@@ -253,7 +243,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationMinute() const
   {
-    return minutes(crtTime);
+    return minutes(dir.crtTime);
   }
 
   /**
@@ -263,7 +253,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationSeconds() const
   {
-    return seconds(crtTime);
+    return seconds(dir.crtTime);
   }
 
   /**
@@ -271,47 +261,76 @@ public:
    *
    * @return retorna o dia do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteDay() const { return day(wrtDate); }
+  [[nodiscard]] inline WORD getWriteDay() const { return day(dir.wrtDate); }
 
   /**
    * @brief Retorna o mês de criação do arquivo
    *
    * @return retorna o mês do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteMonth() const { return month(wrtDate); }
+  [[nodiscard]] inline WORD getWriteMonth() const { return month(dir.wrtDate); }
 
   /**
    * @brief Retorna o ano de criação do arquivo
    *
    * @return retorna o ano do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteYear() const { return year(wrtDate); }
+  [[nodiscard]] inline WORD getWriteYear() const { return year(dir.wrtDate); }
 
   /**
    * @brief Retorna a hora de criação do arquivo
    *
    * @return retorna a hora do timestamp wrtTime
    */
-  [[nodiscard]] inline WORD getWriteHour() const { return hour(wrtTime); }
+  [[nodiscard]] inline WORD getWriteHour() const { return hour(dir.wrtTime); }
 
   /**
    * @brief Retorna o mês de criação do arquivo
    *
    * @return retorna o mês do timestamp wrtTime
    */
-  [[nodiscard]] inline WORD getWriteMinute() const { return minutes(wrtTime); }
+  [[nodiscard]] inline WORD getWriteMinute() const
+  {
+    return minutes(dir.wrtTime);
+  }
 
   /**
    * @brief Retorna o ano de criação do arquivo
    *
    * @return retorna o ano do timestamp wrtTime
    */
-  [[nodiscard]] inline WORD getWriteSeconds() const { return seconds(wrtTime); }
+  [[nodiscard]] inline WORD getWriteSeconds() const
+  {
+    return seconds(dir.wrtTime);
+  }
+
+  /**
+   * @brief Retorna a entrada curta relacionada a está entrada
+   *
+   * @return retorna uma cópia de dir
+   */
+  [[nodiscard]] inline Dir getDirectory() const { return dir; }
+
+  /**
+   * @brief Retorna todas entradas longas relacionada a está entrada
+   *
+   * @return retorna uma cópia da lista de entrada longas
+   */
+  [[nodiscard]] inline std::vector<LongDir> getLongDirectories() const
+  {
+    return longDirs;
+  }
 
   /**
    * @brief Imprime as informações sobre a entrada
    */
   void printInfo() const;
+
+  /**
+   * @brief Marca todas as entradas que fazem parte deste arquivo/diretório como
+   * livres
+   */
+  void markFree();
 };
 
 #endif// DENTRY_HPP

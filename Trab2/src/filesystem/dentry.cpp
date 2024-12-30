@@ -11,23 +11,12 @@
 #include "filesystem/dir.hpp"
 #include <cctype>
 
-Dentry::Dentry(Dir dir, std::vector<LongDir> &ldir, DWORD initPos, DWORD endPos)
-  : initPos(initPos), endPos(endPos)
+Dentry::Dentry(const Dir &dir,
+  const std::vector<LongDir> &ldir,
+  const DWORD initPos,
+  const DWORD endPos)
+  : dir(dir), longDirs(ldir), initPos(initPos), endPos(endPos)
 {
-  // Inicialização de metadados
-  this->hidden = ((dir.attr & ATTR_HIDDEN) != 0);
-  this->directory = ((dir.attr & ATTR_DIRECTORY) != 0);
-  this->readOnly = ((dir.attr & ATTR_READ_ONLY) != 0);
-  this->cluster = static_cast<DWORD>(dir.fstClusHI << 16) | dir.fstClusLO;
-  this->crtTimeTenth = dir.crtTimeTenth;
-  this->crtTime = dir.crtTime;
-  this->crtDate = dir.crtDate;
-  this->lstAccDate = dir.lstAccDate;
-  this->fstClusHI = dir.fstClusHI;
-  this->wrtTime = dir.wrtTime;
-  this->wrtDate = dir.wrtDate;
-  this->fileSize = dir.fileSize;
-
   for (auto a : ldir) {
     std::string name;
 
@@ -55,21 +44,22 @@ Dentry::Dentry(Dir dir, std::vector<LongDir> &ldir, DWORD initPos, DWORD endPos)
     longName = name + longName;
   }
 
-  for (size_t i = 0; i < 11; i++) {
+  for (size_t i = 0; i < NAME_MAIN_SIZE + NAME_EXT_SIZE; i++) {
     shortName[i] = static_cast<char>(dir.name[i]);
   }
+  shortName[NAME_MAIN_SIZE + NAME_EXT_SIZE] = '\0';
 }
 
 void Dentry::printInfo() const
 {
   // Informações sobre tipo e permissão da entrada
-  std::fprintf(stdout, "%-2c", directory ? 'd' : 'f');
-  std::fprintf(stdout, "%-2c", readOnly ? 'r' : '-');
-  std::fprintf(stdout, "%-2c", hidden ? '-' : 'H');
+  std::fprintf(stdout, "%-2c", isDirectory() ? 'd' : 'f');
+  std::fprintf(stdout, "%-2c", isReadOnly() ? 'r' : '-');
+  std::fprintf(stdout, "%-2c", isHidden() ? '-' : 'H');
 
   // Informações sobre do cluster e tamanho
   std::fprintf(stdout, "cluster=%-4d", getCluster());
-  std::fprintf(stdout, "size=%-8d", fileSize);
+  std::fprintf(stdout, "size=%-8d", getFileSize());
 
   // Informações sobre data de escrita
   std::fprintf(
@@ -85,4 +75,13 @@ void Dentry::printInfo() const
   // Nome do arquivo
   std::fprintf(stdout, "%-30s", getLongName().c_str());
   std::fprintf(stdout, "(%-11s)\n", getShortName());
+}
+
+void Dentry::markFree()
+{
+  dir.name[0] = FREE_ENTRY;
+
+  for (auto &a : longDirs) {
+    a.ord = FREE_ENTRY;
+  }
 }

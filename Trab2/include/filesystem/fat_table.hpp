@@ -13,8 +13,15 @@
 #include "filesystem/bpb.hpp"
 #include "io/image.hpp"
 
+/* Máscaras para leitura e escrita na tabela */
+#define LSB_MASK (0x0FFFFFFF)
+#define MSB_MASK (0xF0000000)
+
+/* Define que o cluster está livre */
+#define FREE_CLUSTER (0x00000000)
+
 /* Define o final da cadeia de clusters */
-#define EOC (0x0FFFFFFF)
+#define EOC (0x0FFFFFF8)
 
 class FatTable
 {
@@ -32,7 +39,34 @@ class FatTable
    *
    * @return true se foi possível ler, false caso contrário
    */
-  bool readTable(int num);
+  bool readFatTable(const int num);
+
+  /**
+   * @brief Escreve uma das tabelas FAT na imagem
+   *
+   * @return true se foi possível escrever, false caso contrário
+   */
+  bool writeFatTable(const int num);
+
+  /**
+   * @brief Lê uma entrada da tabela FAT em memória
+   *
+   * @param offset Posição a ser lida da tabela
+   * @param value Variável que recebe valor a ser lido da tabela
+   *
+   * @return true se foi possível ler, false caso contrário
+   */
+  DWORD readFromTable(const DWORD offset) const;
+
+  /**
+   * @brief Escreve em uma das entradas da tabela FAT em memória
+   *
+   * @param offset Posição a ser escrita na tabela
+   * @param value Variável armazena o valor a ser escrito na tabela
+   *
+   * @return true se foi possível escrever, false caso contrário
+   */
+  void writeInTable(const DWORD num, const DWORD value);
 
   /**
    * @brief Quantidade de clusters em uso
@@ -69,12 +103,19 @@ public:
   /**
    * @brief Imprime a tabela atual
    */
-  void printTable();
+  void printTable() const;
 
   /**
    * @brief Mostra informações de espaço da tabela atual
    */
-  void printInfo();
+  void printInfo() const;
+
+  /**
+   * @brief Remove uma cadeia de clusters alocada
+   *
+   * @param start Inicio da cadeia a ser removida
+   */
+  bool removeChain(const DWORD start);
 };
 
 #endif// FAT_TABLE_HPP
