@@ -457,79 +457,30 @@ void FatFS::rmdir(const std::string &path)
   std::vector<std::string> listPath;
   try {
     listPath = pathParser(path, true);
-  } catch (const std::runtime_error &error) {
+  } catch (const std::exception &error) {
     std::cout << error.what();
     return;
   }
 
-  // Começa a busca pelo "/"
-  DWORD clt = bios->getRootClus();
-  bool found = false;
+  // Diretório raiz
+  if (listPath.back() == "img") {
+    std::fprintf(stderr, "[" ERROR "] operação não permitida\n");
+    return;
+  }
 
-  // Lista de entradas
-  std::vector<Dentry> dentries = getDirEntries(clt);
+  try {
+    // Busca pela entrada
+    std::pair<Dentry, DWORD> entry = searchEntry(listPath, true);
 
-  // Entrada e cluster que precisam ser removidos
-  std::pair<Dentry, DWORD> rmEntry = { dentries[0], 0 };
-
-  // Caminha pela lista de nomes
-  for (size_t i = 1; i < listPath.size(); i++, found = false) {
-    for (size_t j = 0; j < dentries.size(); j++) {
-      if (listPath[i] == dentries[j].getLongName()) {
-        // Se a última parte do caminho for um arquivo gera um erro
-        if (i == listPath.size() - 1 && !dentries[j].isDirectory()) {
-          std::fprintf(
-            stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
-          return;
-        }
-
-        // Se no meio do caminho temos um arquivo, gera um erro
-        if (!dentries[j].isDirectory()) {
-          std::fprintf(
-            stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
-          return;
-        }
-
-        // Se o caminho é um "." não atualiza a entrada
-        if (listPath[i] == "." && dentries[j].getLongName() == ".") {
-          found = true;
-          continue;
-        }
-
-        // Atualiza a entrada a ser removida
-        rmEntry.first = dentries[j];
-        rmEntry.second = clt;
-
-        // Altera o cluster em que ocorre a busca
-        clt = getEntryClus(dentries[j]);
-        found = true;
-        break;
-      }
-    }
-
-    // Se não foi encontrado, gera um erro
-    if (!found) {
-      std::fprintf(stderr, "[" ERROR "] %s não encontrado\n", path.c_str());
+    if (!removeEntry(entry.first, entry.second)) {
+      std::fprintf(
+        stderr, "[" ERROR "] rmdir %s operação falhou\n", path.c_str());
       return;
     }
-
-    // Atualiza a lista de entradas
-    dentries = getDirEntries(clt);
-  }
-
-  // Carrega a entrada e verifica se ela está vazia
-  std::vector<Dentry> entries = getDirEntries(rmEntry.first.getCluster());
-  if (entries.size() > 2 || rmEntry.first.getNameType() == DOTDOT_NAME) {
-    std::fprintf(stderr, "[" ERROR "] %s não está vazio\n", path.c_str());
+  } catch (const std::exception &error) {
+    std::cout << error.what();
     return;
   }
-
-  // Remove a entrada do sistema
-  if (removeEntry(rmEntry.first, rmEntry.second)) {
-    return;
-  }
-
-  std::fprintf(stderr, "[" ERROR "] rmdir %s operação falhou\n", path.c_str());
 }
 
 void FatFS::pwd() { std::fprintf(stdout, "%s\n", curPath.c_str()); }
