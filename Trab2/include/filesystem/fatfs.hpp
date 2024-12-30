@@ -29,6 +29,9 @@ private:
   // Interface para lidar com a tabela FAT
   FatTable *fatTable;
 
+  // Caminho atual no sistema de arquivos
+  std::string curPath;
+
   /**
    * @brief Lê um cluster da memória em um buffer
    *
@@ -151,6 +154,11 @@ public:
    * @param path Caminho do diretório vazio a ser removido
    */
   void rmdir(const std::string &path);
+
+  /**
+   * @brief Retorna o caminho atual do sistema
+   */
+  void pwd();
 };
 
 #endif// FAT_FS_HPP

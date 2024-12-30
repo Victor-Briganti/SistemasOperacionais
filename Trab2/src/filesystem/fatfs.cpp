@@ -201,6 +201,8 @@ FatFS::FatFS(const std::string &path)
     std::string error = "[" ERROR "] Não foi alocar tabela FAT";
     throw std::runtime_error(error);
   }
+
+  curPath = "img/";
 }
 
 FatFS::~FatFS()
@@ -459,3 +461,6 @@ notEmpty:
 notDir:
   std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
 }
+
+
+void FatFS::pwd() { std::fprintf(stdout, "%s\n", curPath.c_str()); }
