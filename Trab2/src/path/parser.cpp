@@ -24,3 +24,18 @@ std::vector<std::string> split(const std::string &path, char delim)
 
   return paths;
 }
+
+std::string merge(const std::vector<std::string> &path)
+{
+  std::string pathName;
+
+  if (path[0] == "img") {
+    pathName += "img/";
+  }
+
+  for (size_t i = 1; i < path.size(); i++) {
+    pathName += path[i] + "/";
+  }
+
+  return pathName;
+}

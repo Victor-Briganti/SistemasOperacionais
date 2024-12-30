@@ -464,3 +464,81 @@ notDir:
 
 
 void FatFS::pwd() { std::fprintf(stdout, "%s\n", curPath.c_str()); }
+
+void FatFS::cd(const std::string &path)
+{
+  // Lista de nomes nos caminhos
+  std::vector<std::string> listPath = split(path, '/');
+
+  if (path[0] == '/') {
+    std::fprintf(stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+    return;
+  }
+
+  // Se necessário monta o caminho completo
+  if (listPath[0] != "img") {
+    std::vector<std::string> fullPath = split(curPath, '/');
+    fullPath.insert(fullPath.end(), listPath.begin(), listPath.end());
+    listPath = fullPath;
+  }
+
+  // Caminho que irá se tornar o caminho atual
+  std::vector<std::string> newPath;
+  newPath.emplace_back("img");
+
+  // Começa a busca pelo "/"
+  DWORD clt = bios->getRootClus();
+  bool found = false;
+
+  // Lista de entradas
+  std::vector<Dentry> dentries = getDirEntries(clt);
+
+  // Caminha pela lista de nomes
+  for (size_t i = 1; i < listPath.size(); i++, found = false) {
+    // Caminha por todas as entradas até encontrar o diretório
+    for (const auto &a : dentries) {
+      if (listPath[i] == a.getLongName()) {
+        // Se no meio do caminho tivermos um arquivo gera um erro
+        if (!a.isDirectory()) {
+          std::fprintf(
+            stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+          return;
+        }
+
+        if (a.getNameType() == DOT_NAME) {
+          found = true;
+          break;
+        }
+
+        if (a.getNameType() == DOTDOT_NAME && newPath.size() == 1) {
+          std::fprintf(
+            stderr, "[" ERROR "] %s caminho inválido\n", path.c_str());
+          return;
+        }
+
+        if (a.getNameType() == DOTDOT_NAME && newPath.size() > 1) {
+          newPath.pop_back();
+        } else {
+          newPath.push_back(a.getLongName());
+        }
+
+        // Altera o cluster em que ocorre a busca
+        clt = getEntryClus(a);
+        found = true;
+        break;
+      }
+    }
+
+    // Se não foi encontrado, gera um erro
+    if (!found) {
+      std::fprintf(
+        stderr, "[" ERROR "] %s caminho não encontrado\n", path.c_str());
+      return;
+    }
+
+    // Atualiza a lista de entradas
+    dentries = getDirEntries(clt);
+  }
+
+  curPath = merge(newPath);
+}

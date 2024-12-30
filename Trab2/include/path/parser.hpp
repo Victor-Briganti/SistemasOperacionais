@@ -24,4 +24,13 @@
  */
 std::vector<std::string> split(const std::string &path, char delim);
 
+/**
+ * @brief Junta todas as partes de um caminho
+ *
+ * @param path Vetor com cada parte do caminho a ser unido
+ *
+ * @return Uma string com o caminho
+ */
+std::string merge(const std::vector<std::string> &path);
+
 #endif// PARSER_HPP

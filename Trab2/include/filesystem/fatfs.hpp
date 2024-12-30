@@ -159,6 +159,13 @@ public:
    * @brief Retorna o caminho atual do sistema
    */
   void pwd();
+
+  /**
+   * @brief Altera o caminho atual
+   *
+   * @param path Novo caminho base do sistema
+   */
+  void cd(const std::string &path);
 };
 
 #endif// FAT_FS_HPP
