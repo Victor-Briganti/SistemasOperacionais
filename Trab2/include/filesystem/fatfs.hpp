@@ -91,6 +91,16 @@ private:
     const Dir &dir,
     const std::vector<LongDir> &ldir);
 
+  /**
+   * @brief Remove uma entrada do diretório e da FAT table
+   *
+   * @param entry Entrada a ser removida
+   * @param num Número do cluster onde a entrada está localizada
+   *
+   * @return true se foi possível remover, false caso contrário.
+   */
+  bool removeEntry(Dentry &entry, DWORD num);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo

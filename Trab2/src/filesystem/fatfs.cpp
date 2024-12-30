@@ -65,7 +65,7 @@ DWORD FatFS::getEntryClus(const Dentry &entry)
 std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 {
   // Aloca o buffer do diretório
-  void *buffer = calloc(sizeof(char), bios->totClusByts());
+  void *buffer = new char[bios->totClusByts()];
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return {};
@@ -134,7 +134,7 @@ bool FatFS::setDirEntries(DWORD num,
   const std::vector<LongDir> &ldir)
 {
   // Aloca o buffer do diretório
-  void *buffer = calloc(sizeof(char), bios->totClusByts());
+  void *buffer = new char[bios->totClusByts()];
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return {};
@@ -163,6 +163,20 @@ bool FatFS::setDirEntries(DWORD num,
   delete[] static_cast<char *>(buffer);
   return result;
 }
+
+bool FatFS::removeEntry(Dentry &entry, DWORD num)
+{
+  entry.markFree();
+  bool fatRm = fatTable->removeChain(entry.getCluster());
+  bool entryRm = setDirEntries(num,
+    entry.getInitPos(),
+    entry.getEndPos(),
+    entry.getDirectory(),
+    entry.getLongDirectories());
+
+  return fatRm && entryRm;
+}
+
 
 //===------------------------------------------------------------------------===
 // PUBLIC
@@ -227,38 +241,46 @@ void FatFS::cluster(DWORD num)
 // TODO: Ajustar está função para aceitar o raiz como se fosse um dir normal
 void FatFS::ls(const std::string &path)
 {
+  // Lista de nomes nos caminhos
   std::vector<std::string> listPath = split(path, '/');
-  std::vector<Dentry> dentries;
+
 
   // Lista caminhos longos
   if (listPath[0] == "img") {
+    // Começa a busca pelo "/"
     DWORD clt = bios->getRootClus();
     bool found = false;
 
-    dentries = getDirEntries(clt);
+    // Lista de entradas
+    std::vector<Dentry> dentries = getDirEntries(clt);
+
+    // Caminha pela lista de nomes
     for (size_t i = 1; i < listPath.size(); i++, found = false) {
       // Caminha por todas as entradas até encontrar o diretório
       for (const auto &a : dentries) {
-        // Se a última parte do caminho não for um diretório gera um erro.
         if (listPath[i] == a.getLongName()) {
+          // Se no meio do caminho tivermos um arquivo gera um erro
           if (!a.isDirectory()) {
             goto notDir;
           }
 
+          // Altera o cluster em que ocorre a busca
           clt = getEntryClus(a);
           found = true;
           break;
         }
       }
 
+      // Se não foi encontrado, gera um erro
       if (!found) {
         goto notFound;
       }
 
+      // Atualiza a lista de entradas
       dentries = getDirEntries(clt);
     }
 
-
+    // Mostra todas as entradas
     for (const auto &a : dentries) {
       a.printInfo();
     }
@@ -277,17 +299,19 @@ notDir:
 
 void FatFS::rm(const std::string &path)
 {
+  // Lista de nomes nos caminhos
   std::vector<std::string> listPath = split(path, '/');
-  if (listPath.size() == 1) {
-    goto notArchive;
-  }
 
   // Caminho completo
   if (listPath.size() != 1 && listPath[0] == "img") {
-    bool found = false;
+    // Começa a busca pelo "/"
     DWORD clt = bios->getRootClus();
+    bool found = false;
+
+    // Lista de entradas
     std::vector<Dentry> dentries = getDirEntries(clt);
 
+    // Caminha pela lista de nomes
     for (size_t i = 1; i < listPath.size(); i++, found = false) {
       for (auto &a : dentries) {
         if (listPath[i] == a.getLongName()) {
@@ -298,32 +322,31 @@ void FatFS::rm(const std::string &path)
 
           // Se o arquivo foi encontrado deleta suas entradas.
           if (i == listPath.size() - 1 && !a.isDirectory()) {
-            a.markFree();
-            if (!fatTable->removeChain(a.getCluster())
-                || !setDirEntries(clt,
-                  a.getInitPos(),
-                  a.getEndPos(),
-                  a.getDirectory(),
-                  a.getLongDirectories())) {
+            if (!removeEntry(a, clt)) {
               goto fail;
             }
+
             return;
           }
 
+          // Se no meio do caminho temos um arquivo, gera um erro
           if (!a.isDirectory()) {
             goto invalidPath;
           }
 
+          // Altera o cluster em que ocorre a busca
           clt = getEntryClus(a);
           found = true;
           break;
         }
       }
 
+      // Se não foi encontrado, gera um erro
       if (!found) {
         goto notFound;
       }
 
+      // Atualiza a lista de entradas
       dentries = getDirEntries(clt);
     }
 
@@ -347,18 +370,27 @@ fail:
 
 void FatFS::rmdir(const std::string &path)
 {
+  // Lista de nomes nos caminhos
   std::vector<std::string> listPath = split(path, '/');
+
+  // O diretório img/ não pode ser deletado
   if (listPath.size() == 1) {
     goto invalidPath;
   }
 
   // Caminho completo
   if (listPath.size() != 1 && listPath[0] == "img") {
-    bool found = false;
+    // Começa a busca pelo "/"
     DWORD clt = bios->getRootClus();
+    bool found = false;
+
+    // Lista de entradas
     std::vector<Dentry> dentries = getDirEntries(clt);
+
+    // Entrada e cluster que precisam ser removidos
     std::pair<Dentry, DWORD> rmEntry = { dentries[0], 0 };
 
+    // Caminha pela lista de nomes
     for (size_t i = 1; i < listPath.size(); i++, found = false) {
       for (size_t j = 0; j < dentries.size(); j++) {
         if (listPath[i] == dentries[j].getLongName()) {
@@ -367,45 +399,50 @@ void FatFS::rmdir(const std::string &path)
             goto notDir;
           }
 
+          // Se no meio do caminho temos um arquivo, gera um erro
           if (!dentries[j].isDirectory()) {
             goto invalidPath;
           }
 
+          // Se o caminho é um "." não atualiza a entrada
           if (listPath[i] == "." && dentries[j].getLongName() == ".") {
             found = true;
             continue;
           }
 
+          // Atualiza a entrada a ser removida
           rmEntry.first = dentries[j];
           rmEntry.second = clt;
+
+          // Altera o cluster em que ocorre a busca
           clt = getEntryClus(dentries[j]);
           found = true;
           break;
         }
       }
 
+      // Se não foi encontrado, gera um erro
       if (!found) {
         goto notFound;
       }
 
+      // Atualiza a lista de entradas
       dentries = getDirEntries(clt);
     }
 
+    // Carrega a entrada e verifica se ela está vazia
     std::vector<Dentry> entries = getDirEntries(rmEntry.first.getCluster());
     if (entries.size() > 2 || rmEntry.first.getNameType() == DOTDOT_NAME) {
       goto notEmpty;
     }
 
-    rmEntry.first.markFree();
-    if (fatTable->removeChain(rmEntry.first.getCluster())
-        && setDirEntries(rmEntry.second,
-          rmEntry.first.getInitPos(),
-          rmEntry.first.getEndPos(),
-          rmEntry.first.getDirectory(),
-          rmEntry.first.getLongDirectories())) {
+    // Remove a entrada do sistema
+    if (removeEntry(rmEntry.first, rmEntry.second)) {
       return;
     }
   }
+
+  // TODO: Fazer caminho relativo
 
 fail:
   std::fprintf(stderr, "[" ERROR "] rmdir %s operação falhou\n", path.c_str());

@@ -14,7 +14,7 @@ image:
 	mkfs.fat -F 32 fat.img
 
 valgrind: debug
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --verbose build/main fat32.img img/files/
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --verbose build/main fat32.img img/test/test2
 
 directory:
 	mkdir -p build
