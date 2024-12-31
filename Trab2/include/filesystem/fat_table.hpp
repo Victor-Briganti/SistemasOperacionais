@@ -68,14 +68,6 @@ class FatTable
    */
   void writeInTable(const DWORD num, const DWORD value);
 
-  /**
-   * @brief Quantidade de clusters em uso
-   *
-   * Lê a tabela atual e retorn a quantidade de clusters que estão em uso.
-   *
-   * @return Valor da quantidade de clusters em uso
-   */
-  [[nodiscard]] size_t inUse() const;
 
 public:
   /**
@@ -116,6 +108,24 @@ public:
    * @param start Inicio da cadeia a ser removida
    */
   bool removeChain(const DWORD start);
+
+  /**
+   * @brief Quantidade de clusters em uso
+   *
+   * Lê a tabela atual e retorn a quantidade de clusters que estão em uso.
+   *
+   * @return Valor da quantidade de clusters em uso
+   */
+  [[nodiscard]] DWORD usedClusters() const;
+
+  /**
+   * @brief Quantidade de clusters livres
+   *
+   * Lê a tabela atual e retorna a quantidade de clusters que estão livres.
+   *
+   * @return Valor da quantidade de clusters livres
+   */
+  [[nodiscard]] DWORD freeClusters() const;
 };
 
 #endif// FAT_TABLE_HPP

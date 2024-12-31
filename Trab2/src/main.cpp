@@ -25,12 +25,10 @@ int main(int argc, char **argv)
 
   try {
     std::string image(argv[1]);
-    std::string path(argv[2]);
     FatFS fat(image);
-    fat.attr(path);
+    fat.info();
   } catch (const std::exception &error) {
     std::cout << error.what();
-    std::cout << "Ué\n";
   }
 
   return 0;

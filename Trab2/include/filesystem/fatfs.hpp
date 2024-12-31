@@ -13,6 +13,7 @@
 #include "filesystem/bpb.hpp"
 #include "filesystem/dentry.hpp"
 #include "filesystem/fat_table.hpp"
+#include "filesystem/fsinfo.hpp"
 #include "io/image.hpp"
 
 #include <string>
@@ -33,6 +34,9 @@ private:
 
   // Interface para lidar com a tabela FAT
   FatTable *fatTable;
+
+  // Interface para lidar com a estrutura FSInfo
+  FileSysInfo *fsInfo;
 
   // Caminho atual no sistema de arquivos
   std::string curPath;

@@ -43,20 +43,6 @@ bool FatTable::writeFatTable(const int num)
   return this->image->write(fatOffset, table, fatSize);
 }
 
-size_t FatTable::inUse() const
-{
-  const auto *dwordTable = static_cast<DWORD *>(table);
-
-  size_t count = 0;
-  for (DWORD i = 0; i < bios->getFATSz(); i++) {
-    if (dwordTable[i] != 0) {
-      count++;
-    }
-  }
-
-  return count;
-}
-
 DWORD FatTable::readFromTable(const DWORD offset) const
 {
   return static_cast<DWORD *>(table)[offset] & LSB_MASK;
@@ -110,20 +96,20 @@ void FatTable::printTable() const
 
 void FatTable::printInfo() const
 {
-  const DWORD totalSec = bios->getDataSecTotal() / bios->getSecPerCluster();
+  const DWORD totalClus = bios->getDataSecTotal() / bios->getSecPerCluster();
 
   std::fprintf(stdout,
     "Free clusters: %u/%u\n",
-    totalSec - static_cast<DWORD>(inUse()),
-    totalSec);
+    totalClus - static_cast<DWORD>(usedClusters()),
+    totalClus);
 
   std::fprintf(stdout,
     "Free space: %u\n",
-    (totalSec - static_cast<DWORD>(inUse())) * bios->getBytesPerSec());
+    (totalClus - static_cast<DWORD>(usedClusters())) * bios->getBytesPerSec());
 
   std::fprintf(stdout,
     "Used space: %u\n",
-    static_cast<DWORD>(inUse()) * bios->getBytesPerSec());
+    static_cast<DWORD>(usedClusters()) * bios->getBytesPerSec());
 }
 
 bool FatTable::removeChain(const DWORD start)
@@ -153,4 +139,27 @@ bool FatTable::removeChain(const DWORD start)
   }
 
   return true;
+}
+
+DWORD FatTable::usedClusters() const
+{
+  const auto *dwordTable = static_cast<DWORD *>(table);
+
+  DWORD totalClus = bios->getDataSecTotal() / bios->getSecPerCluster();
+  DWORD count = 0;
+
+  for (DWORD i = 0; i < totalClus; i++) {
+    if (dwordTable[i] != 0) {
+      count++;
+    }
+  }
+
+  // Cluster 1 e 2 sempre estão alocados
+  return count - 2;
+}
+
+DWORD FatTable::freeClusters() const
+{
+  DWORD totalClus = bios->getDataSecTotal() / bios->getSecPerCluster();
+  return totalClus - usedClusters();
 }

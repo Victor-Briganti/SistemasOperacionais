@@ -11,6 +11,7 @@
 #include "filesystem/bpb.hpp"
 #include "filesystem/dentry.hpp"
 #include "filesystem/dir.hpp"
+#include "filesystem/fsinfo.hpp"
 #include "path/parser.hpp"
 #include "utils/color.hpp"
 
@@ -353,11 +354,19 @@ FatFS::FatFS(const std::string &path)
     throw std::runtime_error(error);
   }
 
+  fsInfo = new FileSysInfo(
+    image, bios->getFSInfo() * bios->getBytesPerSec(), fatTable);
+  if (fsInfo == nullptr) {
+    std::string error = "[" ERROR "] Não foi alocar FSInfo";
+    throw std::runtime_error(error);
+  }
+
   curPath = "img/";
 }
 
 FatFS::~FatFS()
 {
+  delete fsInfo;
   delete fatTable;
   delete bios;
   delete image;

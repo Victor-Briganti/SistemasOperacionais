@@ -192,12 +192,18 @@ public:
    * @brief Tamanho do cluster em bytes
    *
    * @return A quantidade de bytes por setor do clsuter
-
    */
   [[nodiscard]] inline size_t totClusByts() const
   {
     return static_cast<size_t>(getSecPerCluster()) * getBytesPerSec();
   }
+
+  /**
+   * @brief Setor em que o FSInfo se encontra
+   *
+   * @return Retorna o valor de bpb.FSInfo
+   */
+  [[nodiscard]] inline DWORD getFSInfo() const { return bpb.FSInfo; }
 };
 
 #endif// BPB_HPP
