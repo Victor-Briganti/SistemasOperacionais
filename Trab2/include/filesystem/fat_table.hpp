@@ -106,8 +106,10 @@ public:
    * @brief Remove uma cadeia de clusters alocada
    *
    * @param start Inicio da cadeia a ser removida
+   *
+   * @return Retorna a quantidade de cadeias removidas
    */
-  bool removeChain(const DWORD start);
+  int removeChain(const DWORD start);
 
   /**
    * @brief Quantidade de clusters em uso

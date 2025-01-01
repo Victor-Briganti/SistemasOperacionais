@@ -172,7 +172,10 @@ bool FatFS::removeEntry(Dentry &entry, DWORD num)
   entry.markFree();
 
   // Remove as entradas da tabela FAT
-  bool fatRm = fatTable->removeChain(entry.getCluster());
+  int fatRm = fatTable->removeChain(entry.getCluster());
+  if (fatRm < 0) {
+    return false;
+  }
 
   // Remove a entrada do diretório
   bool entryRm = setDirEntries(num,
@@ -181,7 +184,14 @@ bool FatFS::removeEntry(Dentry &entry, DWORD num)
     entry.getDirectory(),
     entry.getLongDirectories());
 
-  return fatRm && entryRm;
+  // Salva a quantidade de clusters removidos no FSInfo
+  bool result = (fatRm >= 0) && entryRm;
+  if (result) {
+    DWORD freeClusters = fsInfo->getFreeCount() + static_cast<DWORD>(fatRm);
+    return fsInfo->setFreeCount(freeClusters);
+  }
+
+  return false;
 }
 
 std::vector<std::string> FatFS::pathParser(const std::string &path,
@@ -590,3 +600,6 @@ void FatFS::attr(const std::string &path)
     return;
   }
 }
+
+
+void FatFS::printFSInfo() { fsInfo->printInfo(); }

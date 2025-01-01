@@ -112,11 +112,11 @@ void FatTable::printInfo() const
     static_cast<DWORD>(usedClusters()) * bios->getBytesPerSec());
 }
 
-bool FatTable::removeChain(const DWORD start)
+int FatTable::removeChain(const DWORD start)
 {
   // Arquivo recém criado que não tem nada escrito
   if (start == 0) {
-    return true;
+    return 0;
   }
 
   std::vector<DWORD> chain;
@@ -134,11 +134,11 @@ bool FatTable::removeChain(const DWORD start)
 
   for (int i = 0; i < bios->getNumFATs(); i++) {
     if (!writeFatTable(i)) {
-      return false;
+      return -1;
     }
   }
 
-  return true;
+  return static_cast<int>(chain.size());
 }
 
 DWORD FatTable::usedClusters() const

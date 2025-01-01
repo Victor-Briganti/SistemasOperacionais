@@ -52,11 +52,8 @@ class FileSysInfo
   /* Flag para definir se a estrutura foi ou não alterada */
   bool dirty = false;
 
-  /* Limite inferior da tabela FAT */
-  DWORD lowerBound = 0;
-
-  /* Limite superior da tabela FAT */
-  DWORD upperBound;
+  /* Total de clusters no sistema */
+  DWORD totalClus;
 
 public:
   /**
@@ -109,6 +106,11 @@ public:
    * @return true se foi possível alterar, false caso contrário
    */
   bool setNextFree(DWORD nextFree);
+
+  /**
+   * @brief Mostra informações sobre a estrutura
+   */
+  void printInfo() const;
 };
 
 #endif// FSINFO_HPP

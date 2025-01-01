@@ -42,20 +42,20 @@ FileSysInfo::FileSysInfo(Image *image, DWORD offset, FatTable *fatTable)
 
   DWORD freeClusters = fatTable->freeClusters();
 
-  upperBound = freeClusters + fatTable->usedClusters();
+  totalClus = freeClusters + fatTable->usedClusters();
 
   if (fsinfo.FreeCount == UNKNOWN_FREECLUS) {
     fsinfo.FreeCount = freeClusters;
     dirty = true;
   }
 
-  if (fsinfo.FreeCount > upperBound) {
+  if (fsinfo.FreeCount > totalClus) {
     std::string error =
       "[" ERROR
       "] Quantidade de clusters livres maior do que a quantidade total ";
     error += std::to_string(fsinfo.FreeCount);
     error += " > ";
-    error += std::to_string(upperBound);
+    error += std::to_string(totalClus);
     error += "\n";
     throw std::runtime_error(error);
   }
@@ -70,7 +70,7 @@ FileSysInfo::~FileSysInfo()
 
 bool FileSysInfo::setFreeCount(DWORD freeCount)
 {
-  if (freeCount > upperBound) {
+  if (freeCount > totalClus) {
     return false;
   }
 
@@ -81,11 +81,19 @@ bool FileSysInfo::setFreeCount(DWORD freeCount)
 
 bool FileSysInfo::setNextFree(DWORD nextFree)
 {
-  if (nextFree > upperBound || nextFree == 0 || nextFree == 1) {
+  if (nextFree > totalClus || nextFree == 0 || nextFree == 1) {
     return false;
   }
 
   fsinfo.NextFree = nextFree;
   dirty = true;
   return true;
+}
+
+void FileSysInfo::printInfo() const
+{
+  std::fprintf(
+    stdout, "FreeCount: %d (0x%08x)\n", fsinfo.FreeCount, fsinfo.FreeCount);
+  std::fprintf(
+    stdout, "NextFree: %d (0x%08x)\n", fsinfo.NextFree, fsinfo.NextFree);
 }

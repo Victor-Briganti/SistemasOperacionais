@@ -208,6 +208,8 @@ public:
    * @param path Caminho para a entrada a ser apresentada
    */
   void attr(const std::string &path);
+
+  void printFSInfo();
 };
 
 #endif// FAT_FS_HPP
