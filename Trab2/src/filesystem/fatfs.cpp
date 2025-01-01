@@ -586,8 +586,9 @@ void FatFS::attr(const std::string &path)
       entry.first.getLstAccMonth(),
       entry.first.getLstAccYear());
 
-    std::fprintf(
-      stdout, "Tipo: %s", entry.first.isDirectory() ? "diretório" : "arquivo");
+    std::fprintf(stdout,
+      "Tipo: %s",
+      entry.first.isDirectory() ? "diretório\n" : "arquivo\n");
 
     std::fprintf(stdout,
       "%s",
@@ -600,6 +601,3 @@ void FatFS::attr(const std::string &path)
     return;
   }
 }
-
-
-void FatFS::printFSInfo() { fsInfo->printInfo(); }

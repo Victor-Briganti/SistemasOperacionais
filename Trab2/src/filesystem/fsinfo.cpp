@@ -89,11 +89,3 @@ bool FileSysInfo::setNextFree(DWORD nextFree)
   dirty = true;
   return true;
 }
-
-void FileSysInfo::printInfo() const
-{
-  std::fprintf(
-    stdout, "FreeCount: %d (0x%08x)\n", fsinfo.FreeCount, fsinfo.FreeCount);
-  std::fprintf(
-    stdout, "NextFree: %d (0x%08x)\n", fsinfo.NextFree, fsinfo.NextFree);
-}

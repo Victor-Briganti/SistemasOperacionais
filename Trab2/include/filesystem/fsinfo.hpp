@@ -106,11 +106,6 @@ public:
    * @return true se foi possível alterar, false caso contrário
    */
   bool setNextFree(DWORD nextFree);
-
-  /**
-   * @brief Mostra informações sobre a estrutura
-   */
-  void printInfo() const;
 };
 
 #endif// FSINFO_HPP

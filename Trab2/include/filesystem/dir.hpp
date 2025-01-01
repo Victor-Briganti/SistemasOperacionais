@@ -116,4 +116,17 @@ struct __attribute__((packed)) LongDir
   BYTE name3[4]; /* Caracteres 12-13 do nome longo */
 };
 
+//===------------------------------------------------------------------------===
+// FUNÇÕES
+//===------------------------------------------------------------------------===
+
+/**
+ * @brief Gera um checksum com base em um nome curto
+ *
+ * @param shortName Nome curto no qual o checksum será calculado
+ *
+ * @return O valor do checksum já calculado
+ */
+BYTE shortCheckSum(const char *shortName);
+
 #endif// DIR_HPP
