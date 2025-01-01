@@ -12,6 +12,8 @@
 
 #include "utils/types.hpp"
 
+#include <string>
+
 //===------------------------------------------------------------------------===
 // Definições
 //===------------------------------------------------------------------------===
@@ -130,6 +132,15 @@ struct __attribute__((packed)) LongDir
 BYTE shortCheckSum(const char *shortName);
 
 /**
+ * @brief Gera o nome curto a partir do nome longo
+ *
+ * @param longName Nome longo que será tratado
+ *
+ * @return O novo nome curto gerado
+ */
+char *generateShortName(const std::string &longName);
+
+/**
  * @brief Retorna o dia com base em um datestamp
  *
  * @param date Data para ser extraida
@@ -155,7 +166,6 @@ WORD month(WORD date);
  * @return O ano armazenado no datestamp
  */
 WORD year(WORD date);
-
 
 /**
  * @brief Cria um datestamp com base no dia, mês e ano atual

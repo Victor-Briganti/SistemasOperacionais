@@ -48,7 +48,13 @@ Dentry::Dentry(const Dir &dir,
 
   nameType = LONG_NAME;
 
+  BYTE checkSum = shortCheckSum(shortName.data());
   for (auto a : ldir) {
+    if (a.chckSum != checkSum) {
+      std::string error = "[" ERROR "] Checksum não condiz com a entrada\n";
+      throw std::runtime_error(error);
+    }
+
     std::string name;
 
     for (int i = 0; i < 10; i++) {
