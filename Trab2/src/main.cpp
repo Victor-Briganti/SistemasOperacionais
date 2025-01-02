@@ -7,13 +7,14 @@
  * Data: 26/12/2024
  */
 
+#include "filesystem/dentry.hpp"
 #include "filesystem/dir.hpp"
 #include "filesystem/fatfs.hpp"
 
 #include <cstring>
 #include <exception>
 #include <iostream>
-
+#include <string>
 
 int main(int argc, char **argv)
 {
@@ -23,9 +24,6 @@ int main(int argc, char **argv)
     std::cout << argv[0] << " fat32.img\n";
     return -1;
   }
-
-  generateShortName("Um+nome_muito_longo.mesmo.mas[muito-longo].mesmo.yahoo");
-  return -1;
 
   try {
     std::string image(argv[1]);

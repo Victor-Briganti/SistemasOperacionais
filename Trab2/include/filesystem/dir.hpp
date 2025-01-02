@@ -123,6 +123,22 @@ struct __attribute__((packed)) LongDir
 //===------------------------------------------------------------------------===
 
 /**
+ * @brief Cria uma estrutura de diretório
+ *
+ * @param name Nome do diretório a ser criado
+ * @param fileSize Tamanho do arquivo
+ * @param cluster Número do cluster
+ *
+ * @exception Gera uma exceção caso algo não seja válido
+ *
+ * @return Um novo diretório
+ */
+Dir createDir(const std::string &name,
+  DWORD fileSize,
+  DWORD cluster,
+  BYTE attrs);
+
+/**
  * @brief Gera um checksum com base em um nome curto
  *
  * @param shortName Nome curto no qual o checksum será calculado
@@ -215,5 +231,7 @@ WORD seconds(WORD time);
  * @return O timestamp criado
  */
 DWORD timeStamp(DWORD hour, DWORD minutes, DWORD seconds);
+
+void printDir(Dir &dir);
 
 #endif// DIR_HPP

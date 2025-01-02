@@ -8,9 +8,132 @@
  */
 
 #include "filesystem/dir.hpp"
+#include "utils/color.hpp"
 
 #include <cctype>
 #include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <stdexcept>
+#include <sys/time.h>
+
+//===------------------------------------------------------------------------===
+// PRIVATE
+//===------------------------------------------------------------------------===
+
+/**
+ * @brief Dividi o cluster na parte menos significativa
+ *
+ * @param cluster Cluster que terá o seu valor dividido
+ *
+ * @return Valor menos significativo do cluster
+ */
+static inline WORD lowCluster(DWORD cluster)
+{
+  return static_cast<WORD>(cluster);
+}
+
+/**
+ * @brief Dividi o cluster na parte mais significativa
+ *
+ * @param cluster Cluster que terá o seu valor dividido
+ *
+ * @return Valor mais significativo do cluster
+ */
+static inline WORD highCluster(DWORD cluster)
+{
+  return static_cast<WORD>(cluster >> 16);
+}
+
+/**
+ * @brief Cria o timestamp do horário atual
+ *
+ * @return Timestamp do horário atual
+ */
+static inline WORD currentTime()
+{
+  time_t curTime = time(nullptr);
+
+  struct tm *curLocalTime = localtime(&curTime);
+
+  int sec = curLocalTime->tm_sec - (curLocalTime->tm_sec % 2 ? 1 : 0);
+
+  DWORD stamp = timeStamp(static_cast<BYTE>(curLocalTime->tm_hour),
+    static_cast<BYTE>(curLocalTime->tm_min),
+    static_cast<BYTE>(sec));
+
+  return static_cast<WORD>(stamp);
+}
+
+/**
+ * @brief Cria o datestamp da data atual
+ *
+ * @return Datestamp da data atual
+ */
+static inline WORD currentDate()
+{
+  time_t curDate = time(nullptr);
+
+  struct tm *curLocalDate = localtime(&curDate);
+
+  int year = curLocalDate->tm_year + 1900;
+
+  DWORD stamp = dateStamp(static_cast<BYTE>(curLocalDate->tm_mday),
+    static_cast<BYTE>(curLocalDate->tm_mon + 1),
+    static_cast<BYTE>(year));
+
+  return static_cast<WORD>(stamp);
+}
+
+/**
+ * @brief Tempo atual em milisegundos
+ *
+ * @return O tempo atual em milisegundos
+ */
+static inline BYTE currentMilliseconds()
+{
+  struct timeval tv;
+  gettimeofday(&tv, nullptr);
+
+  return static_cast<BYTE>(
+    static_cast<long>(tv.tv_usec) / static_cast<long>(10000));
+}
+
+//===------------------------------------------------------------------------===
+// PUBLIC
+//===------------------------------------------------------------------------===
+
+Dir createDir(const std::string &name,
+  DWORD fileSize,
+  DWORD cluster,
+  BYTE attrs)
+{
+  Dir directory;
+  if (attrs & ~ATTR_LONG_NAME_MASK) {
+    std::string error = "[" ERROR "] Atributo inválido\n";
+    throw std::runtime_error(error);
+  }
+
+  char *shortName = generateShortName(name);
+  if (shortName == nullptr) {
+    std::string error = "[" ERROR "] Não foi possível alocar estrutura\n";
+    throw std::runtime_error(error);
+  }
+  memcpy(directory.name, shortName, 11);
+
+  directory.fileSize = fileSize;
+  directory.fstClusLO = lowCluster(cluster);
+  directory.fstClusHI = highCluster(cluster);
+  directory.attr = attrs;
+  directory.crtTime = currentTime();
+  directory.crtDate = currentDate();
+  directory.wrtTime = currentTime();
+  directory.wrtDate = currentDate();
+  directory.crtTimeTenth = currentMilliseconds();
+  directory.lstAccDate = currentDate();
+
+  return directory;
+}
 
 BYTE shortCheckSum(const char *shortName)
 {
@@ -62,6 +185,7 @@ char *generateShortName(const std::string &longName)
       continue;
     }
 
+    // Salva sempre o último ponto visto no nome do arquivo
     if (longName[i] == '.') {
       period = treatedName.size();
       continue;
@@ -81,7 +205,7 @@ char *generateShortName(const std::string &longName)
   // padding
   if (treatedName.size() < NAME_MAIN_SIZE + NAME_EXT_SIZE) {
     // Realiza o padding na parte principal do nome
-    for (int i = period; period != -1 && i < NAME_MAIN_SIZE; i++) {
+    for (int i = period; period != -1 && i < NAME_MAIN_SIZE; i++, period++) {
       treatedName = treatedName.substr(0, i) + " "
                     + treatedName.substr(i, treatedName.size());
     }

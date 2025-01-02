@@ -85,13 +85,13 @@ Dentry::Dentry(const Dir &dir,
 void Dentry::printInfo() const
 {
   // Informações sobre tipo e permissão da entrada
-  std::fprintf(stdout, "%-2c", isDirectory() ? 'd' : 'f');
-  std::fprintf(stdout, "%-2c", isReadOnly() ? 'r' : '-');
-  std::fprintf(stdout, "%-2c", isHidden() ? '-' : 'H');
+  std::fprintf(stdout, "%-2c ", isDirectory() ? 'd' : 'f');
+  std::fprintf(stdout, "%-2c ", isReadOnly() ? 'r' : '-');
+  std::fprintf(stdout, "%-2c ", isHidden() ? '-' : 'H');
 
   // Informações sobre do cluster e tamanho
-  std::fprintf(stdout, "cluster=%-4d", getCluster());
-  std::fprintf(stdout, "size=%-8d", getFileSize());
+  std::fprintf(stdout, "cluster=%-4d  ", getCluster());
+  std::fprintf(stdout, "size=%-8d  ", getFileSize());
 
   // Informações sobre data de escrita
   std::fprintf(
@@ -99,13 +99,13 @@ void Dentry::printInfo() const
 
   // Informações sobre hora de escrita
   std::fprintf(stdout,
-    "%02d:%02d:%04d  ",
+    "%02d:%02d:%02d  ",
     getWriteHour(),
     getWriteMinute(),
     getWriteSeconds());
 
   // Nome do arquivo
-  std::fprintf(stdout, "%-30s", getLongName().c_str());
+  std::fprintf(stdout, "%-30s  ", getLongName().c_str());
   std::fprintf(stdout, "(%-11s)\n", getShortName());
 }
 
