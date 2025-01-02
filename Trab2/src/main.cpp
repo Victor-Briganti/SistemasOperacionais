@@ -25,6 +25,14 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  std::string path(argv[1]);
+
+  Dir dir = createDir(path, 20, 50, ATTR_DIRECTORY);
+  std::vector<LongDir> ldir = createLongDir(dir, path);
+  Dentry dentry(dir, ldir, 0, 0);
+  dentry.printInfo();
+  return -1;
+
   try {
     std::string image(argv[1]);
     std::string path(argv[2]);

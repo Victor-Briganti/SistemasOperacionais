@@ -13,6 +13,7 @@
 #include "utils/types.hpp"
 
 #include <string>
+#include <vector>
 
 //===------------------------------------------------------------------------===
 // Definições
@@ -52,6 +53,9 @@
 
 /* Valor da última entrada do nome longo */
 #define LAST_LONG_ENTRY (0x40)
+
+/* Tamanho da nome armazenado no nome longo */
+#define LONG_NAME_SIZE (13)
 
 // Definições para nome curto
 
@@ -137,6 +141,18 @@ Dir createDir(const std::string &name,
   DWORD fileSize,
   DWORD cluster,
   BYTE attrs);
+
+/**
+ * @brief Cria uma lista com as estruturas de nomes longos
+ *
+ * @param dir Estrutura de nome curto, relacionada estas entradas
+ * @param name Nome do arquivo
+ *
+ * @exception Gera uma exceção caso algo não seja válido
+ *
+ * @return Uma lista com os nomes longos
+ */
+std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name);
 
 /**
  * @brief Gera um checksum com base em um nome curto

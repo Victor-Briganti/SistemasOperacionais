@@ -10,6 +10,7 @@
 #include "filesystem/dir.hpp"
 #include "utils/color.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
@@ -99,6 +100,44 @@ static inline BYTE currentMilliseconds()
     static_cast<long>(tv.tv_usec) / static_cast<long>(10000));
 }
 
+/**
+ * @brief Verifica se o nome longo é válido
+ *
+ * @return true se for válido, false caso contrário
+ */
+static inline bool validLongName(const std::string &name)
+{
+  bool valid = true;
+
+  for (const auto &a : name) {
+    valid = validLongDirName(a);
+  }
+
+  return valid;
+}
+
+/**
+ * @brief Gera vetor de nomes longos
+ *
+ * @return Uma lista de caracteres prontos para serem escritos
+ */
+static std::vector<char> generateLongName(const std::string &name)
+{
+  std::vector<char> nameVec;
+
+  for (const auto &chr : name) {
+    nameVec.push_back(chr);
+    nameVec.push_back('\0');
+  }
+
+  // Na prática uma entrada de nome longo armazena o dobro de caracteres
+  while (nameVec.size() % (LONG_NAME_SIZE * 2) != 0) {
+    nameVec.push_back(0xFF);
+  }
+
+  return nameVec;
+}
+
 //===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
@@ -133,6 +172,57 @@ Dir createDir(const std::string &name,
   directory.lstAccDate = currentDate();
 
   return directory;
+}
+
+std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name)
+{
+  if (!validLongName(name)) {
+    std::string error = "[" ERROR "] Nome " + name + " inválido\n";
+    throw std::runtime_error(error);
+  }
+
+  std::vector<LongDir> longDirs;
+  DWORD checksum = shortCheckSum(reinterpret_cast<const char *>(dir.name));
+  std::vector<char> longChars = generateLongName(name);
+
+  size_t i = 0;
+  while (i < longChars.size()) {
+    LongDir ldir;
+    ldir.chckSum = checksum;
+    ldir.fstClusLO = 0;
+    ldir.attr = ATTR_LONG_NAME;
+
+    // O único valor especificado aqui é o do diretório que deve ser 0.
+    if (dir.attr & ATTR_DIRECTORY == 0) {
+      ldir.type = 0;
+    } else {
+      ldir.type = 1;
+    }
+
+    for (int j = 0; j < 10; j++, i++) {
+      ldir.name1[j] = longChars[i];
+    }
+
+    for (int j = 0; j < 12; j++, i++) {
+      ldir.name2[j] = longChars[i];
+    }
+
+    for (int j = 0; j < 4; j++, i++) {
+      ldir.name3[j] = longChars[i];
+    }
+
+    longDirs.push_back(ldir);
+  }
+
+  std::reverse(longDirs.begin(), longDirs.end());
+  for (size_t i = longDirs.size() - 1, j = 0; i <= 0; i--, j++) {
+    if (i == longDirs.size() - 1) {
+      longDirs[j].ord = LAST_LONG_ENTRY | i;
+    } else {
+      longDirs[j].ord = i;
+    }
+  }
+  return longDirs;
 }
 
 BYTE shortCheckSum(const char *shortName)
@@ -203,30 +293,43 @@ char *generateShortName(const std::string &longName)
 
   // Se o nome longo for menor do que o necessário no nome curto realizamos o
   // padding
-  if (treatedName.size() < NAME_MAIN_SIZE + NAME_EXT_SIZE) {
+  if (period != -1) {
     // Realiza o padding na parte principal do nome
-    for (int i = period; period != -1 && i < NAME_MAIN_SIZE; i++, period++) {
+    for (int i = period; i < NAME_MAIN_SIZE; i++, period++) {
       treatedName = treatedName.substr(0, i) + " "
                     + treatedName.substr(i, treatedName.size());
+    }
+  } else {
+    // Realiza o padding no final do nome
+    while (treatedName.size() < NAME_MAIN_SIZE + NAME_EXT_SIZE) {
+      treatedName.push_back(' ');
     }
   }
 
   // Adiciona o tail do nome
-  treatedName[6] = '~';
-  treatedName[7] = '1';
+  if (treatedName.size() > NAME_MAIN_SIZE + NAME_EXT_SIZE) {
+    treatedName[6] = '~';
+    treatedName[7] = '1';
+  }
 
   // Copia a parte principal do nome
   for (int i = 0; i < NAME_MAIN_SIZE; i++) {
     shortName[i] = treatedName[i];
   }
 
-  // Copia a extensão do nome
-  for (int i = period, j = NAME_MAIN_SIZE; i < period + NAME_EXT_SIZE;
-    i++, j++) {
-    if (i > treatedName.size()) {
-      shortName[j] = ' ';
-    } else {
-      shortName[j] = treatedName[i];
+  // Copia a extensão do nome. Se existir uma
+  if (period != -1) {
+    for (int i = period, j = NAME_MAIN_SIZE; i < period + NAME_EXT_SIZE;
+      i++, j++) {
+      if (i > treatedName.size()) {
+        shortName[j] = ' ';
+      } else {
+        shortName[j] = treatedName[i];
+      }
+    }
+  } else {
+    for (int i = NAME_MAIN_SIZE; i < NAME_MAIN_SIZE + NAME_EXT_SIZE; i++) {
+      shortName[i] = ' ';
     }
   }
 
