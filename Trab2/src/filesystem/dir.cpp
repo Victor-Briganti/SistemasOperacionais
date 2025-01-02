@@ -225,6 +225,25 @@ std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name)
   return longDirs;
 }
 
+bool randomizeShortname(char *shortName)
+{
+  if (shortName == nullptr) {
+    return false;
+  }
+
+  srand(time(NULL));
+
+  for (int i = 0; i < 6; i++) {
+    if (rand() % 6) {
+      shortName[i] = rand() * ('Z' - 'A') + 'A';
+    } else {
+      shortName[i] = rand() * ('9' - '0') + '0';
+    }
+  }
+
+  return true;
+}
+
 BYTE shortCheckSum(const char *shortName)
 {
   BYTE Sum = 0;
@@ -320,7 +339,7 @@ char *generateShortName(const std::string &longName)
   // Copia a extensão do nome. Se existir uma
   if (period != -1) {
     for (int i = period, j = NAME_MAIN_SIZE; i < period + NAME_EXT_SIZE;
-      i++, j++) {
+         i++, j++) {
       if (i > treatedName.size()) {
         shortName[j] = ' ';
       } else {

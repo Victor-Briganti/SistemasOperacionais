@@ -173,6 +173,15 @@ BYTE shortCheckSum(const char *shortName);
 char *generateShortName(const std::string &longName);
 
 /**
+ * @brief Gera um nome curto aleatório para evitar problemas
+ *
+ * @param shortName Ponteiro para nome curto que será alterado
+ *
+ * @return true se foi possível alterar o nome, false caso contrário
+ */
+bool randomizeShortname(char *shortName);
+
+/**
  * @brief Retorna o dia com base em um datestamp
  *
  * @param date Data para ser extraida
@@ -247,7 +256,5 @@ WORD seconds(WORD time);
  * @return O timestamp criado
  */
 DWORD timeStamp(DWORD hour, DWORD minutes, DWORD seconds);
-
-void printDir(Dir &dir);
 
 #endif// DIR_HPP
