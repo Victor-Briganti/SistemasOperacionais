@@ -13,6 +13,8 @@
 #include "filesystem/bpb.hpp"
 #include "io/image.hpp"
 
+#include <vector>
+
 /* Máscaras para leitura e escrita na tabela */
 #define LSB_MASK (0x0FFFFFFF)
 #define MSB_MASK (0xF0000000)
@@ -103,13 +105,22 @@ public:
   void printInfo() const;
 
   /**
+   * @brief Cadeia de clusters
+   *
+   * @param start Inicio da cadeia a ser listada
+   *
+   * @return Retorna uma lista com todos os clusters da cadeia
+   */
+  std::vector<DWORD> listChain(DWORD start);
+
+  /**
    * @brief Remove uma cadeia de clusters alocada
    *
    * @param start Inicio da cadeia a ser removida
    *
    * @return Retorna a quantidade de cadeias removidas
    */
-  int removeChain(const DWORD start);
+  int removeChain(DWORD start);
 
   /**
    * @brief Quantidade de clusters em uso

@@ -74,55 +74,60 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
     return {};
   }
 
-  // Lê o cluster no qual o diretório se encontra
-  if (!readCluster(buffer, num)) {
-    std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
-    delete[] static_cast<char *>(buffer);
-    return {};
-  }
-
-  // Cast para facilitar manuseio do buffer
-  Dir *bufferDir = static_cast<Dir *>(buffer);
-
   // Lista com diretórios de nomes longos
   std::vector<LongDir> longDirs;
 
   // Vetor com todas as entradas
   std::vector<Dentry> dentries;
 
-  // Define a posição da entrada no buffer
-  DWORD bufferPos = 0;
+  // Cadeia com os clusters
+  std::vector<DWORD> chain = fatTable->listChain(num);
 
-  // Caminha por todo o buffer até encontrar o FREE_ENTRY ou alcançar o limite
-  // de tamanho do cluster.
-  for (size_t i = 0; i < (bios->totClusByts() / sizeof(Dir)); i++) {
-    // Final do diretório
-    if (bufferDir[i].name[0] == EOD_ENTRY) {
-      break;
+  for (auto cluster : chain) {
+    // Lê o cluster no qual o diretório se encontra
+    if (!readCluster(buffer, cluster)) {
+      std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+      delete[] static_cast<char *>(buffer);
+      return {};
     }
 
-    // Diretório vazio
-    if (bufferDir[i].name[0] == FREE_ENTRY) {
-      continue;
-    }
+    // Cast para facilitar manuseio do buffer
+    Dir *bufferDir = static_cast<Dir *>(buffer);
 
-    if (bufferDir[i].attr == ATTR_LONG_NAME) {
-      if (bufferPos == 0) {
-        bufferPos = static_cast<DWORD>(i);
+    // Define a posição da entrada no buffer
+    DWORD bufferPos = 0;
+
+    // Caminha por todo o buffer até encontrar o FREE_ENTRY ou alcançar o limite
+    // de tamanho do cluster.
+    for (size_t i = 0; i < (bios->totClusByts() / sizeof(Dir)); i++) {
+      // Final do diretório
+      if (bufferDir[i].name[0] == EOD_ENTRY) {
+        break;
       }
 
-      LongDir ldir;
-      memcpy(&ldir, &bufferDir[i], sizeof(ldir));
-      longDirs.push_back(ldir);
-    } else {
-      Dentry entry(bufferDir[i],
-        longDirs,
-        static_cast<DWORD>(bufferPos),
-        static_cast<DWORD>(i));
+      // Diretório vazio
+      if (bufferDir[i].name[0] == FREE_ENTRY) {
+        continue;
+      }
 
-      dentries.push_back(entry);
-      longDirs.clear();
-      bufferPos = 0;
+      if (bufferDir[i].attr == ATTR_LONG_NAME) {
+        if (bufferPos == 0) {
+          bufferPos = static_cast<DWORD>(i);
+        }
+
+        LongDir ldir;
+        memcpy(&ldir, &bufferDir[i], sizeof(ldir));
+        longDirs.push_back(ldir);
+      } else {
+        Dentry entry(bufferDir[i],
+          longDirs,
+          static_cast<DWORD>(bufferPos),
+          static_cast<DWORD>(i));
+
+        dentries.push_back(entry);
+        longDirs.clear();
+        bufferPos = 0;
+      }
     }
   }
 

@@ -112,11 +112,11 @@ void FatTable::printInfo() const
     static_cast<DWORD>(usedClusters()) * bios->getBytesPerSec());
 }
 
-int FatTable::removeChain(const DWORD start)
+std::vector<DWORD> FatTable::listChain(DWORD start)
 {
   // Arquivo recém criado que não tem nada escrito
   if (start == 0) {
-    return 0;
+    return {};
   }
 
   std::vector<DWORD> chain;
@@ -126,6 +126,16 @@ int FatTable::removeChain(const DWORD start)
   while (value < EOC) {
     chain.push_back(value);
     value = readFromTable(value);
+  }
+
+  return chain;
+}
+
+int FatTable::removeChain(DWORD start)
+{
+  std::vector<DWORD> chain = listChain(start);
+  if (chain.empty()) {
+    return 0;
   }
 
   for (const auto &a : chain) {
