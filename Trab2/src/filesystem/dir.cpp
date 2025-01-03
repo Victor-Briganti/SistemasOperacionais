@@ -129,6 +129,7 @@ static std::vector<char> generateLongName(const std::string &name)
     nameVec.push_back(chr);
     nameVec.push_back('\0');
   }
+  nameVec.push_back('\0');
 
   // Na prática uma entrada de nome longo armazena o dobro de caracteres
   while (nameVec.size() % (LONG_NAME_SIZE * 2) != 0) {
@@ -215,11 +216,11 @@ std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name)
   }
 
   std::reverse(longDirs.begin(), longDirs.end());
-  for (size_t i = longDirs.size() - 1, j = 0; i <= 0; i--, j++) {
-    if (i == longDirs.size() - 1) {
-      longDirs[j].ord = static_cast<BYTE>(LAST_LONG_ENTRY | i);
+  for (int i = static_cast<int>(longDirs.size() - 1), j = 0; i >= 0; i--, j++) {
+    if (i == static_cast<int>(longDirs.size() - 1)) {
+      longDirs[j].ord = static_cast<BYTE>(LAST_LONG_ENTRY | (i + 1));
     } else {
-      longDirs[j].ord = static_cast<BYTE>(i);
+      longDirs[j].ord = static_cast<BYTE>(i + 1);
     }
   }
   return longDirs;
