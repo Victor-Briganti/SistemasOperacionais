@@ -18,7 +18,6 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
-#include <list>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -394,18 +393,18 @@ bool FatFS::insertDirEntries(DWORD num,
     // entradas livres ou alcançar o limite de tamanho do cluster.
     for (size_t j = 0; j < numDirs; j++) {
       // Final do diretório
-      if (bufferDir[i].name[0] == EOD_ENTRY) {
-        bufferPos = i;
+      if (bufferDir[j].name[0] == EOD_ENTRY) {
+        bufferPos = j;
         break;
       }
 
       // Diretório vazio
-      if (bufferDir[i].name[0] == FREE_ENTRY) {
+      if (bufferDir[j].name[0] == FREE_ENTRY) {
         countFreeEntries++;
 
         // Se for a primeira parte da contagem salva sua posição
         if (countFreeEntries == 1) {
-          bufferPos = i;
+          bufferPos = j;
         }
 
         // Se a quantidade de diretórios vazios bate com o que precisamos use
@@ -427,6 +426,21 @@ bool FatFS::insertDirEntries(DWORD num,
 
       countFreeEntries = 0;
     }
+
+    if (bufferPos + requiredEntries >= numDirs) {
+      return false;
+    }
+
+    size_t k = bufferPos;
+    for (auto a : ldir) {
+      memcpy(&bufferDir[k], &a, sizeof(a));
+      k++;
+    }
+    memcpy(&bufferDir[k], &dir, sizeof(dir));
+
+    bool result = writeCluster(bufferDir, chain[i]);
+    delete[] static_cast<char *>(buffer);
+    return result;
   }
 
   return false;
