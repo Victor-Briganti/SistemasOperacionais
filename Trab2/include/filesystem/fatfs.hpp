@@ -23,6 +23,9 @@
 #define ARCH_ENTRY 0
 #define ALL_ENTRY -1
 
+// Definição sobre o que é o diretório raiz
+#define ROOT_DIR "img/"
+
 class FatFS
 {
 private:
@@ -139,6 +142,21 @@ private:
   std::pair<Dentry, DWORD> searchEntry(const std::vector<std::string> &listPath,
     int expectDir);
 
+  /**
+   * @brief Insere as entradas no espaço do diretório
+   *
+   * @param num Número do cluster onde ocorrerá a busca
+   * @param dir Entrada curta
+   * @param ldir Entradas longas
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca da
+   * entrada do caminho.
+   * @return true se houver espaço false caso contrário
+   */
+  bool insertDirEntries(DWORD num,
+    const Dir &dir,
+    const std::vector<LongDir> &ldir);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo
@@ -208,6 +226,13 @@ public:
    * @param path Caminho para a entrada a ser apresentada
    */
   void attr(const std::string &path);
+
+  /**
+   * @brief Cria um arquivo vazio
+   *
+   * @param path Caminho para a entrada a ser criada
+   */
+  void touch(const std::string &path);
 };
 
 #endif// FAT_FS_HPP

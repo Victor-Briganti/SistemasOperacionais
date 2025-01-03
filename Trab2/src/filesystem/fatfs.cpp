@@ -18,6 +18,7 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
+#include <list>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -97,7 +98,7 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
     // Define a posição da entrada no buffer
     DWORD bufferPos = 0;
 
-    // Caminha por todo o buffer até encontrar o FREE_ENTRY ou alcançar o limite
+    // Caminha por todo o buffer até encontrar o EOD_ENTRY ou alcançar o limite
     // de tamanho do cluster.
     for (size_t i = 0; i < (bios->totClusByts() / sizeof(Dir)); i++) {
       // Final do diretório
@@ -212,15 +213,20 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
   }
 
   // Se necessário monta o caminho completo
-  if (listPath[0] != "img/") {
+  if (listPath.empty() || listPath[0] != ROOT_DIR) {
     std::vector<std::string> fullPath = split(curPath, '/');
     fullPath.insert(fullPath.end(), listPath.begin(), listPath.end());
     listPath = fullPath;
   }
 
+  // Se o caminho é o root, não há o que verificar
+  if (listPath.size() == 1 && listPath[0] == ROOT_DIR) {
+    return listPath;
+  }
+
   // Caminho que será criado
   std::vector<std::string> newPath;
-  newPath.emplace_back("img/");
+  newPath.emplace_back(ROOT_DIR);
 
   // Começa a busca pelo "/"
   DWORD clt = bios->getRootClus();
@@ -250,7 +256,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
 
         if ((i != listPath.size() - 1) && !a.isDirectory()) {
           std::string error =
-            "[" ERROR "] img/" + merge(listPath) + " caminho inválido\n";
+            "[" ERROR "]" ROOT_DIR + merge(listPath) + " caminho inválido\n";
           throw std::runtime_error(error);
         }
 
@@ -261,11 +267,11 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
 
         if (a.getNameType() == DOTDOT_NAME && newPath.size() == 1) {
           std::string error =
-            "[" ERROR "] img/" + merge(listPath) + " caminho inválido\n";
+            "[" ERROR "]" ROOT_DIR + merge(listPath) + " caminho inválido\n";
           throw std::runtime_error(error);
         }
 
-        if (a.getNameType() == DOTDOT_NAME && newPath.back() != "img/") {
+        if (a.getNameType() == DOTDOT_NAME && newPath.back() != ROOT_DIR) {
           newPath.pop_back();
         } else {
           newPath.push_back(a.getLongName());
@@ -281,7 +287,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
     // Se não foi encontrado, gera um erro
     if (!found) {
       std::string error =
-        "[" ERROR "] img/" + merge(listPath) + " caminho inválido\n";
+        "[" ERROR "]" ROOT_DIR + merge(listPath) + " caminho inválido\n";
       throw std::runtime_error(error);
     }
 
@@ -321,7 +327,7 @@ std::pair<Dentry, DWORD>
         // Se no meio do caminho temos um arquivo gera um erro
         if ((i != listPath.size() - 1) && !a.isDirectory()) {
           std::string error =
-            "[" ERROR "] img/" + merge(listPath) + " caminho inválido5\n";
+            "[" ERROR "]" ROOT_DIR + merge(listPath) + " caminho inválido5\n";
           throw std::runtime_error(error);
         }
 
@@ -339,7 +345,7 @@ std::pair<Dentry, DWORD>
     // Se não foi encontrado gera um erro
     if (!found) {
       std::string error =
-        "[" ERROR "] img/" + merge(listPath) + " não encontrado\n";
+        "[" ERROR "]" ROOT_DIR + merge(listPath) + " não encontrado\n";
       throw std::runtime_error(error);
     }
 
@@ -348,6 +354,82 @@ std::pair<Dentry, DWORD>
   }
 
   return entry;
+}
+
+bool FatFS::insertDirEntries(DWORD num,
+  const Dir &dir,
+  const std::vector<LongDir> &ldir)
+{
+  // Aloca o buffer do diretório
+  void *buffer = new char[bios->totClusByts()];
+  if (buffer == nullptr) {
+    std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
+    return false;
+  }
+
+  // Define a posição da entrada no buffer
+  DWORD bufferPos = 0;
+
+  // Quantidade de entradas que precisam ser salvas
+  size_t requiredEntries = ldir.size() + 1;
+
+  // Cadeia com os clusters
+  std::vector<DWORD> chain = fatTable->listChain(num);
+
+  // Quantidade de entradas por cluster
+  size_t numDirs = bios->totClusByts() / sizeof(Dir);
+
+  for (size_t i = 0, countFreeEntries = 0; i < chain.size(); i++) {
+    // Lê o cluster no qual o diretório se encontra
+    if (!readCluster(buffer, chain[i])) {
+      std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+      delete[] static_cast<char *>(buffer);
+      return {};
+    }
+
+    // Cast para facilitar manuseio do buffer
+    Dir *bufferDir = static_cast<Dir *>(buffer);
+
+    // Caminha por todo o buffer até encontrar uma quantidade suficiente de
+    // entradas livres ou alcançar o limite de tamanho do cluster.
+    for (size_t j = 0; j < numDirs; j++) {
+      // Final do diretório
+      if (bufferDir[i].name[0] == EOD_ENTRY) {
+        bufferPos = i;
+        break;
+      }
+
+      // Diretório vazio
+      if (bufferDir[i].name[0] == FREE_ENTRY) {
+        countFreeEntries++;
+
+        // Se for a primeira parte da contagem salva sua posição
+        if (countFreeEntries == 1) {
+          bufferPos = i;
+        }
+
+        // Se a quantidade de diretórios vazios bate com o que precisamos use
+        if (countFreeEntries == requiredEntries) {
+          size_t k = bufferPos;
+          for (auto a : ldir) {
+            memcpy(&bufferDir[k], &a, sizeof(a));
+            k++;
+          }
+          memcpy(&bufferDir[k], &dir, sizeof(dir));
+
+          bool result = writeCluster(bufferDir, chain[i]);
+          delete[] static_cast<char *>(buffer);
+          return result;
+        }
+
+        continue;
+      }
+
+      countFreeEntries = 0;
+    }
+  }
+
+  return false;
 }
 
 //===------------------------------------------------------------------------===
@@ -381,7 +463,7 @@ FatFS::FatFS(const std::string &path)
     throw std::runtime_error(error);
   }
 
-  curPath = "img/";
+  curPath = ROOT_DIR;
 }
 
 FatFS::~FatFS()
@@ -432,7 +514,7 @@ void FatFS::ls(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img/") {
+  if (listPath.back() == ROOT_DIR) {
     // Lista de entradas
     std::vector<Dentry> dentries = getDirEntries(bios->getRootClus());
 
@@ -473,7 +555,7 @@ void FatFS::rm(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img/") {
+  if (listPath.back() == ROOT_DIR) {
     std::fprintf(stderr, "[" ERROR "] rm espera um arquivo\n");
     return;
   }
@@ -504,7 +586,7 @@ void FatFS::rmdir(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img/") {
+  if (listPath.back() == ROOT_DIR) {
     std::fprintf(stderr, "[" ERROR "] operação não permitida\n");
     return;
   }
@@ -547,7 +629,7 @@ void FatFS::attr(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img/") {
+  if (listPath.back() == ROOT_DIR) {
     std::fprintf(stderr, "[" ERROR "] operação não permitida\n");
     return;
   }
@@ -606,5 +688,48 @@ void FatFS::attr(const std::string &path)
   } catch (const std::exception &error) {
     std::cout << error.what();
     return;
+  }
+}
+
+void FatFS::touch(const std::string &path)
+{
+  // Lista de nomes nos caminhos
+  std::vector<std::string> listPath = split(path, '/');
+  if (listPath.size() == 1 && listPath[0] == ROOT_DIR) {
+    std::fprintf(stderr, "[" ERROR "] operação inválida\n");
+    return;
+  }
+
+  // Salva o nome do arquivo a ser criado
+  std::string filename = listPath.back();
+  listPath.pop_back();
+
+  try {
+    std::string newPath = merge(listPath);
+    listPath = pathParser(newPath, DIR_ENTRY);
+  } catch (const std::exception &error) {
+    std::cout << error.what();
+    return;
+  }
+
+  // Diretório raiz
+  if (listPath.back() == ROOT_DIR) {
+    DWORD cluster = bios->getRootClus();
+
+    std::vector<Dentry> dentries = getDirEntries(cluster);
+
+    for (const auto &dtr : dentries) {
+      if (dtr.getLongName() == filename) {
+        std::fprintf(stderr, "[" ERROR "] arquivo já existe\n");
+        return;
+      }
+    }
+
+    Dir dir = createDir(filename, 0, 0, ATTR_LONG_NAME | ATTR_ARCHIVE);
+    std::vector<LongDir> ldir = createLongDir(dir, filename);
+    if (!insertDirEntries(cluster, dir, ldir)) {
+      std::fprintf(stderr, "[" ERROR "] operação falhou\n");
+      return;
+    }
   }
 }
