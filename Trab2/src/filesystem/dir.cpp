@@ -182,7 +182,7 @@ std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name)
   }
 
   std::vector<LongDir> longDirs;
-  DWORD checksum = shortCheckSum(reinterpret_cast<const char *>(dir.name));
+  BYTE checksum = shortCheckSum(reinterpret_cast<const char *>(dir.name));
   std::vector<char> longChars = generateLongName(name);
 
   size_t i = 0;
@@ -193,22 +193,22 @@ std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name)
     ldir.attr = ATTR_LONG_NAME;
 
     // O único valor especificado aqui é o do diretório que deve ser 0.
-    if (dir.attr & ATTR_DIRECTORY == 0) {
+    if ((dir.attr & ATTR_DIRECTORY) == 0) {
       ldir.type = 0;
     } else {
       ldir.type = 1;
     }
 
     for (int j = 0; j < 10; j++, i++) {
-      ldir.name1[j] = longChars[i];
+      ldir.name1[j] = static_cast<BYTE>(longChars[i]);
     }
 
     for (int j = 0; j < 12; j++, i++) {
-      ldir.name2[j] = longChars[i];
+      ldir.name2[j] = static_cast<BYTE>(longChars[i]);
     }
 
     for (int j = 0; j < 4; j++, i++) {
-      ldir.name3[j] = longChars[i];
+      ldir.name3[j] = static_cast<BYTE>(longChars[i]);
     }
 
     longDirs.push_back(ldir);
@@ -217,9 +217,9 @@ std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name)
   std::reverse(longDirs.begin(), longDirs.end());
   for (size_t i = longDirs.size() - 1, j = 0; i <= 0; i--, j++) {
     if (i == longDirs.size() - 1) {
-      longDirs[j].ord = LAST_LONG_ENTRY | i;
+      longDirs[j].ord = static_cast<BYTE>(LAST_LONG_ENTRY | i);
     } else {
-      longDirs[j].ord = i;
+      longDirs[j].ord = static_cast<BYTE>(i);
     }
   }
   return longDirs;
@@ -231,13 +231,13 @@ bool randomizeShortname(char *shortName)
     return false;
   }
 
-  srand(time(NULL));
+  srand(static_cast<unsigned int>(time(NULL)));
 
   for (int i = 0; i < 6; i++) {
     if (rand() % 6) {
-      shortName[i] = rand() * ('Z' - 'A') + 'A';
+      shortName[i] = static_cast<char>(rand() * ('Z' - 'A') + 'A');
     } else {
-      shortName[i] = rand() * ('9' - '0') + '0';
+      shortName[i] = static_cast<char>(rand() * ('9' - '0') + '0');
     }
   }
 
@@ -296,7 +296,7 @@ char *generateShortName(const std::string &longName)
 
     // Salva sempre o último ponto visto no nome do arquivo
     if (longName[i] == '.') {
-      period = treatedName.size();
+      period = static_cast<int>(treatedName.size());
       continue;
     }
 
@@ -314,7 +314,8 @@ char *generateShortName(const std::string &longName)
   // padding
   if (period != -1) {
     // Realiza o padding na parte principal do nome
-    for (int i = period; i < NAME_MAIN_SIZE; i++, period++) {
+    for (size_t i = static_cast<size_t>(period); i < NAME_MAIN_SIZE;
+         i++, period++) {
       treatedName = treatedName.substr(0, i) + " "
                     + treatedName.substr(i, treatedName.size());
     }
@@ -332,13 +333,14 @@ char *generateShortName(const std::string &longName)
   }
 
   // Copia a parte principal do nome
-  for (int i = 0; i < NAME_MAIN_SIZE; i++) {
+  for (size_t i = 0; i < NAME_MAIN_SIZE; i++) {
     shortName[i] = treatedName[i];
   }
 
   // Copia a extensão do nome. Se existir uma
   if (period != -1) {
-    for (int i = period, j = NAME_MAIN_SIZE; i < period + NAME_EXT_SIZE;
+    for (size_t i = static_cast<size_t>(period), j = NAME_MAIN_SIZE;
+         i < static_cast<size_t>(period) + NAME_EXT_SIZE;
          i++, j++) {
       if (i > treatedName.size()) {
         shortName[j] = ' ';
