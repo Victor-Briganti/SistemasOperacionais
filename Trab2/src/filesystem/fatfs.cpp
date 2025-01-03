@@ -441,10 +441,10 @@ void FatFS::ls(const std::string &path)
 
   try {
     // Busca pela entrada
-    std::pair<Dentry, DWORD> entry = searchEntry(listPath, DIR_ENTRY);
+    auto [entry, _] = searchEntry(listPath, DIR_ENTRY);
 
     // Lista de entradas
-    std::vector<Dentry> dentries = getDirEntries(entry.first.getCluster());
+    std::vector<Dentry> dentries = getDirEntries(entry.getCluster());
 
     // Mostra todas as entradas
     for (const auto &a : dentries) {
@@ -506,9 +506,9 @@ void FatFS::rmdir(const std::string &path)
 
   try {
     // Busca pela entrada
-    std::pair<Dentry, DWORD> entry = searchEntry(listPath, DIR_ENTRY);
+    auto [entry, cluster] = searchEntry(listPath, DIR_ENTRY);
 
-    if (!removeEntry(entry.first, entry.second)) {
+    if (!removeEntry(entry, cluster)) {
       std::fprintf(
         stderr, "[" ERROR "] rmdir %s operação falhou\n", path.c_str());
       return;
@@ -549,57 +549,54 @@ void FatFS::attr(const std::string &path)
 
   try {
     // Busca pela entrada
-    std::pair<Dentry, DWORD> entry = searchEntry(listPath, ALL_ENTRY);
+    auto [entry, _] = searchEntry(listPath, ALL_ENTRY);
 
     std::fprintf(stdout,
       "Entrada: %s (%s)\n",
-      entry.first.getLongName().c_str(),
-      entry.first.getShortName());
+      entry.getLongName().c_str(),
+      entry.getShortName());
 
     std::fprintf(stdout,
       "Tamanho=%-8d Cluster=%-4d\n",
-      entry.first.getFileSize(),
-      entry.first.getCluster());
+      entry.getFileSize(),
+      entry.getCluster());
 
     std::fprintf(stdout,
       "Data Criação: %02d-%02d-%02d\n",
-      entry.first.getCreationDay(),
-      entry.first.getCreationMonth(),
-      entry.first.getCreationYear());
+      entry.getCreationDay(),
+      entry.getCreationMonth(),
+      entry.getCreationYear());
 
     std::fprintf(stdout,
       "Hora Criação: %02d:%02d:%04d\n",
-      entry.first.getCreationHour(),
-      entry.first.getCreationMinute(),
-      entry.first.getCreationSeconds());
+      entry.getCreationHour(),
+      entry.getCreationMinute(),
+      entry.getCreationSeconds());
 
     std::fprintf(stdout,
       "Data Escrita: %02d-%02d-%02d\n",
-      entry.first.getWriteDay(),
-      entry.first.getWriteMonth(),
-      entry.first.getWriteYear());
+      entry.getWriteDay(),
+      entry.getWriteMonth(),
+      entry.getWriteYear());
 
     std::fprintf(stdout,
       "Hora Escrita: %02d:%02d:%04d\n",
-      entry.first.getWriteHour(),
-      entry.first.getWriteMinute(),
-      entry.first.getWriteSeconds());
+      entry.getWriteHour(),
+      entry.getWriteMinute(),
+      entry.getWriteSeconds());
 
     std::fprintf(stdout,
       "Última Data de Acesso: %02d-%02d-%02d\n",
-      entry.first.getLstAccDay(),
-      entry.first.getLstAccMonth(),
-      entry.first.getLstAccYear());
+      entry.getLstAccDay(),
+      entry.getLstAccMonth(),
+      entry.getLstAccYear());
 
-    std::fprintf(stdout,
-      "Tipo: %s",
-      entry.first.isDirectory() ? "diretório\n" : "arquivo\n");
-
-    std::fprintf(stdout,
-      "%s",
-      entry.first.isReadOnly() ? "Atributo: Somente leitura\n" : "");
     std::fprintf(
-      stdout, "%s", entry.first.isHidden() ? "Atributo: Escondido\n" : "");
+      stdout, "Tipo: %s", entry.isDirectory() ? "diretório\n" : "arquivo\n");
+
+    std::fprintf(
+      stdout, "%s", entry.isReadOnly() ? "Atributo: Somente leitura\n" : "");
+    std::fprintf(stdout, "%s", entry.isHidden() ? "Atributo: Escondido\n" : "");
 
   } catch (const std::exception &error) {
     std::cout << error.what();
