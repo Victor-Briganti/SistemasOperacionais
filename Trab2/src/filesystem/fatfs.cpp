@@ -206,12 +206,13 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
   std::vector<std::string> listPath = split(path, '/');
 
   if (path[0] == '/') {
-    std::string error = "[" ERROR "] " + path + " caminho inválido\n";
+    std::string error =
+      "[" ERROR "] " + merge(listPath) + " caminho inválido\n";
     throw std::runtime_error(error);
   }
 
   // Se necessário monta o caminho completo
-  if (listPath[0] != "img") {
+  if (listPath[0] != "img/") {
     std::vector<std::string> fullPath = split(curPath, '/');
     fullPath.insert(fullPath.end(), listPath.begin(), listPath.end());
     listPath = fullPath;
@@ -219,7 +220,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
 
   // Caminho que será criado
   std::vector<std::string> newPath;
-  newPath.emplace_back("img");
+  newPath.emplace_back("img/");
 
   // Começa a busca pelo "/"
   DWORD clt = bios->getRootClus();
@@ -235,7 +236,8 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
       if (listPath[i] == a.getLongName()) {
         if (i == listPath.size() - 1 && expectDir != ALL_ENTRY
             && expectDir != static_cast<int>(a.isDirectory())) {
-          std::string error = "[" ERROR "] " + path + " esperava um ";
+          std::string error =
+            "[" ERROR "] " + merge(listPath) + " esperava um ";
 
           if (DIR_ENTRY) {
             error += "diretório\n";
@@ -247,7 +249,8 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
         }
 
         if ((i != listPath.size() - 1) && !a.isDirectory()) {
-          std::string error = "[" ERROR "] " + path + " caminho inválido\n";
+          std::string error =
+            "[" ERROR "] img/" + merge(listPath) + " caminho inválido\n";
           throw std::runtime_error(error);
         }
 
@@ -257,11 +260,12 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
         }
 
         if (a.getNameType() == DOTDOT_NAME && newPath.size() == 1) {
-          std::string error = "[" ERROR "] " + path + " caminho inválido\n";
+          std::string error =
+            "[" ERROR "] img/" + merge(listPath) + " caminho inválido\n";
           throw std::runtime_error(error);
         }
 
-        if (a.getNameType() == DOTDOT_NAME && newPath.back() != "img") {
+        if (a.getNameType() == DOTDOT_NAME && newPath.back() != "img/") {
           newPath.pop_back();
         } else {
           newPath.push_back(a.getLongName());
@@ -276,7 +280,8 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
 
     // Se não foi encontrado, gera um erro
     if (!found) {
-      std::string error = "[" ERROR "] " + path + " caminho inválido\n";
+      std::string error =
+        "[" ERROR "] img/" + merge(listPath) + " caminho inválido\n";
       throw std::runtime_error(error);
     }
 
@@ -316,7 +321,7 @@ std::pair<Dentry, DWORD>
         // Se no meio do caminho temos um arquivo gera um erro
         if ((i != listPath.size() - 1) && !a.isDirectory()) {
           std::string error =
-            "[" ERROR "] " + merge(listPath) + " caminho inválido\n";
+            "[" ERROR "] img/" + merge(listPath) + " caminho inválido5\n";
           throw std::runtime_error(error);
         }
 
@@ -334,7 +339,7 @@ std::pair<Dentry, DWORD>
     // Se não foi encontrado gera um erro
     if (!found) {
       std::string error =
-        "[" ERROR "] " + merge(listPath) + " não encontrado\n";
+        "[" ERROR "] img/" + merge(listPath) + " não encontrado\n";
       throw std::runtime_error(error);
     }
 
@@ -427,7 +432,7 @@ void FatFS::ls(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img") {
+  if (listPath.back() == "img/") {
     // Lista de entradas
     std::vector<Dentry> dentries = getDirEntries(bios->getRootClus());
 
@@ -468,7 +473,7 @@ void FatFS::rm(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img") {
+  if (listPath.back() == "img/") {
     std::fprintf(stderr, "[" ERROR "] rm espera um arquivo\n");
     return;
   }
@@ -499,7 +504,7 @@ void FatFS::rmdir(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img") {
+  if (listPath.back() == "img/") {
     std::fprintf(stderr, "[" ERROR "] operação não permitida\n");
     return;
   }
@@ -542,7 +547,7 @@ void FatFS::attr(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == "img") {
+  if (listPath.back() == "img/") {
     std::fprintf(stderr, "[" ERROR "] operação não permitida\n");
     return;
   }
