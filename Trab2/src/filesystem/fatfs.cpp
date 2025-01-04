@@ -838,19 +838,29 @@ void FatFS::touch(const std::string &path)
 
     std::vector<Dentry> dentries = getDirEntries(cluster);
 
+
+    // Gera a entrada curta
+    Dir dir = createDir(filename, 0, 0, ATTR_ARCHIVE);
     for (const auto &dtr : dentries) {
       if (dtr.getLongName() == filename) {
         std::fprintf(stderr, "[" ERROR "] arquivo já existe\n");
         return;
       }
+
+      while (!std::strncmp(
+        dtr.getShortName(), reinterpret_cast<const char *>(dir.name), 11)) {
+        randomizeShortname(reinterpret_cast<char *>(dir.name));
+      }
     }
 
-    Dir dir = createDir(filename, 0, 0, ATTR_LONG_NAME | ATTR_ARCHIVE);
+    // Gera as entradas longas
     std::vector<LongDir> ldir = createLongDir(dir, filename);
+
     if (!insertDirEntries(cluster, dir, ldir)) {
       std::fprintf(stderr, "[" ERROR "] operação falhou\n");
-      return;
     }
+
+    return;
   }
 
   // Busca pela entrada
@@ -859,15 +869,24 @@ void FatFS::touch(const std::string &path)
   // Lista de entradas
   std::vector<Dentry> dentries = getDirEntries(entry.getCluster());
 
+  // Gera a entrada curta
+  Dir dir = createDir(filename, 0, 0, ATTR_ARCHIVE);
+
   for (const auto &dtr : dentries) {
     if (dtr.getLongName() == filename) {
       std::fprintf(stderr, "[" ERROR "] arquivo já existe\n");
       return;
     }
+
+    while (!std::strncmp(
+      dtr.getShortName(), reinterpret_cast<const char *>(dir.name), 11)) {
+      randomizeShortname(reinterpret_cast<char *>(dir.name));
+    }
   }
 
-  Dir dir = createDir(filename, 0, 0, ATTR_LONG_NAME | ATTR_ARCHIVE);
+  // Gera as entradas longas
   std::vector<LongDir> ldir = createLongDir(dir, filename);
+
   if (!insertDirEntries(entry.getCluster(), dir, ldir)) {
     std::fprintf(stderr, "[" ERROR "] operação falhou\n");
     return;

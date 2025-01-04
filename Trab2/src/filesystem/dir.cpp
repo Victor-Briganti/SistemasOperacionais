@@ -129,6 +129,9 @@ static std::vector<char> generateLongName(const std::string &name)
     nameVec.push_back(chr);
     nameVec.push_back('\0');
   }
+
+  // O nome precisa ser finalizado com '\0'
+  nameVec.push_back('\0');
   nameVec.push_back('\0');
 
   // Na prática uma entrada de nome longo armazena o dobro de caracteres
@@ -237,9 +240,9 @@ bool randomizeShortname(char *shortName)
 
   for (int i = 0; i < 6; i++) {
     if (rand() % 6) {
-      shortName[i] = static_cast<char>(rand() * ('Z' - 'A') + 'A');
+      shortName[i] = static_cast<char>(rand() % ('Z' - 'A') + 'A');
     } else {
-      shortName[i] = static_cast<char>(rand() * ('9' - '0') + '0');
+      shortName[i] = static_cast<char>(rand() % ('9' - '0') + '0');
     }
   }
 
