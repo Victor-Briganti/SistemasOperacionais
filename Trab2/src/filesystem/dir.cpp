@@ -160,6 +160,7 @@ Dir createDir(const std::string &name,
     throw std::runtime_error(error);
   }
   memcpy(directory.name, shortName, 11);
+  delete[] shortName;
 
   directory.fileSize = fileSize;
   directory.fstClusLO = lowCluster(cluster);

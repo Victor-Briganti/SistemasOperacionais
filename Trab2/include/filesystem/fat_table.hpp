@@ -41,14 +41,14 @@ class FatTable
    *
    * @return true se foi possível ler, false caso contrário
    */
-  bool readFatTable(const int num);
+  bool readFatTable(int num);
 
   /**
    * @brief Escreve uma das tabelas FAT na imagem
    *
    * @return true se foi possível escrever, false caso contrário
    */
-  bool writeFatTable(const int num);
+  bool writeFatTable(int num);
 
   /**
    * @brief Lê uma entrada da tabela FAT em memória
@@ -58,7 +58,7 @@ class FatTable
    *
    * @return true se foi possível ler, false caso contrário
    */
-  DWORD readFromTable(const DWORD offset) const;
+  [[nodiscard]] DWORD readFromTable(DWORD offset) const;
 
   /**
    * @brief Escreve em uma das entradas da tabela FAT em memória
@@ -68,8 +68,7 @@ class FatTable
    *
    * @return true se foi possível escrever, false caso contrário
    */
-  void writeInTable(const DWORD num, const DWORD value);
-
+  void writeInTable(DWORD num, DWORD value);
 
 public:
   /**
@@ -139,6 +138,27 @@ public:
    * @return Valor da quantidade de clusters livres
    */
   [[nodiscard]] DWORD freeClusters() const;
+
+  /**
+   * @brief Busca por uma entrada livre na tabela fat
+   *
+   * @param num Posição inicial para realizar a busca. A posição do cluster
+   * encontrado é salvo aqui.
+   *
+   * @return true se foi encontrado, false caso contrário
+   */
+  bool searchFreeEntry(DWORD &num);
+
+  /**
+   * @brief Aloca os clusters
+   *
+   * @param tail Último cluster da antiga cadeia. Está função considera que seu
+   * valor é EOC
+   * @param clusters lista de clusters que serão alocados para formar uma cadeia
+   *
+   * @return true se foi possível escrever na tabela, false caso contrário
+   */
+  bool allocClusters(DWORD tail, const std::vector<DWORD> &clusters);
 };
 
 #endif// FAT_TABLE_HPP

@@ -366,6 +366,9 @@ bool FatFS::insertDirEntries(DWORD num,
     return false;
   }
 
+  // Flag para definir que o EOD foi encontrado
+  bool eodFound = false;
+
   // Define a posição da entrada no buffer
   DWORD bufferPos = 0;
 
@@ -378,16 +381,22 @@ bool FatFS::insertDirEntries(DWORD num,
   // Quantidade de entradas por cluster
   size_t numDirs = bios->totClusByts() / sizeof(Dir);
 
+  // Cast para facilitar manuseio do buffer
+  Dir *bufferDir;
+
+  // Cluster atual
+  DWORD curCluster;
+
   for (size_t i = 0, countFreeEntries = 0; i < chain.size(); i++) {
+    curCluster = chain[i];
     // Lê o cluster no qual o diretório se encontra
-    if (!readCluster(buffer, chain[i])) {
+    if (!readCluster(buffer, curCluster)) {
       std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
       delete[] static_cast<char *>(buffer);
       return {};
     }
 
-    // Cast para facilitar manuseio do buffer
-    Dir *bufferDir = static_cast<Dir *>(buffer);
+    bufferDir = static_cast<Dir *>(buffer);
 
     // Caminha por todo o buffer até encontrar uma quantidade suficiente de
     // entradas livres ou alcançar o limite de tamanho do cluster.
@@ -395,6 +404,7 @@ bool FatFS::insertDirEntries(DWORD num,
       // Final do diretório
       if (bufferDir[j].name[0] == EOD_ENTRY) {
         bufferPos = j;
+        eodFound = true;
         break;
       }
 
@@ -416,7 +426,7 @@ bool FatFS::insertDirEntries(DWORD num,
           }
           memcpy(&bufferDir[k], &dir, sizeof(dir));
 
-          bool result = writeCluster(bufferDir, chain[i]);
+          bool result = writeCluster(bufferDir, curCluster);
           delete[] static_cast<char *>(buffer);
           return result;
         }
@@ -426,11 +436,9 @@ bool FatFS::insertDirEntries(DWORD num,
 
       countFreeEntries = 0;
     }
+  }
 
-    if (bufferPos + requiredEntries >= numDirs) {
-      return false;
-    }
-
+  if (eodFound && bufferPos + requiredEntries < numDirs) {
     size_t k = bufferPos;
     for (auto a : ldir) {
       memcpy(&bufferDir[k], &a, sizeof(a));
@@ -438,11 +446,103 @@ bool FatFS::insertDirEntries(DWORD num,
     }
     memcpy(&bufferDir[k], &dir, sizeof(dir));
 
-    bool result = writeCluster(bufferDir, chain[i]);
+    bool result = writeCluster(bufferDir, curCluster);
     delete[] static_cast<char *>(buffer);
     return result;
   }
 
+  if (eodFound && bufferPos + requiredEntries >= numDirs) {
+    // TODO: Ao alocar as tabelas é necessário atualizar o fsInfo
+    DWORD cluster = fsInfo->getNextFree();
+    if (fatTable->searchFreeEntry(cluster)) {
+      if (!fatTable->allocClusters(curCluster, { cluster })) {
+        std::fprintf(stderr, "[" ERROR "] Não foi possível alocar clusters\n");
+        return false;
+      }
+
+      // Aloca buffer do novo diretório
+      void *newBuffer = new char[bios->totClusByts()];
+      if (newBuffer == nullptr) {
+        std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
+        return false;
+      }
+
+      // Lê o cluster no qual o diretório se encontra
+      if (!readCluster(newBuffer, cluster)) {
+        std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+        delete[] static_cast<char *>(newBuffer);
+        return false;
+      }
+
+      // Zera a entrada para não haver problemas
+      memset(newBuffer, 0, bios->totClusByts());
+
+      // Cast para facilitar manuseio do buffer
+      Dir *newBufferDir = static_cast<Dir *>(newBuffer);
+
+      // Ponteiro que especifica qual o buffer que está sendo utilizado
+      Dir *currentBuffer = bufferDir;
+
+      size_t k = bufferPos;
+      for (size_t j = 0; j < ldir.size(); j++) {
+        if (currentBuffer != newBufferDir && k + j >= numDirs) {
+          currentBuffer = newBufferDir;
+          k = 0;
+        }
+
+        memcpy(&currentBuffer[k], &ldir[j], sizeof(ldir[j]));
+        k++;
+      }
+
+      memcpy(&currentBuffer[k], &dir, sizeof(dir));
+
+      bool result = writeCluster(bufferDir, curCluster)
+                    && writeCluster(newBufferDir, cluster);
+
+      delete[] static_cast<char *>(newBuffer);
+      delete[] static_cast<char *>(buffer);
+      return result;
+    }
+  }
+
+  if (!eodFound) {
+    // TODO: Ao alocar as tabelas é necessário atualizar o fsInfo
+    DWORD cluster = fsInfo->getNextFree();
+    if (fatTable->searchFreeEntry(cluster)) {
+      if (!fatTable->allocClusters(curCluster, { cluster })) {
+        std::fprintf(stderr, "[" ERROR "] Não foi possível alocar clusters\n");
+        return false;
+      }
+
+      // Lê o cluster no qual o diretório se encontra
+      if (!readCluster(buffer, cluster)) {
+        std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
+        delete[] static_cast<char *>(buffer);
+        return false;
+      }
+
+      // Zera a entrada para não haver problemas
+      memset(buffer, 0, bios->totClusByts());
+
+      // Cast para facilitar manuseio do buffer
+      bufferDir = static_cast<Dir *>(buffer);
+
+      size_t k = bufferPos;
+      for (size_t j = 0; j < ldir.size(); j++) {
+        memcpy(&bufferDir[k], &ldir[j], sizeof(ldir[j]));
+        k++;
+      }
+
+      memcpy(&bufferDir[k], &dir, sizeof(dir));
+
+      bool result = writeCluster(bufferDir, cluster);
+
+      delete[] static_cast<char *>(buffer);
+      return result;
+    }
+  }
+
+  delete[] static_cast<char *>(buffer);
   return false;
 }
 

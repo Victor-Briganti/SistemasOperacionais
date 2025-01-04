@@ -19,7 +19,7 @@
 // PRIVATE
 //===------------------------------------------------------------------------===
 
-bool FatTable::readFatTable(const int num)
+bool FatTable::readFatTable(int num)
 {
   if (num < 0 || num >= bios->getNumFATs()) {
     return false;
@@ -31,7 +31,7 @@ bool FatTable::readFatTable(const int num)
   return this->image->read(fatOffset, table, fatSize);
 }
 
-bool FatTable::writeFatTable(const int num)
+bool FatTable::writeFatTable(int num)
 {
   if (num < 0 || num >= bios->getNumFATs()) {
     return false;
@@ -43,7 +43,7 @@ bool FatTable::writeFatTable(const int num)
   return this->image->write(fatOffset, table, fatSize);
 }
 
-DWORD FatTable::readFromTable(const DWORD offset) const
+DWORD FatTable::readFromTable(DWORD offset) const
 {
   return static_cast<DWORD *>(table)[offset] & LSB_MASK;
 }
@@ -172,4 +172,59 @@ DWORD FatTable::freeClusters() const
 {
   DWORD totalClus = bios->getDataSecTotal() / bios->getSecPerCluster();
   return totalClus - usedClusters();
+}
+
+bool FatTable::searchFreeEntry(DWORD &num)
+{
+  // Total de clusters na tablea
+  DWORD totalClus = bios->getDataSecTotal() / bios->getSecPerCluster();
+
+  // Salva o cluster que está livre
+  DWORD savedCluster = 0;
+
+  // Busca por um cluster que esteja livre
+  DWORD i = (num + 1) % totalClus;
+  while (i != num) {
+    if (i == 0 || i == 1) {
+      i = 2;
+    }
+
+    if (readFromTable(i) == 0) {
+      savedCluster = i;
+      break;
+    }
+
+    i++;
+  }
+
+  if (savedCluster != 0) {
+    num = savedCluster;
+    return true;
+  }
+
+  return false;
+}
+
+bool FatTable::allocClusters(DWORD tail, const std::vector<DWORD> &clusters)
+{
+  // Sobreescreve o inicio do tail para apontar para a próxima cadeia
+  writeInTable(tail, clusters[0]);
+
+  // Escreve a nova cadeia de clusters
+  for (size_t i = 0; i < clusters.size(); i++) {
+    if (i < clusters.size() - 1) {
+      writeInTable(clusters[i], clusters[i + 1]);
+    } else {
+      writeInTable(clusters[i], EOC);
+    }
+  }
+
+  // Salva a tabela FAT
+  for (int i = 0; i < bios->getNumFATs(); i++) {
+    if (!writeFatTable(i)) {
+      return false;
+    }
+  }
+
+  return true;
 }
