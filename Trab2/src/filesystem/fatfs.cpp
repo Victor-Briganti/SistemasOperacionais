@@ -15,6 +15,7 @@
 #include "path/parser.hpp"
 #include "utils/color.hpp"
 
+#include <cstdio>
 #include <cstring>
 #include <exception>
 #include <iostream>
@@ -818,6 +819,11 @@ void FatFS::touch(const std::string &path)
   std::string filename = listPath.back();
   listPath.pop_back();
 
+  if (filename.size() > FILENAME_MAX) {
+    std::fprintf(stderr, "[" ERROR "] nome muito longo\n");
+    return;
+  }
+
   try {
     std::string newPath = merge(listPath);
     listPath = pathParser(newPath, DIR_ENTRY);
@@ -845,5 +851,25 @@ void FatFS::touch(const std::string &path)
       std::fprintf(stderr, "[" ERROR "] operação falhou\n");
       return;
     }
+  }
+
+  // Busca pela entrada
+  auto [entry, _] = searchEntry(listPath, DIR_ENTRY);
+
+  // Lista de entradas
+  std::vector<Dentry> dentries = getDirEntries(entry.getCluster());
+
+  for (const auto &dtr : dentries) {
+    if (dtr.getLongName() == filename) {
+      std::fprintf(stderr, "[" ERROR "] arquivo já existe\n");
+      return;
+    }
+  }
+
+  Dir dir = createDir(filename, 0, 0, ATTR_LONG_NAME | ATTR_ARCHIVE);
+  std::vector<LongDir> ldir = createLongDir(dir, filename);
+  if (!insertDirEntries(entry.getCluster(), dir, ldir)) {
+    std::fprintf(stderr, "[" ERROR "] operação falhou\n");
+    return;
   }
 }
