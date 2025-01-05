@@ -13,6 +13,7 @@
 #include "filesystem/bpb.hpp"
 #include "io/image.hpp"
 
+#include <memory>
 #include <vector>
 
 class FatTable
@@ -27,14 +28,14 @@ class FatTable
   /* Define o final da cadeia de clusters */
   static constexpr DWORD EOC = 0x0FFFFFF8;
 
-  // Interface usada para ler e escrever a FAT
+  /* Interface usada para ler e escrever a FAT */
   Image *image;
 
-  // Interface para lidar com o BPB
+  /* Interface para lidar com o BPB */
   BiosBlock *bios;
 
-  // Tabela FAT em memória
-  void *table = nullptr;
+  /* Tabela FAT em memória */
+  std::unique_ptr<uint8_t[]> table;
 
   /**
    * @brief Lê uma das tabelas FAT em memória
@@ -83,15 +84,6 @@ public:
    * inicialização.
    */
   explicit FatTable(Image *image, BiosBlock *bios);
-
-  /**
-   * @brief Finaliza a estrutura FAT
-   *
-   * Desaloca o que for necessário e escreve o que estava pendente
-   *
-   * @exception Gera uma exceção se houver algum erro durante a escrita.
-   */
-  ~FatTable();
 
   /**
    * @brief Imprime a tabela atual
