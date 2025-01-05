@@ -19,6 +19,7 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -69,7 +70,7 @@ DWORD FatFS::getEntryClus(const Dentry &entry)
 std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 {
   // Aloca o buffer do diretório
-  void *buffer = new char[bios->totClusByts()];
+  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return {};
@@ -86,14 +87,13 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 
   for (auto cluster : chain) {
     // Lê o cluster no qual o diretório se encontra
-    if (!readCluster(buffer, cluster)) {
+    if (!readCluster(buffer.get(), cluster)) {
       std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
-      delete[] static_cast<char *>(buffer);
       return {};
     }
 
     // Cast para facilitar manuseio do buffer
-    Dir *bufferDir = static_cast<Dir *>(buffer);
+    const Dir *bufferDir = reinterpret_cast<Dir *>(buffer.get());
 
     // Define a posição da entrada no buffer
     DWORD bufferPos = 0;
@@ -132,7 +132,6 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
     }
   }
 
-  delete[] static_cast<char *>(buffer);
   return dentries;
 }
 
@@ -143,21 +142,20 @@ bool FatFS::setDirEntries(DWORD num,
   const std::vector<LongDir> &ldir)
 {
   // Aloca o buffer do diretório
-  void *buffer = new char[bios->totClusByts()];
+  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return {};
   }
 
   // Lê o cluster no qual o diretório se encontra
-  if (!readCluster(buffer, num)) {
+  if (!readCluster(buffer.get(), num)) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
-    delete[] static_cast<char *>(buffer);
     return {};
   }
 
   // Cast para facilitar manuseio do buffer
-  Dir *bufferDir = static_cast<Dir *>(buffer);
+  Dir *bufferDir = reinterpret_cast<Dir *>(buffer.get());
 
   // Caminha pelo buffer escrevendo os novos valores.
   for (size_t i = startPos, j = 0; i <= endPos; i++, j++) {
@@ -168,9 +166,7 @@ bool FatFS::setDirEntries(DWORD num,
     }
   }
 
-  bool result = writeCluster(buffer, num);
-  delete[] static_cast<char *>(buffer);
-  return result;
+  return writeCluster(buffer.get(), num);
 }
 
 bool FatFS::removeEntry(Dentry &entry, DWORD num)
@@ -361,7 +357,7 @@ bool FatFS::insertDirEntries(DWORD num,
   const std::vector<LongDir> &ldir)
 {
   // Aloca o buffer do diretório
-  void *buffer = new char[bios->totClusByts()];
+  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return false;
@@ -383,21 +379,20 @@ bool FatFS::insertDirEntries(DWORD num,
   size_t numDirs = bios->totClusByts() / sizeof(Dir);
 
   // Cast para facilitar manuseio do buffer
-  Dir *bufferDir;
+  Dir *bufferDir = nullptr;
 
   // Cluster atual
-  DWORD curCluster;
+  DWORD curCluster = 0;
 
   for (size_t i = 0, countFreeEntries = 0; i < chain.size(); i++) {
     curCluster = chain[i];
     // Lê o cluster no qual o diretório se encontra
-    if (!readCluster(buffer, curCluster)) {
+    if (!readCluster(buffer.get(), curCluster)) {
       std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
-      delete[] static_cast<char *>(buffer);
       return {};
     }
 
-    bufferDir = static_cast<Dir *>(buffer);
+    bufferDir = reinterpret_cast<Dir *>(buffer.get());
 
     // Caminha por todo o buffer até encontrar uma quantidade suficiente de
     // entradas livres ou alcançar o limite de tamanho do cluster.
@@ -427,9 +422,7 @@ bool FatFS::insertDirEntries(DWORD num,
           }
           memcpy(&bufferDir[k], &dir, sizeof(dir));
 
-          bool result = writeCluster(bufferDir, curCluster);
-          delete[] static_cast<char *>(buffer);
-          return result;
+          return writeCluster(bufferDir, curCluster);
         }
 
         continue;
@@ -448,7 +441,6 @@ bool FatFS::insertDirEntries(DWORD num,
     memcpy(&bufferDir[k], &dir, sizeof(dir));
 
     bool result = writeCluster(bufferDir, curCluster);
-    delete[] static_cast<char *>(buffer);
     return result;
   }
 
@@ -462,24 +454,23 @@ bool FatFS::insertDirEntries(DWORD num,
       }
 
       // Aloca buffer do novo diretório
-      void *newBuffer = new char[bios->totClusByts()];
+      auto newBuffer = std::make_unique<BYTE[]>(bios->totClusByts());
       if (newBuffer == nullptr) {
         std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
         return false;
       }
 
       // Lê o cluster no qual o diretório se encontra
-      if (!readCluster(newBuffer, cluster)) {
+      if (!readCluster(newBuffer.get(), cluster)) {
         std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
-        delete[] static_cast<char *>(newBuffer);
         return false;
       }
 
       // Zera a entrada para não haver problemas
-      memset(newBuffer, 0, bios->totClusByts());
+      memset(newBuffer.get(), 0, bios->totClusByts());
 
       // Cast para facilitar manuseio do buffer
-      Dir *newBufferDir = static_cast<Dir *>(newBuffer);
+      Dir *newBufferDir = reinterpret_cast<Dir *>(newBuffer.get());
 
       // Ponteiro que especifica qual o buffer que está sendo utilizado
       Dir *currentBuffer = bufferDir;
@@ -497,12 +488,8 @@ bool FatFS::insertDirEntries(DWORD num,
 
       memcpy(&currentBuffer[k], &dir, sizeof(dir));
 
-      bool result = writeCluster(bufferDir, curCluster)
-                    && writeCluster(newBufferDir, cluster);
-
-      delete[] static_cast<char *>(newBuffer);
-      delete[] static_cast<char *>(buffer);
-      return result;
+      return writeCluster(bufferDir, curCluster)
+             && writeCluster(newBufferDir, cluster);
     }
   }
 
@@ -516,17 +503,16 @@ bool FatFS::insertDirEntries(DWORD num,
       }
 
       // Lê o cluster no qual o diretório se encontra
-      if (!readCluster(buffer, cluster)) {
+      if (!readCluster(buffer.get(), cluster)) {
         std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
-        delete[] static_cast<char *>(buffer);
         return false;
       }
 
       // Zera a entrada para não haver problemas
-      memset(buffer, 0, bios->totClusByts());
+      memset(buffer.get(), 0, bios->totClusByts());
 
       // Cast para facilitar manuseio do buffer
-      bufferDir = static_cast<Dir *>(buffer);
+      bufferDir = reinterpret_cast<Dir *>(buffer.get());
 
       size_t k = bufferPos;
       for (size_t j = 0; j < ldir.size(); j++) {
@@ -538,12 +524,10 @@ bool FatFS::insertDirEntries(DWORD num,
 
       bool result = writeCluster(bufferDir, cluster);
 
-      delete[] static_cast<char *>(buffer);
       return result;
     }
   }
 
-  delete[] static_cast<char *>(buffer);
   return false;
 }
 
@@ -597,24 +581,21 @@ void FatFS::info()
 
 void FatFS::cluster(DWORD num)
 {
-  void *buffer = new char[bios->totClusByts()];
+  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível alocar buffer\n");
     return;
   }
 
-  if (!readCluster(buffer, num)) {
+  if (!readCluster(buffer.get(), num)) {
     std::fprintf(stderr, "[" ERROR "] Não foi possível ler cluster\n");
-    delete[] static_cast<char *>(buffer);
     return;
   }
 
-  char *bufferChar = static_cast<char *>(buffer);
+  char *bufferChar = reinterpret_cast<char *>(buffer.get());
   for (size_t i = 0; i < bios->totClusByts() * sizeof(char); i++) {
     std::fprintf(stdout, "%c", bufferChar[i]);
   }
-
-  delete[] static_cast<char *>(buffer);
 }
 
 void FatFS::ls(const std::string &path)
