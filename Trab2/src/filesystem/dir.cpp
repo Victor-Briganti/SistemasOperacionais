@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <memory>
 #include <stdexcept>
 #include <sys/time.h>
 
@@ -157,13 +158,12 @@ Dir createDir(const std::string &name,
     throw std::runtime_error(error);
   }
 
-  char *shortName = generateShortName(name);
+  std::unique_ptr<char[]> shortName = generateShortName(name);
   if (shortName == nullptr) {
     std::string error = "[" ERROR "] Não foi possível alocar estrutura\n";
     throw std::runtime_error(error);
   }
-  memcpy(directory.name, shortName, 11);
-  delete[] shortName;
+  memcpy(directory.name, shortName.get(), 11);
 
   directory.fileSize = fileSize;
   directory.fstClusLO = lowCluster(cluster);
@@ -282,9 +282,9 @@ DWORD timeStamp(DWORD hour, DWORD minutes, DWORD seconds)
   return (hour << 11) | (minutes << 5) | (seconds / 2);
 }
 
-char *generateShortName(const std::string &longName)
+std::unique_ptr<char[]> generateShortName(const std::string &longName)
 {
-  char *shortName = new char[NAME_MAIN_SIZE + NAME_EXT_SIZE];
+  auto shortName = std::make_unique<char[]>(NAME_MAIN_SIZE + NAME_EXT_SIZE);
   if (shortName == nullptr) {
     return nullptr;
   }

@@ -12,6 +12,7 @@
 
 #include "utils/types.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -170,7 +171,7 @@ BYTE shortCheckSum(const char *shortName);
  *
  * @return O novo nome curto gerado
  */
-char *generateShortName(const std::string &longName);
+std::unique_ptr<char[]> generateShortName(const std::string &longName);
 
 /**
  * @brief Gera um nome curto aleatório para evitar problemas
