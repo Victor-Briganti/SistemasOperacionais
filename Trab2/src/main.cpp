@@ -8,6 +8,7 @@
  */
 
 #include "filesystem/fatfs.hpp"
+#include "utils/logger.hpp"
 
 #include <cstring>
 #include <exception>
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
     FatFS fat(image);
     fat.touch(path);
   } catch (const std::exception &error) {
-    std::cout << error.what();
+    logError(error.what());
   }
 
   return 0;

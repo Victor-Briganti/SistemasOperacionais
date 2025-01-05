@@ -8,7 +8,6 @@
  */
 
 #include "filesystem/fsinfo.hpp"
-#include "utils/color.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -18,25 +17,22 @@ FileSysInfo::FileSysInfo(Image *image, DWORD offset, FatTable *fatTable)
   : image(image), offset(offset)
 {
   if (!image->read(offset, &fsinfo, sizeof(fsinfo))) {
-    std::string error = "[" ERROR "] não foi possível ler a estrutura FSInfo\n";
+    std::string error = "Não foi possível ler a estrutura FSInfo\n";
     throw std::runtime_error(error);
   }
 
   if (fsinfo.LeadSig != LEADISG) {
-    std::string error =
-      "[" ERROR "] LeadSig de FSInfo diferente de 0x41615252\n";
+    std::string error = "LeadSig de FSInfo diferente de 0x41615252\n";
     throw std::runtime_error(error);
   }
 
   if (fsinfo.StrucSig != STRUCSIG) {
-    std::string error =
-      "[" ERROR "] LeadSig de FSInfo diferente de 0x61417272\n";
+    std::string error = "LeadSig de FSInfo diferente de 0x61417272\n";
     throw std::runtime_error(error);
   }
 
   if (fsinfo.TrailSig != TRAILSIG) {
-    std::string error =
-      "[" ERROR "] TrailSig de FSInfo diferente de 0xAA550000\n";
+    std::string error = "TrailSig de FSInfo diferente de 0xAA550000\n";
     throw std::runtime_error(error);
   }
 
@@ -51,8 +47,7 @@ FileSysInfo::FileSysInfo(Image *image, DWORD offset, FatTable *fatTable)
 
   if (fsinfo.FreeCount > totalClus) {
     std::string error =
-      "[" ERROR
-      "] Quantidade de clusters livres maior do que a quantidade total ";
+      "Quantidade de clusters livres maior do que a quantidade total ";
     error += std::to_string(fsinfo.FreeCount);
     error += " > ";
     error += std::to_string(totalClus);

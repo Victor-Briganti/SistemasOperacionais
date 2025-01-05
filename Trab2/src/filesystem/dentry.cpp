@@ -9,7 +9,6 @@
 
 #include "filesystem/dentry.hpp"
 #include "filesystem/dir.hpp"
-#include "utils/color.hpp"
 
 #include <cctype>
 #include <cstring>
@@ -32,7 +31,7 @@ Dentry::Dentry(const Dir &dir,
     strncmp(shortName.data(), DOTDOT, NAME_MAIN_SIZE + NAME_EXT_SIZE);
 
   if ((!isDot || !isDotDot) && !ldir.empty()) {
-    std::string error = "[" ERROR "] Nome da entrada está errado\n";
+    std::string error = "Nome da entrada está errado\n";
     throw std::runtime_error(error);
   }
 
@@ -51,7 +50,7 @@ Dentry::Dentry(const Dir &dir,
   BYTE checkSum = shortCheckSum(shortName.data());
   for (auto a : ldir) {
     if (a.chckSum != checkSum) {
-      std::string error = "[" ERROR "] Checksum não condiz com a entrada\n";
+      std::string error = "Checksum não condiz com a entrada\n";
       throw std::runtime_error(error);
     }
 

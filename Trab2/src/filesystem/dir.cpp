@@ -8,7 +8,6 @@
  */
 
 #include "filesystem/dir.hpp"
-#include "utils/color.hpp"
 #include "utils/time.hpp"
 
 #include <algorithm>
@@ -101,13 +100,13 @@ Dir createDir(const std::string &name,
 {
   Dir directory;
   if (attrs & ~ATTR_LONG_NAME_MASK) {
-    std::string error = "[" ERROR "] Atributo inválido\n";
+    std::string error = "Atributo inválido\n";
     throw std::runtime_error(error);
   }
 
   std::unique_ptr<BYTE[]> shortName = generateShortName(name);
   if (shortName == nullptr) {
-    std::string error = "[" ERROR "] Não foi possível alocar estrutura\n";
+    std::string error = "Não foi possível alocar estrutura\n";
     throw std::runtime_error(error);
   }
   memcpy(directory.name, shortName.get(), 11);
@@ -129,7 +128,7 @@ Dir createDir(const std::string &name,
 std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name)
 {
   if (!validLongName(name)) {
-    std::string error = "[" ERROR "] Nome " + name + " inválido\n";
+    std::string error = "Nome " + name + " inválido\n";
     throw std::runtime_error(error);
   }
 
@@ -244,7 +243,7 @@ std::unique_ptr<BYTE[]> generateShortName(const std::string &longName)
   if (period != -1) {
     // Realiza o padding na parte principal do nome
     for (size_t i = static_cast<size_t>(period); i < NAME_MAIN_SIZE;
-         i++, period++) {
+      i++, period++) {
       treatedName = treatedName.substr(0, i) + " "
                     + treatedName.substr(i, treatedName.size());
     }
@@ -269,8 +268,8 @@ std::unique_ptr<BYTE[]> generateShortName(const std::string &longName)
   // Copia a extensão do nome. Se existir uma
   if (period != -1) {
     for (size_t i = static_cast<size_t>(period), j = NAME_MAIN_SIZE;
-         i < static_cast<size_t>(period) + NAME_EXT_SIZE;
-         i++, j++) {
+      i < static_cast<size_t>(period) + NAME_EXT_SIZE;
+      i++, j++) {
       if (i > treatedName.size()) {
         shortName[j] = ' ';
       } else {

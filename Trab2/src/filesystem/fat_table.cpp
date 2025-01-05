@@ -9,9 +9,7 @@
 
 #include "filesystem/fat_table.hpp"
 #include "filesystem/bpb.hpp"
-#include "utils/color.hpp"
 
-#include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <stdexcept>
@@ -65,12 +63,12 @@ FatTable::FatTable(Image *image, BiosBlock *bios) : image(image), bios(bios)
 {
   table = std::make_unique<BYTE[]>(bios->getFATSz() * bios->getBytesPerSec());
   if (table == nullptr) {
-    std::string error = "[" ERROR "] Não foi possível alocar a FAT table\n";
+    std::string error = "Não foi possível alocar a FAT table\n";
     throw std::runtime_error(error);
   }
 
   if (!readFatTable(0)) {
-    std::string error = "[" ERROR "] Não foi possível ler a FAT table\n";
+    std::string error = "Não foi possível ler a FAT table\n";
     throw std::runtime_error(error);
   }
 }

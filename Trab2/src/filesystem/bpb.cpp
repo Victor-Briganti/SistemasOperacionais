@@ -9,7 +9,6 @@
 
 #include "filesystem/bpb.hpp"
 #include "io/image.hpp"
-#include "utils/color.hpp"
 
 #include <cstdio>
 #include <stdexcept>
@@ -77,14 +76,14 @@ int BiosBlock::bpbInit()
 BiosBlock::BiosBlock(Image *image)
 {
   if (!image->read(0, static_cast<void *>(&bpb), sizeof(bpb))) {
-    std::string error = "[" ERROR "] Não foi possível ler o BPB\n";
+    std::string error = "Não foi possível ler o BPB\n";
     throw std::runtime_error(error);
   }
 
   bpbInit();
 
   if (fatType() != 32) {
-    std::string error = "[" ERROR "] Somente o FAT32 é suportado\n";
+    std::string error = "Somente o FAT32 é suportado\n";
     throw std::runtime_error(error);
   }
 }
@@ -129,8 +128,7 @@ void BiosBlock::bpbPrint() const
 DWORD BiosBlock::fatSector(int num) const
 {
   if (num >= bpb.NumFATs || num < 0) {
-    std::string numStr = std::to_string(num);
-    std::string error = "[" ERROR "] " + numStr + " é uma FAT inválida\n";
+    std::string error = std::to_string(num) + " é uma FAT inválida\n";
     throw std::runtime_error(error);
   }
 
