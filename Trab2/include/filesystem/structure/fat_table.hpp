@@ -10,7 +10,7 @@
 #ifndef FAT_TABLE_HPP
 #define FAT_TABLE_HPP
 
-#include "filesystem/bpb.hpp"
+#include "filesystem/structure/bpb.hpp"
 #include "io/image.hpp"
 
 #include <memory>

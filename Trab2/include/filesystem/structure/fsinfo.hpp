@@ -10,7 +10,7 @@
 #ifndef FSINFO_HPP
 #define FSINFO_HPP
 
-#include "filesystem/fat_table.hpp"
+#include "filesystem/structure/fat_table.hpp"
 #include "io/image.hpp"
 #include "utils/types.hpp"
 

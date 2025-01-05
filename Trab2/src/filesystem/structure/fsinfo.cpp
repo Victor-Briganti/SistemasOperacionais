@@ -7,7 +7,7 @@
  * Data: 31/12/2024
  */
 
-#include "filesystem/fsinfo.hpp"
+#include "filesystem/structure/fsinfo.hpp"
 
 #include <cstdio>
 #include <cstdlib>

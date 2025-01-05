@@ -10,10 +10,10 @@
 #ifndef FAT_FS_HPP
 #define FAT_FS_HPP
 
-#include "filesystem/bpb.hpp"
 #include "filesystem/dentry.hpp"
-#include "filesystem/fat_table.hpp"
-#include "filesystem/fsinfo.hpp"
+#include "filesystem/structure/bpb.hpp"
+#include "filesystem/structure/fat_table.hpp"
+#include "filesystem/structure/fsinfo.hpp"
 #include "io/image.hpp"
 
 #include <string>

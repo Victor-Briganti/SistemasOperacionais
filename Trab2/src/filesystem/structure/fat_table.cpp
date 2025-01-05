@@ -7,8 +7,8 @@
  * Data: 26/12/2024
  */
 
-#include "filesystem/fat_table.hpp"
-#include "filesystem/bpb.hpp"
+#include "filesystem/structure/fat_table.hpp"
+#include "filesystem/structure/bpb.hpp"
 
 #include <cstdlib>
 #include <memory>

@@ -7,7 +7,7 @@
  * Data: 26/12/2024
  */
 
-#include "filesystem/bpb.hpp"
+#include "filesystem/structure/bpb.hpp"
 #include "io/image.hpp"
 
 #include <cstdio>
