@@ -14,20 +14,20 @@
 #include "io/image.hpp"
 #include "utils/types.hpp"
 
-/* Definição de valor quando não se sabe a quantidade de clusters livres */
-#define UNKNOWN_FREECLUS (0xFFFFFFFF)
-
 // Classe para lidar com a estrutura FSInfo do FAT filesystem
 class FileSysInfo
 {
+  /* Definição de valor quando não se sabe a quantidade de clusters livres */
+  static constexpr DWORD UNKNOWN_FREECLUS = 0xFFFFFFFF;
+
   /* Valor da assinatura do LeadSig */
-  const DWORD LEADISG = 0x41615252;
+  static constexpr DWORD LEADISG = 0x41615252;
 
   /* Valor da assinatura do StrucSig */
-  const DWORD STRUCSIG = 0x61417272;
+  static constexpr DWORD STRUCSIG = 0x61417272;
 
   /* Valor da assinatura do TrailSig*/
-  const DWORD TRAILSIG = 0xAA550000;
+  static constexpr DWORD TRAILSIG = 0xAA550000;
 
   struct __attribute__((packed)) FSInfo
   {

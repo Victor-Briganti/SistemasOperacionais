@@ -15,18 +15,18 @@
 
 #include <vector>
 
-/* Máscaras para leitura e escrita na tabela */
-#define LSB_MASK (0x0FFFFFFF)
-#define MSB_MASK (0xF0000000)
-
-/* Define que o cluster está livre */
-#define FREE_CLUSTER (0x00000000)
-
-/* Define o final da cadeia de clusters */
-#define EOC (0x0FFFFFF8)
-
 class FatTable
 {
+  /* Máscaras para leitura e escrita na tabela */
+  static constexpr DWORD LSB_MASK = 0x0FFFFFFF;
+  static constexpr DWORD MSB_MASK = 0xF0000000;
+
+  /* Define que o cluster está livre */
+  static constexpr DWORD FREE_CLUSTER = 0x00000000;
+
+  /* Define o final da cadeia de clusters */
+  static constexpr DWORD EOC = 0x0FFFFFF8;
+
   // Interface usada para ler e escrever a FAT
   Image *image;
 
