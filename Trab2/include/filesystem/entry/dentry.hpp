@@ -20,9 +20,11 @@
 #include <vector>
 
 // Define os tipos de nomes que a entrada pode ter
-#define DOT_NAME (0)
-#define DOTDOT_NAME (1)
-#define LONG_NAME (2)
+enum DentryType {
+  DOT_NAME = 0,
+  DOTDOT_NAME = 1,
+  LONG_NAME = 2,
+};
 
 class Dentry
 {
@@ -39,7 +41,7 @@ class Dentry
   std::array<char, NAME_FULL_SIZE + 1> shortName;
 
   /* Define qual o tipo de nome que a entrada possui */
-  int nameType;
+  DentryType type;
 
   /* Posição inicial no buffer do diretório */
   DWORD initPos;
@@ -70,7 +72,7 @@ public:
    */
   [[nodiscard]] inline std::string getLongName() const
   {
-    switch (nameType) {
+    switch (type) {
     case DOT_NAME:
       return ".";
     case DOTDOT_NAME:
@@ -308,7 +310,7 @@ public:
    *
    * @return retorna o valor de nameType
    */
-  [[nodiscard]] inline int getNameType() const { return nameType; }
+  [[nodiscard]] inline int getNameType() const { return type; }
 
   /**
    * @brief Imprime as informações sobre a entrada

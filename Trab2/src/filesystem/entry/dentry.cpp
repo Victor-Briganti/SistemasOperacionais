@@ -7,7 +7,7 @@
  * Data: 26/12/2024
  */
 
-#include "filesystem/dentry.hpp"
+#include "filesystem/entry/dentry.hpp"
 #include "filesystem/dir.hpp"
 
 #include <cctype>
@@ -27,31 +27,28 @@ Dentry::Dentry(const Dir &dir,
   shortName[NAME_FULL_SIZE] = '\0';
 
   int isDot = strncmp(shortName.data(), DOT, NAME_FULL_SIZE);
-  int isDotDot =
-    strncmp(shortName.data(), DOTDOT, NAME_FULL_SIZE);
+  int isDotDot = strncmp(shortName.data(), DOTDOT, NAME_FULL_SIZE);
 
   if ((!isDot || !isDotDot) && !ldir.empty()) {
-    std::string error = "Nome da entrada está errado\n";
-    throw std::runtime_error(error);
+    throw std::runtime_error("Nome da entrada está errado");
   }
 
   if (!isDot) {
-    nameType = DOT_NAME;
+    type = DOT_NAME;
     return;
   }
 
   if (!isDotDot) {
-    nameType = DOTDOT_NAME;
+    type = DOTDOT_NAME;
     return;
   }
 
-  nameType = LONG_NAME;
+  type = LONG_NAME;
 
   BYTE checkSum = shortCheckSum(shortName.data());
   for (auto a : ldir) {
     if (a.chckSum != checkSum) {
-      std::string error = "Checksum não condiz com a entrada\n";
-      throw std::runtime_error(error);
+      throw std::runtime_error("Checksum não condiz com a entrada");
     }
 
     std::string name;

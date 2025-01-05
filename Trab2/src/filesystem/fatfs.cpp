@@ -8,8 +8,8 @@
  */
 
 #include "filesystem/fatfs.hpp"
-#include "filesystem/dentry.hpp"
 #include "filesystem/dir.hpp"
+#include "filesystem/entry/dentry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
 #include "path/parser.hpp"

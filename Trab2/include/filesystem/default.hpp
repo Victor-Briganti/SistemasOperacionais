@@ -63,6 +63,12 @@ constexpr BYTE LAST_LONG_ENTRY = 0x40;
 /* Tamanho da nome armazenado no nome longo */
 constexpr DWORD LONG_NAME_SIZE = 13;
 
+/* Verifica se o caracter é válido para nomes longos */
+#define validLongDirName(c)                                                \
+  (0x22 != (c) && 0x2A != (c) && 0x2E != (c) && 0x2F != (c) && 0x3A != (c) \
+    && 0x3C != (c) && 0x3E != (c) && 0x3F != (c) && 0x5C != (c) && 0x7C    \
+    && ((c) > 0x20 || (c) == 0x05))
+
 //===-----------------------------------------------------------------------===
 // NOMES CURTOS
 //===-----------------------------------------------------------------------===
@@ -85,5 +91,11 @@ constexpr char DOTDOT[NAME_FULL_SIZE + 1] = "..         ";
 /* Posição do "numeric tail" no nome curto */
 constexpr int NUM_TAIL_POS = 6;
 
+/* Verifica se o caracter é válido para nomes curtos */
+#define validShortDirName(c)                                                   \
+  (0x22 != (c) && 0x2A != (c) && 0x2B != (c) && 0x2C != (c) && 0x2E != (c)     \
+    && 0x2F != (c) && 0x3A != (c) && 0x3B != (c) && 0x3C != (c) && 0x3D != (c) \
+    && 0x3E != (c) && 0x3F != (c) && 0x5B != (c) && 0x5C != (c) && 0x5D != (c) \
+    && 0x7C && ((c) > 0x20 || (c) == 0x05))
 
 #endif// DEFAULT_HPP
