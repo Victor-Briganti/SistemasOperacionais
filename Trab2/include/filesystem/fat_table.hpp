@@ -35,7 +35,7 @@ class FatTable
   BiosBlock *bios;
 
   /* Tabela FAT em memória */
-  std::unique_ptr<uint8_t[]> table;
+  std::unique_ptr<BYTE[]> table;
 
   /**
    * @brief Lê uma das tabelas FAT em memória

@@ -63,8 +63,7 @@ void FatTable::writeInTable(const DWORD offset, const DWORD value)
 
 FatTable::FatTable(Image *image, BiosBlock *bios) : image(image), bios(bios)
 {
-  table =
-    std::make_unique<uint8_t[]>(bios->getFATSz() * bios->getBytesPerSec());
+  table = std::make_unique<BYTE[]>(bios->getFATSz() * bios->getBytesPerSec());
   if (table == nullptr) {
     std::string error = "[" ERROR "] Não foi possível alocar a FAT table\n";
     throw std::runtime_error(error);

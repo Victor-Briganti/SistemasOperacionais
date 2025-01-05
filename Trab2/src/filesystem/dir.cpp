@@ -158,7 +158,7 @@ Dir createDir(const std::string &name,
     throw std::runtime_error(error);
   }
 
-  std::unique_ptr<char[]> shortName = generateShortName(name);
+  std::unique_ptr<BYTE[]> shortName = generateShortName(name);
   if (shortName == nullptr) {
     std::string error = "[" ERROR "] Não foi possível alocar estrutura\n";
     throw std::runtime_error(error);
@@ -282,9 +282,9 @@ DWORD timeStamp(DWORD hour, DWORD minutes, DWORD seconds)
   return (hour << 11) | (minutes << 5) | (seconds / 2);
 }
 
-std::unique_ptr<char[]> generateShortName(const std::string &longName)
+std::unique_ptr<BYTE[]> generateShortName(const std::string &longName)
 {
-  auto shortName = std::make_unique<char[]>(NAME_MAIN_SIZE + NAME_EXT_SIZE);
+  auto shortName = std::make_unique<BYTE[]>(NAME_MAIN_SIZE + NAME_EXT_SIZE);
   if (shortName == nullptr) {
     return nullptr;
   }
