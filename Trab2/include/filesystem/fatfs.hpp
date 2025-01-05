@@ -11,6 +11,7 @@
 #define FAT_FS_HPP
 
 #include "filesystem/entry/dentry.hpp"
+#include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fat_table.hpp"
@@ -97,7 +98,7 @@ private:
    * @param startPos Posição inicial no cluster
    * @param endPos Posição final no cluster
    * @param dir Entrada curta que será escrita
-   * @param ldir Entrada longa que será escrita
+   * @param lentry Entrada longa que será escrita
    *
    * @return true se foi possível escrever, false caso contrário.
    */
@@ -105,7 +106,7 @@ private:
     DWORD startPos,
     DWORD endPos,
     const ShortEntry &entry,
-    const std::vector<LongDir> &ldir);
+    const std::vector<LongEntry> &lentry);
 
   /**
    * @brief Remove uma entrada do diretório e da FAT table
@@ -148,7 +149,7 @@ private:
    *
    * @param num Número do cluster onde ocorrerá a busca
    * @param dir Entrada curta
-   * @param ldir Entradas longas
+   * @param lentry Entradas longas
    *
    * @exception Gera um exceção se houver algum problema durante a busca da
    * entrada do caminho.
@@ -156,7 +157,7 @@ private:
    */
   bool insertDirEntries(DWORD num,
     const ShortEntry &entry,
-    const std::vector<LongDir> &ldir);
+    const std::vector<LongEntry> &lentry);
 
 public:
   /**

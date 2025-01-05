@@ -1,5 +1,5 @@
 /**
- * Descrição: Definição da estrutura de diretórios do FAT
+ * Descrição: Definição da entrada de nome longo
  *
  * Autores: João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
@@ -7,13 +7,12 @@
  * Data: 26/12/2024
  */
 
-#ifndef DIR_HPP
-#define DIR_HPP
+#ifndef LONG_ENTRY_HPP
+#define LONG_ENTRY_HPP
 
 #include "filesystem/entry/short_entry.hpp"
 #include "utils/types.hpp"
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -22,7 +21,7 @@
 //===------------------------------------------------------------------------===
 
 // Estrutura de diretórios/arquivos para nomes longos
-struct __attribute__((packed)) LongDir
+struct __attribute__((packed)) LongEntry
 {
   BYTE ord; /* A ordem dessa entrada na sequência de nomes longos */
   BYTE name1[10]; /* Caracteres de 1-5 do nome longo */
@@ -48,7 +47,7 @@ struct __attribute__((packed)) LongDir
  *
  * @return Uma lista com os nomes longos
  */
-std::vector<LongDir> createLongDir(const ShortEntry &entry,
+std::vector<LongEntry> createLongEntries(const ShortEntry &entry,
   const std::string &name);
 
 /**
@@ -60,4 +59,4 @@ std::vector<LongDir> createLongDir(const ShortEntry &entry,
  */
 BYTE shortCheckSum(const char *shortName);
 
-#endif// DIR_HPP
+#endif// LONG_ENTRY_HPP

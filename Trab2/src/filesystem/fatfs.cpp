@@ -8,8 +8,8 @@
  */
 
 #include "filesystem/fatfs.hpp"
-#include "filesystem/dir.hpp"
 #include "filesystem/entry/dentry.hpp"
+#include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
@@ -77,7 +77,7 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
   }
 
   // Lista com diretórios de nomes longos
-  std::vector<LongDir> longDirs;
+  std::vector<LongEntry> longDirs;
 
   // Vetor com todas as entradas
   std::vector<Dentry> dentries;
@@ -117,9 +117,9 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
           bufferPos = static_cast<DWORD>(i);
         }
 
-        LongDir ldir;
-        memcpy(&ldir, &bufferEntry[i], sizeof(ldir));
-        longDirs.push_back(ldir);
+        LongEntry lentry;
+        memcpy(&lentry, &bufferEntry[i], sizeof(lentry));
+        longDirs.push_back(lentry);
       } else {
         Dentry entry(bufferEntry[i],
           longDirs,
@@ -140,7 +140,7 @@ bool FatFS::setDirEntries(DWORD num,
   DWORD startPos,
   DWORD endPos,
   const ShortEntry &entry,
-  const std::vector<LongDir> &ldir)
+  const std::vector<LongEntry> &lentry)
 {
   // Aloca o buffer do diretório
   auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
@@ -160,8 +160,8 @@ bool FatFS::setDirEntries(DWORD num,
 
   // Caminha pelo buffer escrevendo os novos valores.
   for (size_t i = startPos, j = 0; i <= endPos; i++, j++) {
-    if (j < ldir.size()) {
-      memcpy(&bufferEntry[i], &ldir[j], sizeof(entry));
+    if (j < lentry.size()) {
+      memcpy(&bufferEntry[i], &lentry[j], sizeof(entry));
     } else {
       memcpy(&bufferEntry[i], &entry, sizeof(entry));
     }
@@ -185,7 +185,7 @@ bool FatFS::removeEntry(Dentry &entry, DWORD num)
     entry.getInitPos(),
     entry.getEndPos(),
     entry.getShortEntry(),
-    entry.getLongDirectories());
+    entry.getLongEntries());
 
   // Salva a quantidade de clusters removidos no FSInfo
   bool result = (fatRm >= 0) && entryRm;
@@ -348,7 +348,7 @@ std::pair<Dentry, DWORD>
 // TODO: Criação de um diretório deve atualizar suas informações
 bool FatFS::insertDirEntries(DWORD num,
   const ShortEntry &entry,
-  const std::vector<LongDir> &ldir)
+  const std::vector<LongEntry> &lentry)
 {
   // Aloca o buffer do diretório
   auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
@@ -364,7 +364,7 @@ bool FatFS::insertDirEntries(DWORD num,
   DWORD bufferPos = 0;
 
   // Quantidade de entradas que precisam ser salvas
-  size_t requiredEntries = ldir.size() + 1;
+  size_t requiredEntries = lentry.size() + 1;
 
   // Cadeia com os clusters
   std::vector<DWORD> chain = fatTable->listChain(num);
@@ -393,7 +393,7 @@ bool FatFS::insertDirEntries(DWORD num,
     for (size_t j = 0; j < numDirs; j++) {
       // Final do diretório
       if (bufferEntry[j].name[0] == EOD_ENTRY) {
-        bufferPos = j;
+        bufferPos = static_cast<DWORD>(j);
         eodFound = true;
         break;
       }
@@ -404,13 +404,13 @@ bool FatFS::insertDirEntries(DWORD num,
 
         // Se for a primeira parte da contagem salva sua posição
         if (countFreeEntries == 1) {
-          bufferPos = j;
+          bufferPos = static_cast<DWORD>(j);
         }
 
         // Se a quantidade de diretórios vazios bate com o que precisamos use
         if (countFreeEntries == requiredEntries) {
           size_t k = bufferPos;
-          for (auto a : ldir) {
+          for (auto a : lentry) {
             memcpy(&bufferEntry[k], &a, sizeof(a));
             k++;
           }
@@ -428,7 +428,7 @@ bool FatFS::insertDirEntries(DWORD num,
 
   if (eodFound && bufferPos + requiredEntries < numDirs) {
     size_t k = bufferPos;
-    for (auto a : ldir) {
+    for (auto a : lentry) {
       memcpy(&bufferEntry[k], &a, sizeof(a));
       k++;
     }
@@ -470,13 +470,13 @@ bool FatFS::insertDirEntries(DWORD num,
       ShortEntry *currentBuffer = bufferEntry;
 
       size_t k = bufferPos;
-      for (size_t j = 0; j < ldir.size(); j++) {
+      for (size_t j = 0; j < lentry.size(); j++) {
         if (currentBuffer != newBufferDir && k + j >= numDirs) {
           currentBuffer = newBufferDir;
           k = 0;
         }
 
-        memcpy(&currentBuffer[k], &ldir[j], sizeof(ldir[j]));
+        memcpy(&currentBuffer[k], &lentry[j], sizeof(lentry[j]));
         k++;
       }
 
@@ -509,8 +509,8 @@ bool FatFS::insertDirEntries(DWORD num,
       bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
 
       size_t k = bufferPos;
-      for (size_t j = 0; j < ldir.size(); j++) {
-        memcpy(&bufferEntry[k], &ldir[j], sizeof(ldir[j]));
+      for (size_t j = 0; j < lentry.size(); j++) {
+        memcpy(&bufferEntry[k], &lentry[j], sizeof(lentry[j]));
         k++;
       }
 
@@ -824,9 +824,9 @@ void FatFS::touch(const std::string &path)
     }
 
     // Gera as entradas longas
-    std::vector<LongDir> ldir = createLongDir(entry, filename);
+    std::vector<LongEntry> lentry = createLongEntries(entry, filename);
 
-    if (!insertDirEntries(cluster, entry, ldir)) {
+    if (!insertDirEntries(cluster, entry, lentry)) {
       logError("operação falhou");
     }
 
@@ -855,9 +855,9 @@ void FatFS::touch(const std::string &path)
   }
 
   // Gera as entradas longas
-  std::vector<LongDir> ldir = createLongDir(entry, filename);
+  std::vector<LongEntry> lentry = createLongEntries(entry, filename);
 
-  if (!insertDirEntries(dentry.getCluster(), entry, ldir)) {
+  if (!insertDirEntries(dentry.getCluster(), entry, lentry)) {
     logError("operação falhou");
     return;
   }

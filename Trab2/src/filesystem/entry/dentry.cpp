@@ -8,7 +8,7 @@
  */
 
 #include "filesystem/entry/dentry.hpp"
-#include "filesystem/dir.hpp"
+#include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
 
 #include <cctype>
@@ -16,10 +16,10 @@
 #include <stdexcept>
 
 Dentry::Dentry(const ShortEntry &entry,
-  const std::vector<LongDir> &ldir,
+  const std::vector<LongEntry> &lentry,
   const DWORD initPos,
   const DWORD endPos)
-  : entry(entry), longDirs(ldir), initPos(initPos), endPos(endPos)
+  : entry(entry), longEntries(lentry), initPos(initPos), endPos(endPos)
 {
 
   for (size_t i = 0; i < NAME_FULL_SIZE; i++) {
@@ -30,7 +30,7 @@ Dentry::Dentry(const ShortEntry &entry,
   int isDot = strncmp(shortName.data(), DOT, NAME_FULL_SIZE);
   int isDotDot = strncmp(shortName.data(), DOTDOT, NAME_FULL_SIZE);
 
-  if ((!isDot || !isDotDot) && !ldir.empty()) {
+  if ((!isDot || !isDotDot) && !lentry.empty()) {
     throw std::runtime_error("Nome da entrada está errado");
   }
 
@@ -47,7 +47,7 @@ Dentry::Dentry(const ShortEntry &entry,
   type = LONG_NAME;
 
   BYTE checkSum = shortCheckSum(shortName.data());
-  for (auto a : ldir) {
+  for (auto a : lentry) {
     if (a.chckSum != checkSum) {
       throw std::runtime_error("Checksum não condiz com a entrada");
     }
@@ -110,7 +110,7 @@ void Dentry::markFree()
 {
   entry.name[0] = FREE_ENTRY;
 
-  for (auto &a : longDirs) {
+  for (auto &a : longEntries) {
     a.ord = FREE_ENTRY;
   }
 }

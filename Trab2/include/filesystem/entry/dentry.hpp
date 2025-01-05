@@ -11,7 +11,7 @@
 #define DENTRY_HPP
 
 #include "filesystem/default.hpp"
-#include "filesystem/dir.hpp"
+#include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
 #include "utils/time.hpp"
 #include "utils/types.hpp"
@@ -33,7 +33,7 @@ class Dentry
   ShortEntry entry;
 
   /* Lista de nomes longos */
-  std::vector<LongDir> longDirs;
+  std::vector<LongEntry> longEntries;
 
   /* Nome longo da entrada */
   std::string longName;
@@ -54,15 +54,15 @@ public:
   /**
    * @brief Inicializa a entrada
    *
-   * @param dir Entrada curta, que possui os atributos do arquivo em si
-   * @param ldir Vetor que contém todos as partes do nome longo
+   * @param entry Entrada curta, que possui os atributos do arquivo em si
+   * @param lentry Vetor que contém todos as partes do nome longo
    * @param initPost Posição inicial na entrada do buffer
    * @param endPos Posição final na entrada do buffer
    *
-   * @exception Gera uma exceção no caso de haver algum erro no dir ou ldir.
+   * @exception Gera uma exceção no caso de haver algum erro no entry ou lentry.
    */
   explicit Dentry(const ShortEntry &entry,
-    const std::vector<LongDir> &ldir,
+    const std::vector<LongEntry> &lentry,
     const DWORD initPos,
     const DWORD endPos);
 
@@ -293,9 +293,9 @@ public:
    *
    * @return retorna uma cópia da lista de entrada longas
    */
-  [[nodiscard]] inline std::vector<LongDir> getLongDirectories() const
+  [[nodiscard]] inline std::vector<LongEntry> getLongEntries() const
   {
-    return longDirs;
+    return longEntries;
   }
 
   /**
