@@ -9,20 +9,21 @@
 
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/dir.hpp"
+#include "filesystem/entry/short_entry.hpp"
 
 #include <cctype>
 #include <cstring>
 #include <stdexcept>
 
-Dentry::Dentry(const Dir &dir,
+Dentry::Dentry(const ShortEntry &entry,
   const std::vector<LongDir> &ldir,
   const DWORD initPos,
   const DWORD endPos)
-  : dir(dir), longDirs(ldir), initPos(initPos), endPos(endPos)
+  : entry(entry), longDirs(ldir), initPos(initPos), endPos(endPos)
 {
 
   for (size_t i = 0; i < NAME_FULL_SIZE; i++) {
-    shortName[i] = static_cast<char>(dir.name[i]);
+    shortName[i] = static_cast<char>(entry.name[i]);
   }
   shortName[NAME_FULL_SIZE] = '\0';
 
@@ -107,7 +108,7 @@ void Dentry::printInfo() const
 
 void Dentry::markFree()
 {
-  dir.name[0] = FREE_ENTRY;
+  entry.name[0] = FREE_ENTRY;
 
   for (auto &a : longDirs) {
     a.ord = FREE_ENTRY;

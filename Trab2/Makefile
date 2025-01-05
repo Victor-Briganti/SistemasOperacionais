@@ -52,4 +52,7 @@ image:
 	dd if=/dev/zero of=fat.img bs=1M count=40
 	mkfs.fat -F 32 fat.img
 
+clean:
+	rm -rf build/
+
 .PHONY: all release debug clean valgrind image

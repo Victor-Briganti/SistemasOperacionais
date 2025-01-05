@@ -12,6 +12,7 @@
 
 #include "filesystem/default.hpp"
 #include "filesystem/dir.hpp"
+#include "filesystem/entry/short_entry.hpp"
 #include "utils/time.hpp"
 #include "utils/types.hpp"
 
@@ -29,7 +30,7 @@ enum DentryType {
 class Dentry
 {
   /* Estrutura de metadados */
-  Dir dir;
+  ShortEntry entry;
 
   /* Lista de nomes longos */
   std::vector<LongDir> longDirs;
@@ -60,7 +61,7 @@ public:
    *
    * @exception Gera uma exceção no caso de haver algum erro no dir ou ldir.
    */
-  explicit Dentry(const Dir &dir,
+  explicit Dentry(const ShortEntry &entry,
     const std::vector<LongDir> &ldir,
     const DWORD initPos,
     const DWORD endPos);
@@ -99,7 +100,7 @@ public:
    */
   [[nodiscard]] inline DWORD getCluster() const
   {
-    return static_cast<DWORD>(dir.fstClusHI << 16) | dir.fstClusLO;
+    return static_cast<DWORD>(entry.fstClusHI << 16) | entry.fstClusLO;
   }
 
   /**
@@ -107,7 +108,7 @@ public:
    *
    * @return retorna o tamanho do arquivo
    */
-  [[nodiscard]] inline DWORD getFileSize() const { return dir.fileSize; }
+  [[nodiscard]] inline DWORD getFileSize() const { return entry.fileSize; }
 
   /**
    * @brief Retorna verdadeiro se é um diretório
@@ -116,7 +117,7 @@ public:
    */
   [[nodiscard]] inline bool isDirectory() const
   {
-    return ((dir.attr & ATTR_DIRECTORY) != 0);
+    return ((entry.attr & ATTR_DIRECTORY) != 0);
   }
 
   /**
@@ -126,7 +127,7 @@ public:
    */
   [[nodiscard]] inline bool isHidden() const
   {
-    return ((dir.attr & ATTR_HIDDEN) != 0);
+    return ((entry.attr & ATTR_HIDDEN) != 0);
   }
 
   /**
@@ -136,7 +137,7 @@ public:
    */
   [[nodiscard]] inline bool isReadOnly() const
   {
-    return ((dir.attr & ATTR_READ_ONLY) != 0);
+    return ((entry.attr & ATTR_READ_ONLY) != 0);
   }
 
   /**
@@ -144,7 +145,10 @@ public:
    *
    * @return retorna o dia do datestamp crtDate
    */
-  [[nodiscard]] inline WORD getCreationDay() const { return day(dir.crtDate); }
+  [[nodiscard]] inline WORD getCreationDay() const
+  {
+    return day(entry.crtDate);
+  }
 
   /**
    * @brief Retorna o mês de criação do arquivo
@@ -153,7 +157,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationMonth() const
   {
-    return month(dir.crtDate);
+    return month(entry.crtDate);
   }
 
   /**
@@ -163,7 +167,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationYear() const
   {
-    return year(dir.crtDate);
+    return year(entry.crtDate);
   }
 
   /**
@@ -173,7 +177,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationHour() const
   {
-    return hour(dir.crtTime);
+    return hour(entry.crtTime);
   }
 
   /**
@@ -183,7 +187,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationMinute() const
   {
-    return minutes(dir.crtTime);
+    return minutes(entry.crtTime);
   }
 
   /**
@@ -193,7 +197,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationSeconds() const
   {
-    return seconds(dir.crtTime);
+    return seconds(entry.crtTime);
   }
 
   /**
@@ -201,28 +205,34 @@ public:
    *
    * @return retorna o dia do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteDay() const { return day(dir.wrtDate); }
+  [[nodiscard]] inline WORD getWriteDay() const { return day(entry.wrtDate); }
 
   /**
    * @brief Retorna o mês de criação do arquivo
    *
    * @return retorna o mês do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteMonth() const { return month(dir.wrtDate); }
+  [[nodiscard]] inline WORD getWriteMonth() const
+  {
+    return month(entry.wrtDate);
+  }
 
   /**
    * @brief Retorna o ano de criação do arquivo
    *
    * @return retorna o ano do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteYear() const { return year(dir.wrtDate); }
+  [[nodiscard]] inline WORD getWriteYear() const { return year(entry.wrtDate); }
 
   /**
    * @brief Retorna o dia de criação do arquivo
    *
    * @return retorna o dia do datestamp lstAccDate
    */
-  [[nodiscard]] inline WORD getLstAccDay() const { return day(dir.lstAccDate); }
+  [[nodiscard]] inline WORD getLstAccDay() const
+  {
+    return day(entry.lstAccDate);
+  }
 
   /**
    * @brief Retorna o mês de criação do arquivo
@@ -231,7 +241,7 @@ public:
    */
   [[nodiscard]] inline WORD getLstAccMonth() const
   {
-    return month(dir.lstAccDate);
+    return month(entry.lstAccDate);
   }
 
   /**
@@ -241,7 +251,7 @@ public:
    */
   [[nodiscard]] inline WORD getLstAccYear() const
   {
-    return year(dir.lstAccDate);
+    return year(entry.lstAccDate);
   }
 
   /**
@@ -249,7 +259,7 @@ public:
    *
    * @return retorna a hora do timestamp wrtTime
    */
-  [[nodiscard]] inline WORD getWriteHour() const { return hour(dir.wrtTime); }
+  [[nodiscard]] inline WORD getWriteHour() const { return hour(entry.wrtTime); }
 
   /**
    * @brief Retorna o mês de criação do arquivo
@@ -258,7 +268,7 @@ public:
    */
   [[nodiscard]] inline WORD getWriteMinute() const
   {
-    return minutes(dir.wrtTime);
+    return minutes(entry.wrtTime);
   }
 
   /**
@@ -268,7 +278,7 @@ public:
    */
   [[nodiscard]] inline WORD getWriteSeconds() const
   {
-    return seconds(dir.wrtTime);
+    return seconds(entry.wrtTime);
   }
 
   /**
@@ -276,7 +286,7 @@ public:
    *
    * @return retorna uma cópia de dir
    */
-  [[nodiscard]] inline Dir getDirectory() const { return dir; }
+  [[nodiscard]] inline ShortEntry getShortEntry() const { return entry; }
 
   /**
    * @brief Retorna todas entradas longas relacionada a está entrada

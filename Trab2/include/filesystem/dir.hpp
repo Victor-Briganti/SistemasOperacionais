@@ -10,46 +10,16 @@
 #ifndef DIR_HPP
 #define DIR_HPP
 
+#include "filesystem/entry/short_entry.hpp"
 #include "utils/types.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
 
-/* Verifica se o caracter é válido para nomes curtos */
-#define validShortDirName(c)                                                   \
-  (0x22 != (c) && 0x2A != (c) && 0x2B != (c) && 0x2C != (c) && 0x2E != (c)     \
-    && 0x2F != (c) && 0x3A != (c) && 0x3B != (c) && 0x3C != (c) && 0x3D != (c) \
-    && 0x3E != (c) && 0x3F != (c) && 0x5B != (c) && 0x5C != (c) && 0x5D != (c) \
-    && 0x7C && ((c) > 0x20 || (c) == 0x05))
-
-/* Verifica se o caracter é válido para nomes longos */
-#define validLongDirName(c)                                                \
-  (0x22 != (c) && 0x2A != (c) && 0x2E != (c) && 0x2F != (c) && 0x3A != (c) \
-    && 0x3C != (c) && 0x3E != (c) && 0x3F != (c) && 0x5C != (c) && 0x7C    \
-    && ((c) > 0x20 || (c) == 0x05))
-
-
 //===------------------------------------------------------------------------===
 // ESTRUTURAS
 //===------------------------------------------------------------------------===
-
-// Estrutura de diretórios/arquivos
-struct __attribute__((packed)) Dir
-{
-  BYTE name[11]; /* Nome curto */
-  BYTE attr; /* Atributos que o arquivo pode ter */
-  BYTE ntres; /* Reservado */
-  BYTE crtTimeTenth; /* Tempo que o arquivo foi criado em ms */
-  WORD crtTime; /* Tempo em que o arquivo foi criado */
-  WORD crtDate; /* Data em que o arquivo foi criado */
-  WORD lstAccDate; /* Última data de acesso */
-  WORD fstClusHI; /* Bits mais significativos do cluster */
-  WORD wrtTime; /* Tempo em que o arquivo foi escrito */
-  WORD wrtDate; /* Data em que o arquivo foi escrito */
-  WORD fstClusLO; /* Bits menos significativos do cluster */
-  DWORD fileSize; /* Tamanho do arquivo. 0 no caso de diretórios */
-};
 
 // Estrutura de diretórios/arquivos para nomes longos
 struct __attribute__((packed)) LongDir
@@ -69,22 +39,6 @@ struct __attribute__((packed)) LongDir
 //===------------------------------------------------------------------------===
 
 /**
- * @brief Cria uma estrutura de diretório
- *
- * @param name Nome do diretório a ser criado
- * @param fileSize Tamanho do arquivo
- * @param cluster Número do cluster
- *
- * @exception Gera uma exceção caso algo não seja válido
- *
- * @return Um novo diretório
- */
-Dir createDir(const std::string &name,
-  DWORD fileSize,
-  DWORD cluster,
-  BYTE attrs);
-
-/**
  * @brief Cria uma lista com as estruturas de nomes longos
  *
  * @param dir Estrutura de nome curto, relacionada estas entradas
@@ -94,7 +48,8 @@ Dir createDir(const std::string &name,
  *
  * @return Uma lista com os nomes longos
  */
-std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name);
+std::vector<LongDir> createLongDir(const ShortEntry &entry,
+  const std::string &name);
 
 /**
  * @brief Gera um checksum com base em um nome curto
@@ -104,23 +59,5 @@ std::vector<LongDir> createLongDir(const Dir &dir, const std::string &name);
  * @return O valor do checksum já calculado
  */
 BYTE shortCheckSum(const char *shortName);
-
-/**
- * @brief Gera o nome curto a partir do nome longo
- *
- * @param longName Nome longo que será tratado
- *
- * @return O novo nome curto gerado
- */
-std::unique_ptr<BYTE[]> generateShortName(const std::string &longName);
-
-/**
- * @brief Gera um nome curto aleatório para evitar problemas
- *
- * @param shortName Ponteiro para nome curto que será alterado
- *
- * @return true se foi possível alterar o nome, false caso contrário
- */
-bool randomizeShortname(char *shortName);
 
 #endif// DIR_HPP

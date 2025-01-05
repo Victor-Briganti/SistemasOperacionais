@@ -11,6 +11,7 @@
 #define FAT_FS_HPP
 
 #include "filesystem/entry/dentry.hpp"
+#include "filesystem/entry/short_entry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fat_table.hpp"
 #include "filesystem/structure/fsinfo.hpp"
@@ -103,7 +104,7 @@ private:
   bool setDirEntries(DWORD num,
     DWORD startPos,
     DWORD endPos,
-    const Dir &dir,
+    const ShortEntry &entry,
     const std::vector<LongDir> &ldir);
 
   /**
@@ -154,7 +155,7 @@ private:
    * @return true se houver espaço false caso contrário
    */
   bool insertDirEntries(DWORD num,
-    const Dir &dir,
+    const ShortEntry &entry,
     const std::vector<LongDir> &ldir);
 
 public:
