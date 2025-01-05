@@ -10,7 +10,7 @@ RELEASE_DIR:=$(BUILD_DIR)/release
 DEBUG_DIR:=$(BUILD_DIR)/debug
 
 # Arquivos .cpp e .o
-SRCS:=$(wildcard $(SRC_DIR)/**/*.cpp) src/main.cpp
+SRCS:=$(shell find src -type f)
 
 # Diretórios padrões
 DIRS:=$(sort $(dir $(SRCS)))

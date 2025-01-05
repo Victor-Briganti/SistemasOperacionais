@@ -16,65 +16,6 @@
 #include <string>
 #include <vector>
 
-//===------------------------------------------------------------------------===
-// Definições
-//===------------------------------------------------------------------------===
-
-// Atributos de um arquivo
-
-/* Arquivo somente leitura */
-#define ATTR_READ_ONLY (0x01)
-/* Arquivo escondido */
-#define ATTR_HIDDEN (0x02)
-/* Arquivo do sistema operacional */
-#define ATTR_SYSTEM (0x04)
-/* Deve ser usado somente no diretório raiz */
-#define ATTR_VOLUME_ID (0x08)
-/* Define um diretório */
-#define ATTR_DIRECTORY (0x10)
-/* Usado por ferramentas de backup */
-#define ATTR_ARCHIVE (0x20)
-/* Define um nome longo */
-#define ATTR_LONG_NAME \
-  (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID)
-
-/* Mascára para detectar se o arquivo faz parte do nome longo */
-#define ATTR_LONG_NAME_MASK                                    \
-  (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID \
-    | ATTR_DIRECTORY | ATTR_ARCHIVE)
-
-// Definição de entrada de um arquivo
-
-/* Entrada livre. Existia algo e foi apagado */
-#define FREE_ENTRY (0xE5)
-/* Entrada livre. Marca o inicio das entrads não usadas */
-#define EOD_ENTRY (0x00)
-
-// Definição para nomes longos
-
-/* Valor da última entrada do nome longo */
-#define LAST_LONG_ENTRY (0x40)
-
-/* Tamanho da nome armazenado no nome longo */
-#define LONG_NAME_SIZE (13)
-
-// Definições para nome curto
-
-/* Tamanho do nome principal */
-#define NAME_MAIN_SIZE 8
-
-/* Tamanho da extensão */
-#define NAME_EXT_SIZE 3
-
-// Nomes dos diretórios dot
-
-/* Referência ao diretório atual */
-#define DOT (".          ")
-/* Referência ao diretório anterior */
-#define DOTDOT ("..         ")
-
-// Macro para verificação
-
 /* Verifica se o caracter é válido para nomes curtos */
 #define validShortDirName(c)                                                   \
   (0x22 != (c) && 0x2A != (c) && 0x2B != (c) && 0x2C != (c) && 0x2E != (c)     \

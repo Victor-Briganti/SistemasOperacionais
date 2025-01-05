@@ -8,6 +8,7 @@
  */
 
 #include "filesystem/dir.hpp"
+#include "filesystem/default.hpp"
 #include "utils/time.hpp"
 
 #include <algorithm>
@@ -184,8 +185,8 @@ bool randomizeShortname(char *shortName)
 
   srand(static_cast<unsigned int>(time(NULL)));
 
-  for (int i = 0; i < 6; i++) {
-    if (rand() % 6) {
+  for (int i = 0; i < NUM_TAIL_POS; i++) {
+    if (rand() % NUM_TAIL_POS) {
       shortName[i] = static_cast<char>(rand() % ('Z' - 'A') + 'A');
     } else {
       shortName[i] = static_cast<char>(rand() % ('9' - '0') + '0');
@@ -199,7 +200,7 @@ BYTE shortCheckSum(const char *shortName)
 {
   BYTE Sum = 0;
 
-  for (size_t i = 0; i < NAME_MAIN_SIZE + NAME_EXT_SIZE; i++) {
+  for (size_t i = 0; i < NAME_FULL_SIZE; i++) {
     Sum = static_cast<BYTE>(((Sum & 1) ? 0x80 : 0) + (Sum >> 1) + shortName[i]);
   }
 
@@ -207,7 +208,7 @@ BYTE shortCheckSum(const char *shortName)
 }
 std::unique_ptr<BYTE[]> generateShortName(const std::string &longName)
 {
-  auto shortName = std::make_unique<BYTE[]>(NAME_MAIN_SIZE + NAME_EXT_SIZE);
+  auto shortName = std::make_unique<BYTE[]>(NAME_FULL_SIZE);
   if (shortName == nullptr) {
     return nullptr;
   }
@@ -242,22 +243,22 @@ std::unique_ptr<BYTE[]> generateShortName(const std::string &longName)
   // padding
   if (period != -1) {
     // Realiza o padding na parte principal do nome
-    for (size_t i = static_cast<size_t>(period); i < NAME_MAIN_SIZE;
+    for (auto i = static_cast<size_t>(period); i < NAME_MAIN_SIZE;
       i++, period++) {
       treatedName = treatedName.substr(0, i) + " "
                     + treatedName.substr(i, treatedName.size());
     }
   } else {
     // Realiza o padding no final do nome
-    while (treatedName.size() < NAME_MAIN_SIZE + NAME_EXT_SIZE) {
+    while (treatedName.size() < NAME_FULL_SIZE) {
       treatedName.push_back(' ');
     }
   }
 
   // Adiciona o tail do nome
-  if (treatedName.size() > NAME_MAIN_SIZE + NAME_EXT_SIZE) {
-    treatedName[6] = '~';
-    treatedName[7] = '1';
+  if (treatedName.size() > NAME_FULL_SIZE) {
+    treatedName[NUM_TAIL_POS] = '~';
+    treatedName[NUM_TAIL_POS + 1] = '1';
   }
 
   // Copia a parte principal do nome
@@ -277,7 +278,7 @@ std::unique_ptr<BYTE[]> generateShortName(const std::string &longName)
       }
     }
   } else {
-    for (int i = NAME_MAIN_SIZE; i < NAME_MAIN_SIZE + NAME_EXT_SIZE; i++) {
+    for (int i = NAME_MAIN_SIZE; i < NAME_FULL_SIZE; i++) {
       shortName[i] = ' ';
     }
   }

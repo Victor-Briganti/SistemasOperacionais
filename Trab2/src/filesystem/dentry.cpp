@@ -21,14 +21,14 @@ Dentry::Dentry(const Dir &dir,
   : dir(dir), longDirs(ldir), initPos(initPos), endPos(endPos)
 {
 
-  for (size_t i = 0; i < NAME_MAIN_SIZE + NAME_EXT_SIZE; i++) {
+  for (size_t i = 0; i < NAME_FULL_SIZE; i++) {
     shortName[i] = static_cast<char>(dir.name[i]);
   }
-  shortName[NAME_MAIN_SIZE + NAME_EXT_SIZE] = '\0';
+  shortName[NAME_FULL_SIZE] = '\0';
 
-  int isDot = strncmp(shortName.data(), DOT, NAME_MAIN_SIZE + NAME_EXT_SIZE);
+  int isDot = strncmp(shortName.data(), DOT, NAME_FULL_SIZE);
   int isDotDot =
-    strncmp(shortName.data(), DOTDOT, NAME_MAIN_SIZE + NAME_EXT_SIZE);
+    strncmp(shortName.data(), DOTDOT, NAME_FULL_SIZE);
 
   if ((!isDot || !isDotDot) && !ldir.empty()) {
     std::string error = "Nome da entrada está errado\n";

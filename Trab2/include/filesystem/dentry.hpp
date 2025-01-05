@@ -10,6 +10,7 @@
 #ifndef DENTRY_HPP
 #define DENTRY_HPP
 
+#include "filesystem/default.hpp"
 #include "filesystem/dir.hpp"
 #include "utils/time.hpp"
 #include "utils/types.hpp"
@@ -35,7 +36,7 @@ class Dentry
   std::string longName;
 
   /* Nome curto da entrada */
-  std::array<char, NAME_MAIN_SIZE + NAME_EXT_SIZE + 1> shortName;
+  std::array<char, NAME_FULL_SIZE + 1> shortName;
 
   /* Define qual o tipo de nome que a entrada possui */
   int nameType;
