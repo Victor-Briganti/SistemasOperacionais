@@ -9,6 +9,7 @@
 
 #include "filesystem/dir.hpp"
 #include "utils/color.hpp"
+#include "utils/time.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -45,60 +46,6 @@ static inline WORD lowCluster(DWORD cluster)
 static inline WORD highCluster(DWORD cluster)
 {
   return static_cast<WORD>(cluster >> 16);
-}
-
-/**
- * @brief Cria o timestamp do horário atual
- *
- * @return Timestamp do horário atual
- */
-static inline WORD currentTime()
-{
-  time_t curTime = time(nullptr);
-
-  struct tm *curLocalTime = localtime(&curTime);
-
-  int sec = curLocalTime->tm_sec - (curLocalTime->tm_sec % 2 ? 1 : 0);
-
-  DWORD stamp = timeStamp(static_cast<BYTE>(curLocalTime->tm_hour),
-    static_cast<BYTE>(curLocalTime->tm_min),
-    static_cast<BYTE>(sec));
-
-  return static_cast<WORD>(stamp);
-}
-
-/**
- * @brief Cria o datestamp da data atual
- *
- * @return Datestamp da data atual
- */
-static inline WORD currentDate()
-{
-  time_t curDate = time(nullptr);
-
-  struct tm *curLocalDate = localtime(&curDate);
-
-  int year = curLocalDate->tm_year + 1900;
-
-  DWORD stamp = dateStamp(static_cast<BYTE>(curLocalDate->tm_mday),
-    static_cast<BYTE>(curLocalDate->tm_mon + 1),
-    static_cast<BYTE>(year));
-
-  return static_cast<WORD>(stamp);
-}
-
-/**
- * @brief Tempo atual em milisegundos
- *
- * @return O tempo atual em milisegundos
- */
-static inline BYTE currentMilliseconds()
-{
-  struct timeval tv;
-  gettimeofday(&tv, nullptr);
-
-  return static_cast<BYTE>(
-    static_cast<long>(tv.tv_usec) / static_cast<long>(10000));
 }
 
 /**
@@ -259,29 +206,6 @@ BYTE shortCheckSum(const char *shortName)
 
   return Sum;
 }
-
-WORD day(WORD date) { return date & 0x1F; }
-
-WORD month(WORD date) { return (date >> 5) & 0x0F; }
-
-WORD year(WORD date) { return ((date >> 9) & 0xFF) + 1980; }
-
-DWORD dateStamp(DWORD day, DWORD month, DWORD year)
-{
-  return day | (month << 5) | ((year - 1980) << 9);
-}
-
-WORD hour(WORD time) { return (time >> 11) & 0xFF; }
-
-WORD minutes(WORD time) { return (time >> 5) & 0x3F; }
-
-WORD seconds(WORD time) { return ((time >> 9) & 0xFF) + 1980; }
-
-DWORD timeStamp(DWORD hour, DWORD minutes, DWORD seconds)
-{
-  return (hour << 11) | (minutes << 5) | (seconds / 2);
-}
-
 std::unique_ptr<BYTE[]> generateShortName(const std::string &longName)
 {
   auto shortName = std::make_unique<BYTE[]>(NAME_MAIN_SIZE + NAME_EXT_SIZE);

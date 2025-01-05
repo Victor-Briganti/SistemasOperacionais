@@ -11,6 +11,7 @@
 #define DENTRY_HPP
 
 #include "filesystem/dir.hpp"
+#include "utils/time.hpp"
 #include "utils/types.hpp"
 
 #include <array>
