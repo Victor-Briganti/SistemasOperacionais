@@ -17,9 +17,8 @@
 
 Dentry::Dentry(const ShortEntry &entry,
   const std::vector<LongEntry> &lentry,
-  const DWORD initPos,
-  const DWORD endPos)
-  : entry(entry), longEntries(lentry), initPos(initPos), endPos(endPos)
+  const std::vector<ClusterIndex> &clusterIndexes)
+  : entry(entry), longEntries(lentry), clusterIndexes(clusterIndexes)
 {
 
   for (size_t i = 0; i < NAME_FULL_SIZE; i++) {

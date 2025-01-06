@@ -8,6 +8,7 @@
  */
 
 #include "filesystem/cluster/cluster.hpp"
+#include "filesystem/cluster/cluster_index.hpp"
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
@@ -75,19 +76,18 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
     logger::logError("Não foi possível alocar buffer");
     return {};
   }
+  auto *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
 
   std::vector<LongEntry> longDirs;
   std::vector<Dentry> dentries;
+  std::vector<ClusterIndex> clusterIndexes;
 
   std::vector<DWORD> chain = fatTable->listChain(num);
   for (auto cluster : chain) {
-    if (!readCluster(buffer.get(), cluster)) {
+    if (!readCluster(static_cast<void *>(bufferEntry), cluster)) {
       logger::logError("Não foi possível alocar cluster");
       return {};
     }
-
-    const ShortEntry *bufferEntry =
-      reinterpret_cast<ShortEntry *>(buffer.get());
 
     // Caminha por todo o buffer até encontrar o EOD_ENTRY ou alcançar o limite
     // de tamanho do cluster.
@@ -106,17 +106,25 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
       if (bufferEntry[i].attr == ATTR_LONG_NAME) {
         if (bufferPos == 0) {
           bufferPos = static_cast<DWORD>(i);
+          clusterIndexes.push_back({ cluster, bufferPos, 0 });
         }
 
         LongEntry lentry = {};
         memcpy(&lentry, &bufferEntry[i], sizeof(lentry));
         longDirs.push_back(lentry);
       } else {
-        Dentry entry(
-          bufferEntry[i], longDirs, bufferPos, static_cast<DWORD>(i));
+        auto endPos = static_cast<DWORD>(i);
+        if (clusterIndexes.empty()) {
+          clusterIndexes.push_back({ cluster, endPos, endPos });
+        } else {
+          clusterIndexes.back().endPos = endPos;
+        }
 
+        Dentry entry(bufferEntry[i], longDirs, clusterIndexes);
         dentries.push_back(entry);
+
         longDirs.clear();
+        clusterIndexes.clear();
         bufferPos = 0;
       }
     }

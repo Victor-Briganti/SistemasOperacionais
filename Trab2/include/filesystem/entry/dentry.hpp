@@ -10,6 +10,7 @@
 #ifndef DENTRY_HPP
 #define DENTRY_HPP
 
+#include "filesystem/cluster/cluster_index.hpp"
 #include "filesystem/default.hpp"
 #include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
@@ -44,11 +45,8 @@ class Dentry
   /* Define qual o tipo de nome que a entrada possui */
   DentryType type;
 
-  /* Posição inicial no buffer do diretório */
-  DWORD initPos;
-
-  /* Posição final no buffer do diretório */
-  DWORD endPos;
+  /* Lista de clusters e posições que está entrada pode estar */
+  std::vector<ClusterIndex> clusterIndexes;
 
 public:
   /**
@@ -63,8 +61,7 @@ public:
    */
   explicit Dentry(const ShortEntry &entry,
     const std::vector<LongEntry> &lentry,
-    const DWORD initPos,
-    const DWORD endPos);
+    const std::vector<ClusterIndex> &clusterIndexes);
 
   /**
    * @brief Nome longo da entrada
@@ -312,14 +309,20 @@ public:
    *
    * @return retorna o valor de initPos
    */
-  [[nodiscard]] inline DWORD getInitPos() const { return initPos; }
+  [[nodiscard]] inline DWORD getInitPos() const
+  {
+    return clusterIndexes[0].initPos;
+  }
 
   /**
    * @brief Retorna a posição final dessa entrada no cluster
    *
    * @return retorna o valor de endPos
    */
-  [[nodiscard]] inline DWORD getEndPos() const { return endPos; }
+  [[nodiscard]] inline DWORD getEndPos() const
+  {
+    return clusterIndexes[0].endPos;
+  }
 
   /**
    * @brief Tipo do arquivo

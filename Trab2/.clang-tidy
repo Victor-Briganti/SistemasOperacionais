@@ -23,6 +23,7 @@ Checks: "*,
         -cppcoreguidelines-avoid-c-arrays,
         -modernize-avoid-c-arrays,
         -cppcoreguidelines-prefer-member-initializer,
+        -cppcoreguidelines-pro-type-reinterpret-cast,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
