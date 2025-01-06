@@ -106,8 +106,9 @@ std::vector<LongEntry> createLongEntries(const ShortEntry &entry,
   }
 
   std::reverse(longEntries.begin(), longEntries.end());
-  for (size_t i = longEntries.size() - 1, j = 0; i >= 0; i--, j++) {
-    if (i == longEntries.size() - 1) {
+  for (int i = static_cast<int>(longEntries.size() - 1), j = 0; i >= 0;
+       i--, j++) {
+    if (i == static_cast<int>(longEntries.size() - 1)) {
       longEntries[j].ord = static_cast<BYTE>(LAST_LONG_ENTRY | (i + 1));
     } else {
       longEntries[j].ord = static_cast<BYTE>(i + 1);
