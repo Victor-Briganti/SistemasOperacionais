@@ -64,11 +64,11 @@ bool ClusterIO::writeCluster(const void *buffer, DWORD num)
 
 DWORD ClusterIO::getEntryClus(const Dentry &entry)
 {
-  if (entry.getNameType() == DOTDOT_NAME && entry.getCluster() == 0) {
+  if (entry.getNameType() == DOTDOT_NAME && entry.getDataCluster() == 0) {
     return bios->getRootClus();
   }
 
-  return entry.getCluster();
+  return entry.getDataCluster();
 }
 
 std::vector<Dentry> ClusterIO::getListEntries(DWORD num)

@@ -101,7 +101,7 @@ void Dentry::printInfo() const
   std::fprintf(stdout, "%-2c ", isHidden() ? '-' : 'H');
 
   // Informações sobre do cluster e tamanho
-  std::fprintf(stdout, "cluster=%-4d  ", getCluster());
+  std::fprintf(stdout, "cluster=%-4d  ", getDataCluster());
   std::fprintf(stdout, "size=%-8d  ", getFileSize());
 
   // Informações sobre data de escrita

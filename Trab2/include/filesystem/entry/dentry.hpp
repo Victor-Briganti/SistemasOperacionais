@@ -37,11 +37,11 @@ class Dentry
   /* Lista de nomes longos */
   std::vector<LongEntry> longEntries;
 
-  /* Nome longo da entrada */
-  std::string longName;
-
   /* Nome curto da entrada */
   std::array<char, NAME_FULL_SIZE + 1> shortName;
+
+  /* Nome longo da entrada */
+  std::string longName;
 
   /* Define qual o tipo de nome que a entrada possui */
   DentryNameType nameType;
@@ -97,13 +97,23 @@ public:
   }
 
   /**
-   * @brief Cluster da entrada
+   * @brief Cluster onde os dados da entrada estão armazenados
    *
-   * @return retorna o cluster da entrada
+   * @return retorna o cluster referente aos dados dessa entrada
    */
-  [[nodiscard]] inline DWORD getCluster() const
+  [[nodiscard]] inline DWORD getDataCluster() const
   {
     return static_cast<DWORD>(entry.fstClusHI << 16) | entry.fstClusLO;
+  }
+
+  /**
+   * @brief Cluster onde está entrada está armazenada
+   *
+   * @return retorna o cluster referente ao cluster que armazena está entrada
+   */
+  [[nodiscard]] inline DWORD getEntryCluster() const
+  {
+    return clusterIndexes[0].clusterNum;
   }
 
   /**

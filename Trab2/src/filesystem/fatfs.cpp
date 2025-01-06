@@ -68,7 +68,7 @@ bool FatFS::removeEntry(Dentry &entry, DWORD num)
   entry.markFree();
 
   // Remove as entradas da tabela FAT
-  int fatRm = fatTable->removeChain(entry.getCluster());
+  int fatRm = fatTable->removeChain(entry.getDataCluster());
   if (fatRm < 0) {
     return false;
   }
@@ -508,7 +508,7 @@ void FatFS::ls(const std::string &path)
 
     // Lista de entradas
     std::vector<Dentry> dentries =
-      clusterIO->getListEntries(entry.getCluster());
+      clusterIO->getListEntries(entry.getDataCluster());
 
     // Mostra todas as entradas
     for (const auto &a : dentries) {
@@ -610,7 +610,7 @@ void FatFS::attr(const std::string &path)
     std::fprintf(stdout,
       "Tamanho=%-8d Cluster=%-4d\n",
       entry.getFileSize(),
-      entry.getCluster());
+      entry.getDataCluster());
 
     std::fprintf(stdout,
       "Data Criação: %02d-%02d-%02d\n",
@@ -715,7 +715,8 @@ void FatFS::touch(const std::string &path)
   auto [dentry, _] = searchEntry(listPath, DIR_ENTRY);
 
   // Lista de entradas
-  std::vector<Dentry> dentries = clusterIO->getListEntries(dentry.getCluster());
+  std::vector<Dentry> dentries =
+    clusterIO->getListEntries(dentry.getDataCluster());
 
   // Gera a entrada curta
   ShortEntry entry = createShortEntry(filename, 0, 0, ATTR_ARCHIVE);
@@ -736,7 +737,7 @@ void FatFS::touch(const std::string &path)
   // Gera as entradas longas
   std::vector<LongEntry> lentry = createLongEntries(entry, filename);
 
-  if (!insertDirEntries(dentry.getCluster(), entry, lentry)) {
+  if (!insertDirEntries(dentry.getDataCluster(), entry, lentry)) {
     logger::logError("operação falhou");
     return;
   }
