@@ -10,6 +10,7 @@
 #ifndef FAT_FS_HPP
 #define FAT_FS_HPP
 
+#include "filesystem/cluster/cluster.hpp"
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
@@ -47,38 +48,8 @@ private:
   /* Caminho atual no sistema de arquivos */
   PathParser *pathParser;
 
-  /**
-   * @brief Lê um cluster da memória em um buffer
-   *
-   * @param buffer Ponteiro que irá receber as informações a serem lidas
-   * @param num Número do cluster que será lido
-   *
-   * @return true se foi possível ler, false caso contrário
-   */
-  bool readCluster(void *buffer, DWORD num);
-
-  /**
-   * @brief Escreve um cluster na imagem
-   *
-   * @param buffer Ponteiro com as informações que serão escritas
-   * @param num Número do cluster que será escrito
-   *
-   * @return true se foi possível escrever, false caso contrário
-   */
-  bool writeCluster(const void *buffer, DWORD num);
-
-  /**
-   * @brief Retorna o cluster da entrada corrente
-   *
-   * No caso da entrada que é um "..", ao tentar retornar seu cluster o valor 0
-   * será retornado. Para evitar problemas aqui retornamos o valor do
-   * RootClus.
-   *
-   * @param entry Entrada que terá seu cluster extraído.
-   *
-   * @return O valor do cluster da entrada
-   */
-  DWORD getEntryClus(const Dentry &entry);
+  /* Classe para acesso aos clusters */
+  ClusterIO *clusterIO;
 
   /**
    * @brief Retorna uma lista com todas as entradas de um diretório

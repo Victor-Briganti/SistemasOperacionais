@@ -29,45 +29,6 @@
 // PRIVATE
 //===------------------------------------------------------------------------===
 
-bool FatFS::readCluster(void *buffer, DWORD num)
-{
-  if (num >= bios->getCountOfClusters()) {
-    logger::logError(std::to_string(num) + " número inváldo de cluster");
-    return false;
-  }
-
-  const DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
-  if (!image->read(offset, buffer, bios->totClusByts())) {
-    logger::logError("Não foi possível ler cluster");
-    return false;
-  }
-  return true;
-}
-
-bool FatFS::writeCluster(const void *buffer, DWORD num)
-{
-  if (num >= bios->getCountOfClusters()) {
-    logger::logError(std::to_string(num) + " número inváldo de cluster");
-    return false;
-  }
-
-  DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
-  if (!image->write(offset, buffer, bios->totClusByts())) {
-    logger::logError("Não foi possível escrever cluster");
-    return false;
-  }
-  return true;
-}
-
-DWORD FatFS::getEntryClus(const Dentry &entry)
-{
-  if (entry.getNameType() == DOTDOT_NAME && entry.getCluster() == 0) {
-    return bios->getRootClus();
-  }
-
-  return entry.getCluster();
-}
-
 std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 {
   // Aloca o buffer do diretório
@@ -88,7 +49,7 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
 
   for (auto cluster : chain) {
     // Lê o cluster no qual o diretório se encontra
-    if (!readCluster(buffer.get(), cluster)) {
+    if (!clusterIO->readCluster(buffer.get(), cluster)) {
       logger::logError("Não foi possível ler cluster");
       return {};
     }
@@ -151,7 +112,7 @@ bool FatFS::setDirEntries(DWORD num,
   }
 
   // Lê o cluster no qual o diretório se encontra
-  if (!readCluster(buffer.get(), num)) {
+  if (!clusterIO->readCluster(buffer.get(), num)) {
     logger::logError("Não foi possível ler cluster");
     return {};
   }
@@ -168,7 +129,7 @@ bool FatFS::setDirEntries(DWORD num,
     }
   }
 
-  return writeCluster(buffer.get(), num);
+  return clusterIO->writeCluster(buffer.get(), num);
 }
 
 bool FatFS::removeEntry(Dentry &entry, DWORD num)
@@ -272,7 +233,7 @@ std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
         }
 
         // Altera o cluster em que ocorre a busca
-        clt = getEntryClus(a);
+        clt = clusterIO->getEntryClus(a);
         found = true;
         break;
       }
@@ -328,7 +289,7 @@ std::pair<Dentry, DWORD>
         entry.second = clt;
 
         // Altera o cluster em que ocorre a busca
-        clt = getEntryClus(a);
+        clt = clusterIO->getEntryClus(a);
         found = true;
         break;
       }
@@ -382,7 +343,7 @@ bool FatFS::insertDirEntries(DWORD num,
   for (size_t i = 0, countFreeEntries = 0; i < chain.size(); i++) {
     curCluster = chain[i];
     // Lê o cluster no qual o diretório se encontra
-    if (!readCluster(buffer.get(), curCluster)) {
+    if (!clusterIO->readCluster(buffer.get(), curCluster)) {
       logger::logError("Não foi possível ler cluster");
       return {};
     }
@@ -417,7 +378,7 @@ bool FatFS::insertDirEntries(DWORD num,
           }
           memcpy(&bufferEntry[k], &entry, sizeof(entry));
 
-          return writeCluster(bufferEntry, curCluster);
+          return clusterIO->writeCluster(bufferEntry, curCluster);
         }
 
         continue;
@@ -435,7 +396,7 @@ bool FatFS::insertDirEntries(DWORD num,
     }
     memcpy(&bufferEntry[k], &entry, sizeof(entry));
 
-    bool result = writeCluster(bufferEntry, curCluster);
+    bool result = clusterIO->writeCluster(bufferEntry, curCluster);
     return result;
   }
 
@@ -456,7 +417,7 @@ bool FatFS::insertDirEntries(DWORD num,
       }
 
       // Lê o cluster no qual o diretório se encontra
-      if (!readCluster(newBuffer.get(), cluster)) {
+      if (!clusterIO->readCluster(newBuffer.get(), cluster)) {
         logger::logError("Não foi possível ler cluster");
         return false;
       }
@@ -483,8 +444,8 @@ bool FatFS::insertDirEntries(DWORD num,
 
       memcpy(&currentBuffer[k], &entry, sizeof(entry));
 
-      return writeCluster(bufferEntry, curCluster)
-             && writeCluster(newBufferDir, cluster);
+      return clusterIO->writeCluster(bufferEntry, curCluster)
+             && clusterIO->writeCluster(newBufferDir, cluster);
     }
   }
 
@@ -498,7 +459,7 @@ bool FatFS::insertDirEntries(DWORD num,
       }
 
       // Lê o cluster no qual o diretório se encontra
-      if (!readCluster(buffer.get(), cluster)) {
+      if (!clusterIO->readCluster(buffer.get(), cluster)) {
         logger::logError("Não foi possível ler cluster");
         return false;
       }
@@ -517,7 +478,7 @@ bool FatFS::insertDirEntries(DWORD num,
 
       memcpy(&bufferEntry[k], &entry, sizeof(entry));
 
-      bool result = writeCluster(bufferEntry, cluster);
+      bool result = clusterIO->writeCluster(bufferEntry, cluster);
 
       return result;
     }
@@ -557,6 +518,11 @@ FatFS::FatFS(const std::string &path)
   if (fsInfo == nullptr) {
     throw std::runtime_error("Não foi possível iniciar PathParser");
   }
+
+  clusterIO = new ClusterIO(image, bios, fatTable, fsInfo, pathParser);
+  if (fsInfo == nullptr) {
+    throw std::runtime_error("Não foi possível iniciar o cluster");
+  }
 }
 
 FatFS::~FatFS()
@@ -566,6 +532,7 @@ FatFS::~FatFS()
   delete bios;
   delete image;
   delete pathParser;
+  delete clusterIO;
 }
 
 void FatFS::info()
@@ -582,7 +549,7 @@ void FatFS::cluster(DWORD num)
     return;
   }
 
-  if (!readCluster(buffer.get(), num)) {
+  if (!clusterIO->readCluster(buffer.get(), num)) {
     logger::logError("Não foi possível ler cluster");
     return;
   }
