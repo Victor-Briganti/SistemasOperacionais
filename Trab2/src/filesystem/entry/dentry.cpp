@@ -10,10 +10,10 @@
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
+#include "utils/logger.hpp"
 
 #include <cctype>
 #include <cstring>
-#include <stdexcept>
 
 Dentry::Dentry(const ShortEntry &entry,
   const std::vector<LongEntry> &lentry,
@@ -31,7 +31,7 @@ Dentry::Dentry(const ShortEntry &entry,
   int isDotDot = strncmp(shortName.data(), DOTDOT, NAME_FULL_SIZE);
 
   if ((!isDot || !isDotDot) && !lentry.empty()) {
-    throw std::runtime_error("Nome da entrada está errado");
+    logger::logWarning("Entrada sem nome longo");
   }
 
   if (!isDot) {
@@ -49,7 +49,9 @@ Dentry::Dentry(const ShortEntry &entry,
   BYTE checkSum = shortCheckSum(shortName.data());
   for (auto a : lentry) {
     if (a.chckSum != checkSum) {
-      throw std::runtime_error("Checksum não condiz com a entrada");
+      logger::logWarning("Checksum não condiz com a entrada");
+      longEntries.clear();
+      break;
     }
 
     std::string name;

@@ -29,75 +29,6 @@
 // PRIVATE
 //===------------------------------------------------------------------------===
 
-std::vector<Dentry> FatFS::getDirEntries(DWORD num)
-{
-  // Aloca o buffer do diretório
-  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
-  if (buffer == nullptr) {
-    logger::logError("Não foi possível alocar buffer");
-    return {};
-  }
-
-  // Lista com diretórios de nomes longos
-  std::vector<LongEntry> longDirs;
-
-  // Vetor com todas as entradas
-  std::vector<Dentry> dentries;
-
-  // Cadeia com os clusters
-  std::vector<DWORD> chain = fatTable->listChain(num);
-
-  for (auto cluster : chain) {
-    // Lê o cluster no qual o diretório se encontra
-    if (!clusterIO->readCluster(buffer.get(), cluster)) {
-      logger::logError("Não foi possível ler cluster");
-      return {};
-    }
-
-    // Cast para facilitar manuseio do buffer
-    const ShortEntry *bufferEntry =
-      reinterpret_cast<ShortEntry *>(buffer.get());
-
-    // Define a posição da entrada no buffer
-    DWORD bufferPos = 0;
-
-    // Caminha por todo o buffer até encontrar o EOD_ENTRY ou alcançar o limite
-    // de tamanho do cluster.
-    for (size_t i = 0; i < (bios->totClusByts() / sizeof(ShortEntry)); i++) {
-      // Final do diretório
-      if (bufferEntry[i].name[0] == EOD_ENTRY) {
-        break;
-      }
-
-      // Diretório vazio
-      if (bufferEntry[i].name[0] == FREE_ENTRY) {
-        continue;
-      }
-
-      if (bufferEntry[i].attr == ATTR_LONG_NAME) {
-        if (bufferPos == 0) {
-          bufferPos = static_cast<DWORD>(i);
-        }
-
-        LongEntry lentry;
-        memcpy(&lentry, &bufferEntry[i], sizeof(lentry));
-        longDirs.push_back(lentry);
-      } else {
-        Dentry entry(bufferEntry[i],
-          longDirs,
-          static_cast<DWORD>(bufferPos),
-          static_cast<DWORD>(i));
-
-        dentries.push_back(entry);
-        longDirs.clear();
-        bufferPos = 0;
-      }
-    }
-  }
-
-  return dentries;
-}
-
 bool FatFS::setDirEntries(DWORD num,
   DWORD startPos,
   DWORD endPos,
@@ -190,7 +121,7 @@ std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
   bool found = false;
 
   // Lista de entradas
-  std::vector<Dentry> dentries = getDirEntries(clt);
+  std::vector<Dentry> dentries = clusterIO->getListEntries(clt);
 
   // Caminha pela lista de nomes
   for (size_t i = 1; i < listPath.size(); i++, found = false) {
@@ -246,7 +177,7 @@ std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
     }
 
     // Atualiza a lista de entradas
-    dentries = getDirEntries(clt);
+    dentries = clusterIO->getListEntries(clt);
   }
 
   return newPath;
@@ -260,7 +191,7 @@ std::pair<Dentry, DWORD>
   bool found = false;
 
   // Lista de entradas
-  std::vector<Dentry> dentries = getDirEntries(clt);
+  std::vector<Dentry> dentries = clusterIO->getListEntries(clt);
 
   // Entrada e cluster a ser retornado
   std::pair<Dentry, DWORD> entry = { dentries[0], 0 };
@@ -301,7 +232,7 @@ std::pair<Dentry, DWORD>
     }
 
     // Atualiza a lista de entradas
-    dentries = getDirEntries(clt);
+    dentries = clusterIO->getListEntries(clt);
   }
 
   return entry;
@@ -574,7 +505,8 @@ void FatFS::ls(const std::string &path)
   // Diretório raiz
   if (listPath.back() == ROOT_DIR) {
     // Lista de entradas
-    std::vector<Dentry> dentries = getDirEntries(bios->getRootClus());
+    std::vector<Dentry> dentries =
+      clusterIO->getListEntries(bios->getRootClus());
 
     // Mostra todas as entradas
     for (const auto &a : dentries) {
@@ -589,7 +521,8 @@ void FatFS::ls(const std::string &path)
     auto [entry, _] = searchEntry(listPath, DIR_ENTRY);
 
     // Lista de entradas
-    std::vector<Dentry> dentries = getDirEntries(entry.getCluster());
+    std::vector<Dentry> dentries =
+      clusterIO->getListEntries(entry.getCluster());
 
     // Mostra todas as entradas
     for (const auto &a : dentries) {
@@ -783,8 +716,7 @@ void FatFS::touch(const std::string &path)
   if (listPath.back() == ROOT_DIR) {
     DWORD cluster = bios->getRootClus();
 
-    std::vector<Dentry> dentries = getDirEntries(cluster);
-
+    std::vector<Dentry> dentries = clusterIO->getListEntries(cluster);
 
     // Gera a entrada curta
     ShortEntry entry = createShortEntry(filename, 0, 0, ATTR_ARCHIVE);
@@ -815,7 +747,7 @@ void FatFS::touch(const std::string &path)
   auto [dentry, _] = searchEntry(listPath, DIR_ENTRY);
 
   // Lista de entradas
-  std::vector<Dentry> dentries = getDirEntries(dentry.getCluster());
+  std::vector<Dentry> dentries = clusterIO->getListEntries(dentry.getCluster());
 
   // Gera a entrada curta
   ShortEntry entry = createShortEntry(filename, 0, 0, ATTR_ARCHIVE);

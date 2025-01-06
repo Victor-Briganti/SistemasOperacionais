@@ -14,6 +14,8 @@
 #include "filesystem/structure/fsinfo.hpp"
 #include "path/path_parser.hpp"
 
+#include <vector>
+
 class ClusterIO
 {
   /* Interface usada para ler e escrever a imagem */
@@ -70,6 +72,18 @@ public:
    * @return O valor do cluster da entrada
    */
   DWORD getEntryClus(const Dentry &entry);
+
+  /**
+   * @brief Retorna uma lista com todas as entradas de um diretório
+   *
+   * @param num Número do cluster do diretório que será listado
+   *
+   * @exception Exceções podem ocorrer durante a leitura das informações das
+   * entradas.
+   *
+   * @return Um vetor com todos as entradas se foi possível ler.
+   */
+  std::vector<Dentry> getListEntries(DWORD num);
 };
 
 #endif// CLUSTER_HPP

@@ -54,18 +54,6 @@ private:
   /**
    * @brief Retorna uma lista com todas as entradas de um diretório
    *
-   * @param num Número do cluster do diretório que será listado
-   *
-   * @exception Exceções podem ocorrer durante a leitura das informações das
-   * entradas.
-   *
-   * @return Um vetor com todos as entradas se foi possível ler.
-   */
-  std::vector<Dentry> getDirEntries(DWORD num);
-
-  /**
-   * @brief Retorna uma lista com todas as entradas de um diretório
-   *
    * @param num Número do cluster a ser lido
    * @param startPos Posição inicial no cluster
    * @param endPos Posição final no cluster
