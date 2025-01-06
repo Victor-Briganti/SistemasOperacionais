@@ -44,9 +44,9 @@ class FileSysInfo
   FSInfo fsinfo;
 
   /* Interface usada para ler e escrever a imagem */
-  Image *image;
+  std::shared_ptr<Image> image;
 
-  /* Offset da estrutura no sistema de arquivos */
+  /* Offset da estrutra no sistema de arquivos */
   const DWORD offset;
 
   /* Flag para definir se a estrutura foi ou não alterada */
@@ -69,7 +69,9 @@ public:
    * @exception Gera uma exceção se não for possível ler a estrutura FSInfo ou
    * houve algum erro durante sua verificação.
    */
-  explicit FileSysInfo(Image *image, DWORD offset, FatTable *fatTable);
+  explicit FileSysInfo(std::shared_ptr<Image> image,
+    DWORD offset,
+    const std::shared_ptr<FatTable> &fatTable);
 
   /**
    * @brief Finaliza a estrutura

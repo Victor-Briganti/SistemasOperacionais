@@ -21,11 +21,11 @@
 // PUBLIC
 //===------------------------------------------------------------------------===
 
-ClusterIO::ClusterIO(Image *image,
-  BiosBlock *bios,
-  FatTable *fatTable,
-  FileSysInfo *fsInfo,
-  PathParser *pathParser)
+ClusterIO::ClusterIO(std::shared_ptr<Image> image,
+  std::shared_ptr<BiosBlock> bios,
+  std::shared_ptr<FatTable> fatTable,
+  std::shared_ptr<FileSysInfo> fsInfo,
+  std::shared_ptr<PathParser> pathParser)
   : image(image), bios(bios), fatTable(fatTable), fsInfo(fsInfo),
     pathParser(pathParser)
 {}

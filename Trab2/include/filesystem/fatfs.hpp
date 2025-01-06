@@ -20,6 +20,7 @@
 #include "io/image.hpp"
 #include "path/path_parser.hpp"
 
+#include <memory>
 #include <string>
 
 /* Definições para os tipos de arquivos */
@@ -27,29 +28,26 @@
 #define ARCH_ENTRY 0
 #define ALL_ENTRY -1
 
-/* Definição sobre o que é o diretório raiz */
-#define ROOT_DIR "img/"
-
 class FatFS
 {
 private:
   /* Interface usada para ler e escrever a imagem */
-  Image *image;
+  std::shared_ptr<Image> image;
 
   /* Interface usada lidar com a estrutura BPB */
-  BiosBlock *bios;
+  std::shared_ptr<BiosBlock> bios;
 
   /* Interface para lidar com a tabela FAT */
-  FatTable *fatTable;
+  std::shared_ptr<FatTable> fatTable;
 
   /* Interface para lidar com a estrutura FSInfo */
-  FileSysInfo *fsInfo;
+  std::shared_ptr<FileSysInfo> fsInfo;
 
   /* Caminho atual no sistema de arquivos */
-  PathParser *pathParser;
+  std::shared_ptr<PathParser> pathParser;
 
   /* Classe para acesso aos clusters */
-  ClusterIO *clusterIO;
+  std::shared_ptr<ClusterIO> clusterIO;
 
   /**
    * @brief Retorna uma lista com todas as entradas de um diretório
@@ -131,11 +129,6 @@ public:
    * estruturas.
    */
   explicit FatFS(const std::string &path);
-
-  /**
-   * @brief Desaloca as estruturas na ordem correta
-   */
-  ~FatFS();
 
   /**
    * @brief Mostra as informações sobre o sistema de arquivos

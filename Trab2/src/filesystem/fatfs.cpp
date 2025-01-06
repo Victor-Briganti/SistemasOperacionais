@@ -100,7 +100,7 @@ std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
   }
 
   // Se necessário monta o caminho completo
-  if (listPath.empty() || listPath[0] != ROOT_DIR) {
+  if (listPath.empty() || listPath[0] != pathParser->getRootDir()) {
     std::vector<std::string> fullPath =
       pathParser->split(pathParser->getCurPath(), '/');
     fullPath.insert(fullPath.end(), listPath.begin(), listPath.end());
@@ -108,13 +108,13 @@ std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
   }
 
   // Se o caminho é o root, não há o que verificar
-  if (listPath.size() == 1 && listPath[0] == ROOT_DIR) {
+  if (listPath.size() == 1 && listPath[0] == pathParser->getRootDir()) {
     return listPath;
   }
 
   // Caminho que será criado
   std::vector<std::string> newPath;
-  newPath.emplace_back(ROOT_DIR);
+  newPath.emplace_back(pathParser->getRootDir());
 
   // Começa a busca pelo "/"
   DWORD clt = bios->getRootClus();
@@ -157,7 +157,8 @@ std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
             pathParser->merge(listPath) + " caminho inválido");
         }
 
-        if (a.getNameType() == DOTDOT_NAME && newPath.back() != ROOT_DIR) {
+        if (a.getNameType() == DOTDOT_NAME
+            && newPath.back() != pathParser->getRootDir()) {
           newPath.pop_back();
         } else {
           newPath.push_back(a.getLongName());
@@ -424,46 +425,37 @@ bool FatFS::insertDirEntries(DWORD num,
 
 FatFS::FatFS(const std::string &path)
 {
-  image = new Image(path);
+  image = std::make_shared<Image>(path);
   if (image == nullptr) {
     throw std::runtime_error("Não foi possível ler imagem");
   }
 
-  bios = new BiosBlock(image);
+  bios = std::make_shared<BiosBlock>(image);
   if (bios == nullptr) {
     throw std::runtime_error("Não foi possível iniciar BPB");
   }
 
-  fatTable = new FatTable(image, bios);
+  fatTable = std::make_shared<FatTable>(image, bios);
   if (fatTable == nullptr) {
     throw std::runtime_error("Não foi possível iniciar tabela FAT");
   }
 
-  fsInfo = new FileSysInfo(
+  fsInfo = std::make_shared<FileSysInfo>(
     image, bios->getFSInfo() * bios->getBytesPerSec(), fatTable);
   if (fsInfo == nullptr) {
     throw std::runtime_error("Não foi possível iniciar FSInfo");
   }
 
-  pathParser = new PathParser();
+  pathParser = std::make_shared<PathParser>();
   if (fsInfo == nullptr) {
     throw std::runtime_error("Não foi possível iniciar PathParser");
   }
 
-  clusterIO = new ClusterIO(image, bios, fatTable, fsInfo, pathParser);
+  clusterIO =
+    std::make_shared<ClusterIO>(image, bios, fatTable, fsInfo, pathParser);
   if (fsInfo == nullptr) {
     throw std::runtime_error("Não foi possível iniciar o cluster");
   }
-}
-
-FatFS::~FatFS()
-{
-  delete fsInfo;
-  delete fatTable;
-  delete bios;
-  delete image;
-  delete pathParser;
-  delete clusterIO;
 }
 
 void FatFS::info()
@@ -503,7 +495,7 @@ void FatFS::ls(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == ROOT_DIR) {
+  if (listPath.back() == pathParser->getRootDir()) {
     // Lista de entradas
     std::vector<Dentry> dentries =
       clusterIO->getListEntries(bios->getRootClus());
@@ -546,7 +538,7 @@ void FatFS::rm(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == ROOT_DIR) {
+  if (listPath.back() == pathParser->getRootDir()) {
     logger::logError("rm espera um arquivo");
     return;
   }
@@ -577,7 +569,7 @@ void FatFS::rmdir(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == ROOT_DIR) {
+  if (listPath.back() == pathParser->getRootDir()) {
     logger::logError("operação não permitida");
     return;
   }
@@ -624,7 +616,7 @@ void FatFS::attr(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == ROOT_DIR) {
+  if (listPath.back() == pathParser->getRootDir()) {
     logger::logError("operação não permitida");
     return;
   }
@@ -690,7 +682,7 @@ void FatFS::touch(const std::string &path)
 {
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath = pathParser->split(path, '/');
-  if (listPath.size() == 1 && listPath[0] == ROOT_DIR) {
+  if (listPath.size() == 1 && listPath[0] == pathParser->getRootDir()) {
     logger::logError("operação inválida");
     return;
   }
@@ -713,7 +705,7 @@ void FatFS::touch(const std::string &path)
   }
 
   // Diretório raiz
-  if (listPath.back() == ROOT_DIR) {
+  if (listPath.back() == pathParser->getRootDir()) {
     DWORD cluster = bios->getRootClus();
 
     std::vector<Dentry> dentries = clusterIO->getListEntries(cluster);

@@ -14,31 +14,32 @@
 #include "filesystem/structure/fsinfo.hpp"
 #include "path/path_parser.hpp"
 
+#include <memory>
 #include <vector>
 
 class ClusterIO
 {
   /* Interface usada para ler e escrever a imagem */
-  Image *image;
+  std::shared_ptr<Image> image;
 
   /* Interface usada lidar com a estrutura BPB */
-  BiosBlock *bios;
+  std::shared_ptr<BiosBlock> bios;
 
   /* Estrutura que armazena informações sobre os clusters */
-  FileSysInfo *fsInfo;
+  std::shared_ptr<FileSysInfo> fsInfo;
 
   /* Interface para lidar com a tabela FAT */
-  FatTable *fatTable;
+  std::shared_ptr<FatTable> fatTable;
 
   /* Caminho atual no sistema de arquivos */
-  PathParser *pathParser;
+  std::shared_ptr<PathParser> pathParser;
 
 public:
-  explicit ClusterIO(Image *image,
-    BiosBlock *bios,
-    FatTable *fatTable,
-    FileSysInfo *fsInfo,
-    PathParser *pathParser);
+  explicit ClusterIO(std::shared_ptr<Image> image,
+    std::shared_ptr<BiosBlock> bios,
+    std::shared_ptr<FatTable> fatTable,
+    std::shared_ptr<FileSysInfo> fsInfo,
+    std::shared_ptr<PathParser> pathParser);
 
   /**
    * @brief Lê um cluster da memória em um buffer

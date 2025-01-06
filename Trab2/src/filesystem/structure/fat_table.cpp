@@ -59,7 +59,9 @@ void FatTable::writeInTable(const DWORD offset, const DWORD value)
 //===------------------------------------------------------------------------===
 
 
-FatTable::FatTable(Image *image, BiosBlock *bios) : image(image), bios(bios)
+FatTable::FatTable(std::shared_ptr<Image> image,
+  std::shared_ptr<BiosBlock> bios)
+  : image(image), bios(bios)
 {
   table = std::make_unique<BYTE[]>(bios->getFATSz() * bios->getBytesPerSec());
   if (table == nullptr) {

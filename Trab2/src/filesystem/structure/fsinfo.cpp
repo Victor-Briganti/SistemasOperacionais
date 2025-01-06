@@ -13,7 +13,9 @@
 #include <cstdlib>
 #include <string>
 
-FileSysInfo::FileSysInfo(Image *image, DWORD offset, FatTable *fatTable)
+FileSysInfo::FileSysInfo(std::shared_ptr<Image> image,
+  DWORD offset,
+  const std::shared_ptr<FatTable> &fatTable)
   : image(image), offset(offset)
 {
   if (!image->read(offset, &fsinfo, sizeof(fsinfo))) {

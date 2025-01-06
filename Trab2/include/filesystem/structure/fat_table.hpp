@@ -29,10 +29,10 @@ class FatTable
   static constexpr DWORD EOC = 0x0FFFFFF8;
 
   /* Interface usada para ler e escrever a FAT */
-  Image *image;
+  std::shared_ptr<Image> image;
 
   /* Interface para lidar com o BPB */
-  BiosBlock *bios;
+  std::shared_ptr<BiosBlock> bios;
 
   /* Tabela FAT em memória */
   std::unique_ptr<BYTE[]> table;
@@ -83,7 +83,8 @@ public:
    * @exception Gera uma exceção se houver algum erro durante a leitura ou
    * inicialização.
    */
-  explicit FatTable(Image *image, BiosBlock *bios);
+  explicit FatTable(std::shared_ptr<Image> image,
+    std::shared_ptr<BiosBlock> bios);
 
   /**
    * @brief Imprime a tabela atual

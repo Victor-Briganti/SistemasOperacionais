@@ -73,7 +73,7 @@ int BiosBlock::bpbInit()
 // PUBLIC
 //===------------------------------------------------------------------------===
 
-BiosBlock::BiosBlock(Image *image)
+BiosBlock::BiosBlock(const std::shared_ptr<Image> &image)
 {
   if (!image->read(0, static_cast<void *>(&bpb), sizeof(bpb))) {
     std::string error = "Não foi possível ler o BPB\n";

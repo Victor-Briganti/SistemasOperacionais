@@ -13,6 +13,8 @@
 #include "io/image.hpp"
 #include "utils/types.hpp"
 
+#include <memory>
+
 // Classe para lidar com a estrutura BPB do FAT filesystem
 class BiosBlock
 {
@@ -98,7 +100,7 @@ public:
    * @exception Gera uma exceção se não for possível ler a estrutura BPB, ou o
    * sistema de arquivos não ser do tipo FAT32.
    */
-  explicit BiosBlock(Image *image);
+  explicit BiosBlock(const std::shared_ptr<Image> &image);
   ~BiosBlock() = default;
 
   /**
