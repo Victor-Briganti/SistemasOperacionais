@@ -46,7 +46,7 @@ $(RELEASE_DIR)/main: $(RELEASE_OBJS)
 release: $(RELEASE_DIRS) $(RELEASE_DIR)/main
 
 valgrind: debug
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --verbose $(DEBUG_DIR)/main fat32.img teste
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --verbose $(DEBUG_DIR)/main fat32.img test
 
 image:
 	dd if=/dev/zero of=fat.img bs=1M count=40

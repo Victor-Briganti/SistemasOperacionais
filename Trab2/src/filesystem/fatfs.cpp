@@ -8,12 +8,13 @@
  */
 
 #include "filesystem/fatfs.hpp"
+#include "filesystem/default.hpp"
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
-#include "path/parser.hpp"
+#include "path/path_parser.hpp"
 #include "utils/logger.hpp"
 
 #include <cstdio>
@@ -197,19 +198,19 @@ bool FatFS::removeEntry(Dentry &entry, DWORD num)
   return false;
 }
 
-std::vector<std::string> FatFS::pathParser(const std::string &path,
-  int expectDir)
+std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
 {
   // Lista de nomes nos caminhos
-  std::vector<std::string> listPath = split(path, '/');
+  std::vector<std::string> listPath = pathParser->split(path, '/');
 
   if (path[0] == '/') {
-    throw std::runtime_error(merge(listPath) + " caminho inválido");
+    throw std::runtime_error(pathParser->merge(listPath) + " caminho inválido");
   }
 
   // Se necessário monta o caminho completo
   if (listPath.empty() || listPath[0] != ROOT_DIR) {
-    std::vector<std::string> fullPath = split(curPath, '/');
+    std::vector<std::string> fullPath =
+      pathParser->split(pathParser->getCurPath(), '/');
     fullPath.insert(fullPath.end(), listPath.begin(), listPath.end());
     listPath = fullPath;
   }
@@ -237,7 +238,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
       if (listPath[i] == a.getLongName()) {
         if (i == listPath.size() - 1 && expectDir != ALL_ENTRY
             && expectDir != static_cast<int>(a.isDirectory())) {
-          std::string error = merge(listPath) + " esperava um ";
+          std::string error = pathParser->merge(listPath) + " esperava um ";
 
           if (DIR_ENTRY) {
             error += "diretório";
@@ -250,7 +251,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
 
         if ((i != listPath.size() - 1) && !a.isDirectory()) {
           std::string error =
-            ROOT_DIR + merge(listPath) + " caminho inválido\n";
+            pathParser->merge(listPath) + " caminho inválido\n";
           throw std::runtime_error(error);
         }
 
@@ -261,7 +262,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
 
         if (a.getNameType() == DOTDOT_NAME && newPath.size() == 1) {
           throw std::runtime_error(
-            ROOT_DIR + merge(listPath) + " caminho inválido");
+            pathParser->merge(listPath) + " caminho inválido");
         }
 
         if (a.getNameType() == DOTDOT_NAME && newPath.back() != ROOT_DIR) {
@@ -280,7 +281,7 @@ std::vector<std::string> FatFS::pathParser(const std::string &path,
     // Se não foi encontrado, gera um erro
     if (!found) {
       throw std::runtime_error(
-        ROOT_DIR + merge(listPath) + " caminho inválido");
+        pathParser->merge(listPath) + " caminho inválido");
     }
 
     // Atualiza a lista de entradas
@@ -319,7 +320,7 @@ std::pair<Dentry, DWORD>
         // Se no meio do caminho temos um arquivo gera um erro
         if ((i != listPath.size() - 1) && !a.isDirectory()) {
           throw std::runtime_error(
-            ROOT_DIR + merge(listPath) + " caminho inválido");
+            pathParser->merge(listPath) + " caminho inválido");
         }
 
         // Atualiza a entrada
@@ -335,7 +336,7 @@ std::pair<Dentry, DWORD>
 
     // Se não foi encontrado gera um erro
     if (!found) {
-      throw std::runtime_error(ROOT_DIR + merge(listPath) + " não encontrado");
+      throw std::runtime_error(pathParser->merge(listPath) + " não encontrado");
     }
 
     // Atualiza a lista de entradas
@@ -552,7 +553,10 @@ FatFS::FatFS(const std::string &path)
     throw std::runtime_error("Não foi possível iniciar FSInfo");
   }
 
-  curPath = ROOT_DIR;
+  pathParser = new PathParser();
+  if (fsInfo == nullptr) {
+    throw std::runtime_error("Não foi possível iniciar PathParser");
+  }
 }
 
 FatFS::~FatFS()
@@ -561,6 +565,7 @@ FatFS::~FatFS()
   delete fatTable;
   delete bios;
   delete image;
+  delete pathParser;
 }
 
 void FatFS::info()
@@ -593,7 +598,7 @@ void FatFS::ls(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, DIR_ENTRY);
+    listPath = parser(path, DIR_ENTRY);
   } catch (const std::exception &error) {
     logError(error.what());
     return;
@@ -634,7 +639,7 @@ void FatFS::rm(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, ARCH_ENTRY);
+    listPath = parser(path, ARCH_ENTRY);
   } catch (const std::exception &error) {
     logError(error.what());
     return;
@@ -665,7 +670,7 @@ void FatFS::rmdir(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, DIR_ENTRY);
+    listPath = parser(path, DIR_ENTRY);
   } catch (const std::exception &error) {
     logError(error.what());
     return;
@@ -691,12 +696,17 @@ void FatFS::rmdir(const std::string &path)
   }
 }
 
-void FatFS::pwd() { std::fprintf(stdout, "%s\n", curPath.c_str()); }
+void FatFS::pwd()
+{
+  std::fprintf(stdout, "%s\n", pathParser->getCurPath().c_str());
+}
 
 void FatFS::cd(const std::string &path)
 {
   try {
-    curPath = merge(pathParser(path, DIR_ENTRY));
+    auto x = parser(path, DIR_ENTRY);
+    auto y = pathParser->merge(x);
+    pathParser->setCurPath(y);
   } catch (const std::exception &error) {
     logError(error.what());
   }
@@ -707,7 +717,7 @@ void FatFS::attr(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = pathParser(path, ALL_ENTRY);
+    listPath = parser(path, ALL_ENTRY);
   } catch (const std::exception &error) {
     logError(error.what());
     return;
@@ -779,7 +789,7 @@ void FatFS::attr(const std::string &path)
 void FatFS::touch(const std::string &path)
 {
   // Lista de nomes nos caminhos
-  std::vector<std::string> listPath = split(path, '/');
+  std::vector<std::string> listPath = pathParser->split(path, '/');
   if (listPath.size() == 1 && listPath[0] == ROOT_DIR) {
     logError("operação inválida");
     return;
@@ -795,8 +805,8 @@ void FatFS::touch(const std::string &path)
   }
 
   try {
-    std::string newPath = merge(listPath);
-    listPath = pathParser(newPath, DIR_ENTRY);
+    std::string newPath = pathParser->merge(listPath);
+    listPath = parser(newPath, DIR_ENTRY);
   } catch (const std::exception &error) {
     logError(error.what());
     return;
@@ -817,8 +827,9 @@ void FatFS::touch(const std::string &path)
         return;
       }
 
-      while (!std::strncmp(
-        dtr.getShortName(), reinterpret_cast<const char *>(entry.name), 11)) {
+      while (!std::strncmp(dtr.getShortName(),
+        reinterpret_cast<const char *>(entry.name),
+        NAME_FULL_SIZE)) {
         randomizeShortname(reinterpret_cast<char *>(entry.name));
       }
     }
@@ -848,8 +859,9 @@ void FatFS::touch(const std::string &path)
       return;
     }
 
-    while (!std::strncmp(
-      dtr.getShortName(), reinterpret_cast<const char *>(entry.name), 11)) {
+    while (!std::strncmp(dtr.getShortName(),
+      reinterpret_cast<const char *>(entry.name),
+      NAME_FULL_SIZE)) {
       randomizeShortname(reinterpret_cast<char *>(entry.name));
     }
   }

@@ -17,34 +17,35 @@
 #include "filesystem/structure/fat_table.hpp"
 #include "filesystem/structure/fsinfo.hpp"
 #include "io/image.hpp"
+#include "path/path_parser.hpp"
 
 #include <string>
 
-// Definições para os tipos de arquivos
+/* Definições para os tipos de arquivos */
 #define DIR_ENTRY 1
 #define ARCH_ENTRY 0
 #define ALL_ENTRY -1
 
-// Definição sobre o que é o diretório raiz
+/* Definição sobre o que é o diretório raiz */
 #define ROOT_DIR "img/"
 
 class FatFS
 {
 private:
-  // Interface usada para ler e escrever a imagem
+  /* Interface usada para ler e escrever a imagem */
   Image *image;
 
-  // Interface usada lidar com a estrutura BPB
+  /* Interface usada lidar com a estrutura BPB */
   BiosBlock *bios;
 
-  // Interface para lidar com a tabela FAT
+  /* Interface para lidar com a tabela FAT */
   FatTable *fatTable;
 
-  // Interface para lidar com a estrutura FSInfo
+  /* Interface para lidar com a estrutura FSInfo */
   FileSysInfo *fsInfo;
 
-  // Caminho atual no sistema de arquivos
-  std::string curPath;
+  /* Caminho atual no sistema de arquivos */
+  PathParser *pathParser;
 
   /**
    * @brief Lê um cluster da memória em um buffer
@@ -128,7 +129,7 @@ private:
    * do caminho.
    * @return Um vetor com o caminho devidamente dividido.
    */
-  std::vector<std::string> pathParser(const std::string &path, int expectDir);
+  std::vector<std::string> parser(const std::string &path, int expectDir);
 
   /**
    * @brief Busca a entrada e o cluster do diretório onde essa entrada se
