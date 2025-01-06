@@ -46,31 +46,42 @@ Dentry::Dentry(const ShortEntry &entry,
   type = LONG_NAME;
 
   BYTE checkSum = shortCheckSum(shortName.data());
-  for (auto a : lentry) {
-    if (a.chckSum != checkSum) {
+  for (size_t i = 0; i < lentry.size(); i++) {
+    for (auto &a : clusterIndexes) {
+      logger::logInfo(std::string(shortName.data())
+                      + "\nCluster: " + std::to_string(a.clusterNum)
+                      + "\nInitPos: " + std::to_string(a.initPos)
+                      + "\nEndPos: " + std::to_string(a.endPos));
+    }
+
+    if (i == 0 && !(lentry[i].ord & LAST_LONG_ENTRY)) {
+      logger::logWarning("Entrada não está em ordem");
+      break;
+    }
+
+    if (lentry[i].chckSum != checkSum) {
       logger::logWarning("Checksum não condiz com a entrada");
-      longEntries.clear();
       break;
     }
 
     std::string name;
 
-    for (int i = 0; i < 10; i++) {
-      char chr = static_cast<char>(a.name1[i]);
+    for (int j = 0; j < 10; j++) {
+      char chr = static_cast<char>(lentry[i].name1[j]);
       if (std::isprint(chr)) {
         name += chr;
       }
     }
 
-    for (int i = 0; i < 12; i++) {
-      char chr = static_cast<char>(a.name2[i]);
+    for (int j = 0; j < 12; j++) {
+      char chr = static_cast<char>(lentry[i].name2[j]);
       if (std::isprint(chr)) {
         name += chr;
       }
     }
 
-    for (int i = 0; i < 4; i++) {
-      char chr = static_cast<char>(a.name3[i]);
+    for (int j = 0; j < 4; j++) {
+      char chr = static_cast<char>(lentry[i].name3[j]);
       if (std::isprint(chr)) {
         name += chr;
       }

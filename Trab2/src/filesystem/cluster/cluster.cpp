@@ -79,8 +79,8 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
   auto *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
 
   std::vector<LongEntry> longDirs;
-  std::vector<Dentry> dentries;
   std::vector<ClusterIndex> clusterIndexes;
+  std::vector<Dentry> dentries;
 
   std::vector<DWORD> chain = fatTable->listChain(num);
   for (auto cluster : chain) {
@@ -91,10 +91,16 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
 
     // Caminha por todo o buffer até encontrar o EOD_ENTRY ou alcançar o limite
     // de tamanho do cluster.
-    DWORD bufferPos = 0;
+    bool foundDir = false;
     for (size_t i = 0; i < (bios->totClusByts() / sizeof(ShortEntry)); i++) {
       // Final do diretório
       if (bufferEntry[i].name[0] == EOD_ENTRY) {
+        if (!longDirs.empty()) {
+          logger::logWarning("Nome longo não está continuo");
+          longDirs.clear();
+          clusterIndexes.clear();
+        }
+
         break;
       }
 
@@ -104,11 +110,18 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
       }
 
       if (bufferEntry[i].attr == ATTR_LONG_NAME) {
-        if (bufferPos == 0) {
-          bufferPos = static_cast<DWORD>(i);
-          clusterIndexes.push_back({ cluster, bufferPos, 0 });
+        // Se esse é a primeira parte do nome longo salva sua posição
+        if (!foundDir) {
+          foundDir = true;
+          clusterIndexes.push_back({ cluster, static_cast<DWORD>(i), 0 });
         }
 
+        // Se este for o final deste cluster salva a posição do cluster
+        if (i == (bios->totClusByts() / sizeof(ShortEntry)) - 1) {
+          clusterIndexes.back().endPos = static_cast<DWORD>(i);
+        }
+
+        // Salva o diretório longo na lista
         LongEntry lentry = {};
         memcpy(&lentry, &bufferEntry[i], sizeof(lentry));
         longDirs.push_back(lentry);
@@ -125,7 +138,7 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
 
         longDirs.clear();
         clusterIndexes.clear();
-        bufferPos = 0;
+        foundDir = false;
       }
     }
   }
