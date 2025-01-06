@@ -147,7 +147,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationDay() const
   {
-    return day(entry.crtDate);
+    return timefs::day(entry.crtDate);
   }
 
   /**
@@ -157,7 +157,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationMonth() const
   {
-    return month(entry.crtDate);
+    return timefs::month(entry.crtDate);
   }
 
   /**
@@ -167,7 +167,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationYear() const
   {
-    return year(entry.crtDate);
+    return timefs::year(entry.crtDate);
   }
 
   /**
@@ -177,7 +177,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationHour() const
   {
-    return hour(entry.crtTime);
+    return timefs::hour(entry.crtTime);
   }
 
   /**
@@ -187,7 +187,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationMinute() const
   {
-    return minutes(entry.crtTime);
+    return timefs::minutes(entry.crtTime);
   }
 
   /**
@@ -197,7 +197,7 @@ public:
    */
   [[nodiscard]] inline WORD getCreationSeconds() const
   {
-    return seconds(entry.crtTime);
+    return timefs::seconds(entry.crtTime);
   }
 
   /**
@@ -205,7 +205,10 @@ public:
    *
    * @return retorna o dia do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteDay() const { return day(entry.wrtDate); }
+  [[nodiscard]] inline WORD getWriteDay() const
+  {
+    return timefs::day(entry.wrtDate);
+  }
 
   /**
    * @brief Retorna o mês de criação do arquivo
@@ -214,7 +217,7 @@ public:
    */
   [[nodiscard]] inline WORD getWriteMonth() const
   {
-    return month(entry.wrtDate);
+    return timefs::month(entry.wrtDate);
   }
 
   /**
@@ -222,7 +225,10 @@ public:
    *
    * @return retorna o ano do datestamp wrtDate
    */
-  [[nodiscard]] inline WORD getWriteYear() const { return year(entry.wrtDate); }
+  [[nodiscard]] inline WORD getWriteYear() const
+  {
+    return timefs::year(entry.wrtDate);
+  }
 
   /**
    * @brief Retorna o dia de criação do arquivo
@@ -231,7 +237,7 @@ public:
    */
   [[nodiscard]] inline WORD getLstAccDay() const
   {
-    return day(entry.lstAccDate);
+    return timefs::day(entry.lstAccDate);
   }
 
   /**
@@ -241,7 +247,7 @@ public:
    */
   [[nodiscard]] inline WORD getLstAccMonth() const
   {
-    return month(entry.lstAccDate);
+    return timefs::month(entry.lstAccDate);
   }
 
   /**
@@ -251,7 +257,7 @@ public:
    */
   [[nodiscard]] inline WORD getLstAccYear() const
   {
-    return year(entry.lstAccDate);
+    return timefs::year(entry.lstAccDate);
   }
 
   /**
@@ -259,7 +265,10 @@ public:
    *
    * @return retorna a hora do timestamp wrtTime
    */
-  [[nodiscard]] inline WORD getWriteHour() const { return hour(entry.wrtTime); }
+  [[nodiscard]] inline WORD getWriteHour() const
+  {
+    return timefs::hour(entry.wrtTime);
+  }
 
   /**
    * @brief Retorna o mês de criação do arquivo
@@ -268,7 +277,7 @@ public:
    */
   [[nodiscard]] inline WORD getWriteMinute() const
   {
-    return minutes(entry.wrtTime);
+    return timefs::minutes(entry.wrtTime);
   }
 
   /**
@@ -278,7 +287,7 @@ public:
    */
   [[nodiscard]] inline WORD getWriteSeconds() const
   {
-    return seconds(entry.wrtTime);
+    return timefs::seconds(entry.wrtTime);
   }
 
   /**

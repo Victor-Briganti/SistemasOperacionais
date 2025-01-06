@@ -12,6 +12,7 @@
 
 #include "utils/types.hpp"
 
+namespace timefs {
 /**
  * @brief Retorna o dia com base em um datestamp
  *
@@ -108,5 +109,6 @@ WORD currentDate();
  * @return O tempo atual em milisegundos
  */
 BYTE currentMilliseconds();
+}// namespace timefs
 
 #endif// TIME_HPP

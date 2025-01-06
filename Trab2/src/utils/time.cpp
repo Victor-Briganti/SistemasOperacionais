@@ -9,32 +9,32 @@
 
 #include "utils/time.hpp"
 
+#include <ctime>
 #include <sys/time.h>
-#include <time.h>
 
-WORD day(WORD date) { return date & 0x1F; }
+WORD timefs::day(WORD date) { return date & 0x1F; }
 
-WORD month(WORD date) { return (date >> 5) & 0x0F; }
+WORD timefs::month(WORD date) { return (date >> 5) & 0x0F; }
 
-WORD year(WORD date) { return ((date >> 9) & 0xFF) + 1980; }
+WORD timefs::year(WORD date) { return ((date >> 9) & 0xFF) + 1980; }
 
-DWORD dateStamp(DWORD day, DWORD month, DWORD year)
+DWORD timefs::dateStamp(DWORD day, DWORD month, DWORD year)
 {
   return day | (month << 5) | ((year - 1980) << 9);
 }
 
-WORD hour(WORD time) { return (time >> 11) & 0xFF; }
+WORD timefs::hour(WORD time) { return (time >> 11) & 0xFF; }
 
-WORD minutes(WORD time) { return (time >> 5) & 0x3F; }
+WORD timefs::minutes(WORD time) { return (time >> 5) & 0x3F; }
 
-WORD seconds(WORD time) { return ((time >> 9) & 0xFF) + 1980; }
+WORD timefs::seconds(WORD time) { return ((time >> 9) & 0xFF) + 1980; }
 
-DWORD timeStamp(DWORD hour, DWORD minutes, DWORD seconds)
+DWORD timefs::timeStamp(DWORD hour, DWORD minutes, DWORD seconds)
 {
   return (hour << 11) | (minutes << 5) | (seconds / 2);
 }
 
-WORD currentTime()
+WORD timefs::currentTime()
 {
   time_t curTime = time(nullptr);
   struct tm *curLocalTime = localtime(&curTime);
@@ -48,7 +48,7 @@ WORD currentTime()
   return static_cast<WORD>(stamp);
 }
 
-WORD currentDate()
+WORD timefs::currentDate()
 {
   time_t curDate = time(nullptr);
   struct tm *curLocalDate = localtime(&curDate);
@@ -62,7 +62,7 @@ WORD currentDate()
   return static_cast<WORD>(stamp);
 }
 
-BYTE currentMilliseconds()
+BYTE timefs::currentMilliseconds()
 {
   struct timeval tv;
   gettimeofday(&tv, nullptr);

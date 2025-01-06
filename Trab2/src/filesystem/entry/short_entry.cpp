@@ -66,12 +66,12 @@ ShortEntry createShortEntry(const std::string &name,
   entry.fstClusLO = lowCluster(cluster);
   entry.fstClusHI = highCluster(cluster);
   entry.attr = attrs;
-  entry.crtTime = currentTime();
-  entry.crtDate = currentDate();
-  entry.wrtTime = currentTime();
-  entry.wrtDate = currentDate();
-  entry.crtTimeTenth = currentMilliseconds();
-  entry.lstAccDate = currentDate();
+  entry.crtTime = timefs::currentTime();
+  entry.crtDate = timefs::currentDate();
+  entry.wrtTime = timefs::currentTime();
+  entry.wrtDate = timefs::currentDate();
+  entry.crtTimeTenth = timefs::currentMilliseconds();
+  entry.lstAccDate = timefs::currentDate();
 
   return entry;
 }
