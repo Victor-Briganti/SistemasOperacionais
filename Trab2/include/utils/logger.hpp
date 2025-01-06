@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <string>
 
+namespace logger {
 /**
  * @brief Imprime o erro especificado pelo usuário
  *
@@ -63,5 +64,6 @@ void logInfo(const char *info);
  * @return Valor transformado em hexadeciaml
  */
 std::string to_hex(uint64_t value);
+}// namespace logger
 
 #endif// LOGGER_HPP

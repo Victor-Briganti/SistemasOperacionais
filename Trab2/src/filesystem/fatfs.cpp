@@ -32,13 +32,13 @@
 bool FatFS::readCluster(void *buffer, DWORD num)
 {
   if (num >= bios->getCountOfClusters()) {
-    logError(std::to_string(num) + " número inváldo de cluster");
+    logger::logError(std::to_string(num) + " número inváldo de cluster");
     return false;
   }
 
   const DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
   if (!image->read(offset, buffer, bios->totClusByts())) {
-    logError("Não foi possível ler cluster");
+    logger::logError("Não foi possível ler cluster");
     return false;
   }
   return true;
@@ -47,13 +47,13 @@ bool FatFS::readCluster(void *buffer, DWORD num)
 bool FatFS::writeCluster(const void *buffer, DWORD num)
 {
   if (num >= bios->getCountOfClusters()) {
-    logError(std::to_string(num) + " número inváldo de cluster");
+    logger::logError(std::to_string(num) + " número inváldo de cluster");
     return false;
   }
 
   DWORD offset = bios->firstSectorOfCluster(num) * bios->getBytesPerSec();
   if (!image->write(offset, buffer, bios->totClusByts())) {
-    logError("Não foi possível escrever cluster");
+    logger::logError("Não foi possível escrever cluster");
     return false;
   }
   return true;
@@ -73,7 +73,7 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
   // Aloca o buffer do diretório
   auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
-    logError("Não foi possível alocar buffer");
+    logger::logError("Não foi possível alocar buffer");
     return {};
   }
 
@@ -89,7 +89,7 @@ std::vector<Dentry> FatFS::getDirEntries(DWORD num)
   for (auto cluster : chain) {
     // Lê o cluster no qual o diretório se encontra
     if (!readCluster(buffer.get(), cluster)) {
-      logError("Não foi possível ler cluster");
+      logger::logError("Não foi possível ler cluster");
       return {};
     }
 
@@ -146,13 +146,13 @@ bool FatFS::setDirEntries(DWORD num,
   // Aloca o buffer do diretório
   auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
-    logError("Não foi possível alocar buffer");
+    logger::logError("Não foi possível alocar buffer");
     return {};
   }
 
   // Lê o cluster no qual o diretório se encontra
   if (!readCluster(buffer.get(), num)) {
-    logError("Não foi possível ler cluster");
+    logger::logError("Não foi possível ler cluster");
     return {};
   }
 
@@ -354,7 +354,7 @@ bool FatFS::insertDirEntries(DWORD num,
   // Aloca o buffer do diretório
   auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
-    logError("Não foi possível alocar buffer");
+    logger::logError("Não foi possível alocar buffer");
     return false;
   }
 
@@ -383,7 +383,7 @@ bool FatFS::insertDirEntries(DWORD num,
     curCluster = chain[i];
     // Lê o cluster no qual o diretório se encontra
     if (!readCluster(buffer.get(), curCluster)) {
-      logError("Não foi possível ler cluster");
+      logger::logError("Não foi possível ler cluster");
       return {};
     }
 
@@ -444,20 +444,20 @@ bool FatFS::insertDirEntries(DWORD num,
     DWORD cluster = fsInfo->getNextFree();
     if (fatTable->searchFreeEntry(cluster)) {
       if (!fatTable->allocClusters(curCluster, { cluster })) {
-        logError("Não foi possível alocar clusters");
+        logger::logError("Não foi possível alocar clusters");
         return false;
       }
 
       // Aloca buffer do novo diretório
       auto newBuffer = std::make_unique<BYTE[]>(bios->totClusByts());
       if (newBuffer == nullptr) {
-        logError("Não foi possível alocar buffer");
+        logger::logError("Não foi possível alocar buffer");
         return false;
       }
 
       // Lê o cluster no qual o diretório se encontra
       if (!readCluster(newBuffer.get(), cluster)) {
-        logError("Não foi possível ler cluster");
+        logger::logError("Não foi possível ler cluster");
         return false;
       }
 
@@ -493,13 +493,13 @@ bool FatFS::insertDirEntries(DWORD num,
     DWORD cluster = fsInfo->getNextFree();
     if (fatTable->searchFreeEntry(cluster)) {
       if (!fatTable->allocClusters(curCluster, { cluster })) {
-        logError("Não foi possível alocar clusters");
+        logger::logError("Não foi possível alocar clusters");
         return false;
       }
 
       // Lê o cluster no qual o diretório se encontra
       if (!readCluster(buffer.get(), cluster)) {
-        logError("Não foi possível ler cluster");
+        logger::logError("Não foi possível ler cluster");
         return false;
       }
 
@@ -578,12 +578,12 @@ void FatFS::cluster(DWORD num)
 {
   auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
-    logError("Não foi possível alocar buffer");
+    logger::logError("Não foi possível alocar buffer");
     return;
   }
 
   if (!readCluster(buffer.get(), num)) {
-    logError("Não foi possível ler cluster");
+    logger::logError("Não foi possível ler cluster");
     return;
   }
 
@@ -600,7 +600,7 @@ void FatFS::ls(const std::string &path)
   try {
     listPath = parser(path, DIR_ENTRY);
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 
@@ -629,7 +629,7 @@ void FatFS::ls(const std::string &path)
       a.printInfo();
     }
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 }
@@ -641,13 +641,13 @@ void FatFS::rm(const std::string &path)
   try {
     listPath = parser(path, ARCH_ENTRY);
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 
   // Diretório raiz
   if (listPath.back() == ROOT_DIR) {
-    logError("rm espera um arquivo");
+    logger::logError("rm espera um arquivo");
     return;
   }
 
@@ -656,11 +656,11 @@ void FatFS::rm(const std::string &path)
     std::pair<Dentry, DWORD> entry = searchEntry(listPath, ARCH_ENTRY);
 
     if (!removeEntry(entry.first, entry.second)) {
-      logError("rm " + path + " operação falhou");
+      logger::logError("rm " + path + " operação falhou");
       return;
     }
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 }
@@ -672,13 +672,13 @@ void FatFS::rmdir(const std::string &path)
   try {
     listPath = parser(path, DIR_ENTRY);
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 
   // Diretório raiz
   if (listPath.back() == ROOT_DIR) {
-    logError("operação não permitida");
+    logger::logError("operação não permitida");
     return;
   }
 
@@ -687,11 +687,11 @@ void FatFS::rmdir(const std::string &path)
     auto [entry, cluster] = searchEntry(listPath, DIR_ENTRY);
 
     if (!removeEntry(entry, cluster)) {
-      logError("rmdir " + path + " operação não permitida");
+      logger::logError("rmdir " + path + " operação não permitida");
       return;
     }
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 }
@@ -708,7 +708,7 @@ void FatFS::cd(const std::string &path)
     auto y = pathParser->merge(x);
     pathParser->setCurPath(y);
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
   }
 }
 
@@ -719,13 +719,13 @@ void FatFS::attr(const std::string &path)
   try {
     listPath = parser(path, ALL_ENTRY);
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 
   // Diretório raiz
   if (listPath.back() == ROOT_DIR) {
-    logError("operação não permitida");
+    logger::logError("operação não permitida");
     return;
   }
 
@@ -781,7 +781,7 @@ void FatFS::attr(const std::string &path)
     std::fprintf(stdout, "%s", entry.isHidden() ? "Atributo: Escondido\n" : "");
 
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 }
@@ -791,7 +791,7 @@ void FatFS::touch(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath = pathParser->split(path, '/');
   if (listPath.size() == 1 && listPath[0] == ROOT_DIR) {
-    logError("operação inválida");
+    logger::logError("operação inválida");
     return;
   }
 
@@ -800,7 +800,7 @@ void FatFS::touch(const std::string &path)
   listPath.pop_back();
 
   if (filename.size() > FILENAME_MAX) {
-    logError("nome muito longo");
+    logger::logError("nome muito longo");
     return;
   }
 
@@ -808,7 +808,7 @@ void FatFS::touch(const std::string &path)
     std::string newPath = pathParser->merge(listPath);
     listPath = parser(newPath, DIR_ENTRY);
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
     return;
   }
 
@@ -823,7 +823,7 @@ void FatFS::touch(const std::string &path)
     ShortEntry entry = createShortEntry(filename, 0, 0, ATTR_ARCHIVE);
     for (const auto &dtr : dentries) {
       if (dtr.getLongName() == filename) {
-        logError("Arquivo já existe");
+        logger::logError("Arquivo já existe");
         return;
       }
 
@@ -838,7 +838,7 @@ void FatFS::touch(const std::string &path)
     std::vector<LongEntry> lentry = createLongEntries(entry, filename);
 
     if (!insertDirEntries(cluster, entry, lentry)) {
-      logError("operação falhou");
+      logger::logError("operação falhou");
     }
 
     return;
@@ -855,7 +855,7 @@ void FatFS::touch(const std::string &path)
 
   for (const auto &dtr : dentries) {
     if (dtr.getLongName() == filename) {
-      logError(filename + " arquivo já existe");
+      logger::logError(filename + " arquivo já existe");
       return;
     }
 
@@ -870,7 +870,7 @@ void FatFS::touch(const std::string &path)
   std::vector<LongEntry> lentry = createLongEntries(entry, filename);
 
   if (!insertDirEntries(dentry.getCluster(), entry, lentry)) {
-    logError("operação falhou");
+    logger::logError("operação falhou");
     return;
   }
 }

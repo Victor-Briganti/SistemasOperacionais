@@ -12,29 +12,38 @@
 #include <iostream>
 #include <sstream>
 
-static const std::string ERROR = "[\033[31mERROR\033[0m] ";
-static const std::string WARNING = "[\033[33mWARNING\033[0m] ";
-static const std::string INFO = "[\033[32mINFO\033[0m] ";
+namespace {
+constexpr char ERROR[] = "[\033[31mERROR\033[0m] ";
+constexpr char WARNING[] = "[\033[33mWARNING\033[0m] ";
+constexpr char INFO[] = "[\033[32mINFO\033[0m] ";
+}// namespace
 
-void logError(std::string error) { std::cout << ERROR << error << '\n'; }
 
-void logWarning(std::string warning)
+void logger::logError(std::string error)
+{
+  std::cout << ERROR << error << '\n';
+}
+
+void logger::logWarning(std::string warning)
 {
   std::cout << WARNING << warning << '\n';
 }
 
-void logInfo(std::string info) { std::cout << INFO << info << '\n'; }
+void logger::logInfo(std::string info) { std::cout << INFO << info << '\n'; }
 
-void logError(const char *error) { std::cout << ERROR << error << '\n'; }
+void logger::logError(const char *error)
+{
+  std::cout << ERROR << error << '\n';
+}
 
-void logWarning(const char *warning)
+void logger::logWarning(const char *warning)
 {
   std::cout << WARNING << warning << '\n';
 }
 
-void logInfo(const char *info) { std::cout << INFO << info << '\n'; }
+void logger::logInfo(const char *info) { std::cout << INFO << info << '\n'; }
 
-std::string to_hex(uint64_t value)
+std::string logger::to_hex(uint64_t value)
 {
   std::stringstream ss;
   ss << std::hex << std::uppercase << value;

@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     FatFS fat(image);
     fat.attr(path);
   } catch (const std::exception &error) {
-    logError(error.what());
+    logger::logError(error.what());
   }
 
   return 0;
