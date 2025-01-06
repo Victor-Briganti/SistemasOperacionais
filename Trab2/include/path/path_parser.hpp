@@ -46,7 +46,7 @@ public:
    *
    * @return Um vetor contendo o nome de cada parte do caminho
    */
-  std::vector<std::string> split(const std::string &path, char delim);
+  std::vector<std::string> split(const std::string &path, char delim) const;
 
   /**
    * @brief Junta todas as partes de um caminho
@@ -55,7 +55,16 @@ public:
    *
    * @return Uma string com o caminho
    */
-  std::string merge(const std::vector<std::string> &path);
+  std::string merge(const std::vector<std::string> &path) const;
+
+  /**
+   * @brief Gera o caminho completo a partir de um caminho qualquer
+   *
+   * @param path Caminho a ser tratado
+   *
+   * @return Uma lista com o caminho completo
+   */
+  std::vector<std::string> generateFullPath(const std::string &path);
 };
 
 #endif// PATH_PARSER_HPP

@@ -485,30 +485,24 @@ void FatFS::cluster(DWORD num)
 
 void FatFS::ls(const std::string &path)
 {
-  // Lista de nomes nos caminhos
-  std::vector<std::string> listPath;
   try {
-    listPath = parser(path, DIR_ENTRY);
-  } catch (const std::exception &error) {
-    logger::logError(error.what());
-    return;
-  }
+    // Lista de nomes nos caminhos
+    auto [listPath, _] = clusterIO->verifyPathValidity(path, DIRECTORY);
 
-  // Diretório raiz
-  if (listPath.back() == pathParser->getRootDir()) {
-    // Lista de entradas
-    std::vector<Dentry> dentries =
-      clusterIO->getListEntries(bios->getRootClus());
+    // Diretório raiz
+    if (listPath.back() == pathParser->getRootDir()) {
+      // Lista de entradas
+      std::vector<Dentry> dentries =
+        clusterIO->getListEntries(bios->getRootClus());
 
-    // Mostra todas as entradas
-    for (const auto &a : dentries) {
-      a.printInfo();
+      // Mostra todas as entradas
+      for (const auto &a : dentries) {
+        a.printInfo();
+      }
+
+      return;
     }
 
-    return;
-  }
-
-  try {
     // Busca pela entrada
     auto [entry, _] = searchEntry(listPath, DIR_ENTRY);
 
@@ -528,22 +522,17 @@ void FatFS::ls(const std::string &path)
 
 void FatFS::rm(const std::string &path)
 {
-  // Lista de nomes nos caminhos
-  std::vector<std::string> listPath;
   try {
+    // Lista de nomes nos caminhos
+    auto [listPath, _] = clusterIO->verifyPathValidity(path, ARCHIVE);
     listPath = parser(path, ARCH_ENTRY);
-  } catch (const std::exception &error) {
-    logger::logError(error.what());
-    return;
-  }
 
-  // Diretório raiz
-  if (listPath.back() == pathParser->getRootDir()) {
-    logger::logError("rm espera um arquivo");
-    return;
-  }
+    // Diretório raiz
+    if (listPath.back() == pathParser->getRootDir()) {
+      logger::logError("rm espera um arquivo");
+      return;
+    }
 
-  try {
     // Busca pela entrada
     std::pair<Dentry, DWORD> entry = searchEntry(listPath, ARCH_ENTRY);
 
@@ -559,22 +548,16 @@ void FatFS::rm(const std::string &path)
 
 void FatFS::rmdir(const std::string &path)
 {
-  // Lista de nomes nos caminhos
-  std::vector<std::string> listPath;
   try {
-    listPath = parser(path, DIR_ENTRY);
-  } catch (const std::exception &error) {
-    logger::logError(error.what());
-    return;
-  }
+    // Lista de nomes nos caminhos
+    auto [listPath, _] = clusterIO->verifyPathValidity(path, ARCHIVE);
 
-  // Diretório raiz
-  if (listPath.back() == pathParser->getRootDir()) {
-    logger::logError("operação não permitida");
-    return;
-  }
+    // Diretório raiz
+    if (listPath.back() == pathParser->getRootDir()) {
+      logger::logError("operação não permitida");
+      return;
+    }
 
-  try {
     // Busca pela entrada
     auto [entry, cluster] = searchEntry(listPath, DIR_ENTRY);
 
@@ -596,9 +579,8 @@ void FatFS::pwd()
 void FatFS::cd(const std::string &path)
 {
   try {
-    auto x = parser(path, DIR_ENTRY);
-    auto y = pathParser->merge(x);
-    pathParser->setCurPath(y);
+    auto [listPath, _] = clusterIO->verifyPathValidity(path, DIRECTORY);
+    pathParser->setCurPath(pathParser->merge(listPath));
   } catch (const std::exception &error) {
     logger::logError(error.what());
   }
@@ -609,19 +591,14 @@ void FatFS::attr(const std::string &path)
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath;
   try {
-    listPath = parser(path, ALL_ENTRY);
-  } catch (const std::exception &error) {
-    logger::logError(error.what());
-    return;
-  }
+    auto [listPath, _] = clusterIO->verifyPathValidity(path, ALL);
 
-  // Diretório raiz
-  if (listPath.back() == pathParser->getRootDir()) {
-    logger::logError("operação não permitida");
-    return;
-  }
+    // Diretório raiz
+    if (listPath.back() == pathParser->getRootDir()) {
+      logger::logError("operação não permitida");
+      return;
+    }
 
-  try {
     // Busca pela entrada
     auto [entry, _] = searchEntry(listPath, ALL_ENTRY);
 
@@ -671,7 +648,6 @@ void FatFS::attr(const std::string &path)
     std::fprintf(
       stdout, "%s", entry.isReadOnly() ? "Atributo: Somente leitura\n" : "");
     std::fprintf(stdout, "%s", entry.isHidden() ? "Atributo: Escondido\n" : "");
-
   } catch (const std::exception &error) {
     logger::logError(error.what());
     return;

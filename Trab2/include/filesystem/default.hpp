@@ -43,6 +43,18 @@ static constexpr BYTE ATTR_LONG_NAME_MASK =
   (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY
     | ATTR_ARCHIVE);
 
+/* Tipos de entrada suportados */
+enum EntryType {
+  /* Busca somente por diretórios */
+  DIRECTORY = 1,
+
+  /* Busca somente por arquivos comuns */
+  ARCHIVE = 2,
+
+  /* Busca por arquivos ou diretórios */
+  ALL = (1 | 2),
+};
+
 //===-----------------------------------------------------------------------===
 // ENTRADA
 //===-----------------------------------------------------------------------===

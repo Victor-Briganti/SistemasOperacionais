@@ -85,6 +85,20 @@ public:
    * @return Um vetor com todos as entradas se foi possível ler.
    */
   std::vector<Dentry> getListEntries(DWORD num);
+
+  /**
+   * @brief Verifica se um caminho é válido
+   *
+   * @param path Caminho a ser dividido e verificado
+   * @param searchType Especifica o tipo de entrada sendo buscado.
+   *
+   * @exception Gera um exceção se houver algum problema durante a verificação
+   * do caminho.
+   * @return Um vetor com o caminho propriamente dividido e o cluster no qual o
+   * último arquivo se encontra
+   */
+  std::pair<std::vector<std::string>, DWORD>
+    verifyPathValidity(const std::string &path, EntryType searchType);
 };
 
 #endif// CLUSTER_HPP

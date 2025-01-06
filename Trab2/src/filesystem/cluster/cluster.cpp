@@ -9,6 +9,7 @@
 
 #include "filesystem/cluster/cluster.hpp"
 #include "filesystem/cluster/cluster_index.hpp"
+#include "filesystem/default.hpp"
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
@@ -16,6 +17,7 @@
 #include "utils/logger.hpp"
 
 #include <cstring>
+#include <stdexcept>
 
 //===------------------------------------------------------------------------===
 // PUBLIC
@@ -144,4 +146,78 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
   }
 
   return dentries;
+}
+
+std::pair<std::vector<std::string>, DWORD>
+  ClusterIO::verifyPathValidity(const std::string &path, EntryType searchType)
+{
+  std::vector<std::string> fullPath = pathParser->generateFullPath(path);
+  if (fullPath.empty()) {
+    throw std::runtime_error(path + " caminho inválido");
+  }
+
+  // Se o caminho é o root, não há o que verificar
+  if (fullPath.size() == 1 && fullPath[0] == pathParser->getRootDir()) {
+    return { { pathParser->getRootDir() }, bios->getRootClus() };
+  }
+
+  // Caminho a ser criado
+  std::vector<std::string> listPath;
+  listPath.emplace_back(pathParser->getRootDir());
+
+  // Começa  a busca pelo "/"
+  DWORD cluster = bios->getRootClus();
+  std::vector<Dentry> dentries = getListEntries(cluster);
+
+  bool found = false;
+  for (size_t i = 1; i < fullPath.size(); i++, found = false) {
+    for (const auto &dtr : dentries) {
+      if (fullPath[i] == dtr.getLongName()) {
+        if (i == fullPath.size() - 1 && !(searchType & dtr.getEntryType())) {
+          std::string error = path + " esperava um ";
+
+          if (searchType == DIRECTORY) {
+            error += "diretório";
+          } else {
+            error += "arquivo";
+          }
+          throw std::runtime_error(error);
+        }
+
+        if (i != (fullPath.size() - 1) && !dtr.isDirectory()) {
+          throw std::runtime_error(path + " caminho inválido");
+        }
+
+        if (dtr.getNameType() == DOT_NAME) {
+          found = true;
+          break;
+        }
+
+        if (dtr.getNameType() == DOTDOT_NAME && listPath.size() == 1) {
+          throw std::runtime_error(path + " caminho inválido");
+        }
+
+        if (dtr.getNameType() == DOTDOT_NAME
+            && listPath.back() != pathParser->getRootDir()) {
+          listPath.pop_back();
+        } else {
+          listPath.push_back(dtr.getLongName());
+        }
+
+        cluster = getEntryClus(dtr);
+        found = true;
+        break;
+      }
+    }
+
+    // Se não foi encontrado, gera um erro
+    if (!found) {
+      throw std::runtime_error(path + " não encontrado");
+    }
+
+    // Atualiza a lista de entradas
+    dentries = getListEntries(cluster);
+  }
+
+  return { listPath, cluster };
 }

@@ -21,11 +21,12 @@
 #include <string>
 #include <vector>
 
-// Define os tipos de nomes que a entrada pode ter
-enum DentryType {
+/* Define os tipos de nomes que a entrada pode ter */
+enum DentryNameType {
   DOT_NAME = 0,
   DOTDOT_NAME = 1,
   LONG_NAME = 2,
+  SHORT_NAME = 3,
 };
 
 class Dentry
@@ -43,7 +44,10 @@ class Dentry
   std::array<char, NAME_FULL_SIZE + 1> shortName;
 
   /* Define qual o tipo de nome que a entrada possui */
-  DentryType type;
+  DentryNameType nameType;
+
+  /* Define qual o tipo da entrada */
+  EntryType type;
 
   /* Lista de clusters e posições que está entrada pode estar */
   std::vector<ClusterIndex> clusterIndexes;
@@ -70,11 +74,13 @@ public:
    */
   [[nodiscard]] inline std::string getLongName() const
   {
-    switch (type) {
+    switch (nameType) {
     case DOT_NAME:
       return ".";
     case DOTDOT_NAME:
       return "..";
+    case SHORT_NAME:
+      return shortName.data();
     default:
       return longName;
     }
@@ -332,7 +338,14 @@ public:
    *
    * @return retorna o valor de nameType
    */
-  [[nodiscard]] inline int getNameType() const { return type; }
+  [[nodiscard]] inline int getNameType() const { return nameType; }
+
+  /**
+   * @brief Retorna o tipo da entrada
+   *
+   * @return retorna o valor de type
+   */
+  [[nodiscard]] inline EntryType getEntryType() const { return type; }
 
   /**
    * @brief Imprime as informações sobre a entrada

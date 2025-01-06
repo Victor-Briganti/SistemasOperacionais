@@ -33,34 +33,36 @@ Dentry::Dentry(const ShortEntry &entry,
     logger::logWarning("Entrada sem nome longo");
   }
 
+  if (isDirectory()) {
+    type = DIRECTORY;
+  } else {
+    type = ARCHIVE;
+  }
+
   if (!isDot) {
-    type = DOT_NAME;
+    nameType = DOT_NAME;
     return;
   }
 
   if (!isDotDot) {
-    type = DOTDOT_NAME;
+    nameType = DOTDOT_NAME;
     return;
   }
 
-  type = LONG_NAME;
+  nameType = LONG_NAME;
 
   BYTE checkSum = shortCheckSum(shortName.data());
   for (size_t i = 0; i < lentry.size(); i++) {
-    for (auto &a : clusterIndexes) {
-      logger::logInfo(std::string(shortName.data())
-                      + "\nCluster: " + std::to_string(a.clusterNum)
-                      + "\nInitPos: " + std::to_string(a.initPos)
-                      + "\nEndPos: " + std::to_string(a.endPos));
-    }
 
     if (i == 0 && !(lentry[i].ord & LAST_LONG_ENTRY)) {
       logger::logWarning("Entrada não está em ordem");
+      nameType = SHORT_NAME;
       break;
     }
 
     if (lentry[i].chckSum != checkSum) {
       logger::logWarning("Checksum não condiz com a entrada");
+      nameType = SHORT_NAME;
       break;
     }
 

@@ -24,7 +24,8 @@ void PathParser::setCurPath(const std::string &path) { curPath = path; }
 
 std::string PathParser::getRootDir() { return ROOT_DIR; }
 
-std::vector<std::string> PathParser::split(const std::string &path, char delim)
+std::vector<std::string> PathParser::split(const std::string &path,
+  char delim) const
 {
   std::stringstream stream(path);
 
@@ -35,14 +36,14 @@ std::vector<std::string> PathParser::split(const std::string &path, char delim)
     paths.push_back(entry);
   }
 
-  if (path.size() >= 4 && path.substr(0, 4) == "img/") {
-    paths[0] = "img/";
+  if (path.size() >= 4 && path.substr(0, 4) == ROOT_DIR) {
+    paths[0] = ROOT_DIR;
   }
 
   return paths;
 }
 
-std::string PathParser::merge(const std::vector<std::string> &path)
+std::string PathParser::merge(const std::vector<std::string> &path) const
 {
   std::string pathName;
 
@@ -54,4 +55,23 @@ std::string PathParser::merge(const std::vector<std::string> &path)
   }
 
   return pathName;
+}
+
+std::vector<std::string> PathParser::generateFullPath(const std::string &path)
+{
+  // Lista de nomes nos caminhos
+  std::vector<std::string> listPath = split(path, '/');
+
+  if (path[0] == '/') {
+    return {};
+  }
+
+  // Se necessário monta o caminho completo
+  if (listPath.empty() || listPath[0] != getRootDir()) {
+    std::vector<std::string> fullPath = split(getCurPath(), '/');
+    fullPath.insert(fullPath.end(), listPath.begin(), listPath.end());
+    listPath = fullPath;
+  }
+
+  return listPath;
 }
