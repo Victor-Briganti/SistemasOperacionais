@@ -52,7 +52,7 @@ enum EntryType {
   ARCHIVE = 2,
 
   /* Busca por arquivos ou diretórios */
-  ALL = (1 | 2),
+  ANY = (1 | 2),
 };
 
 //===-----------------------------------------------------------------------===

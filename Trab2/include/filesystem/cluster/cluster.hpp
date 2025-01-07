@@ -15,6 +15,7 @@
 #include "path/pathname.hpp"
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 class ClusterIO
@@ -87,9 +88,11 @@ public:
   std::vector<Dentry> getListEntries(DWORD num);
 
   /**
-   * @brief Verifica se um caminho é válido
+   * @brief Busca uma entrada por meio do caminho passado
    *
-   * @param path Caminho a ser dividido e verificado
+   * @param path Caminho que está sendo buscado
+   * @param listPath Referência a lista com todas as partes do caminho. Este
+   * caminho é alterado ao longo da busca.
    * @param searchType Especifica o tipo de entrada sendo buscado.
    *
    * @exception Gera um exceção se houver algum problema durante a verificação
@@ -97,8 +100,9 @@ public:
    * @return Um vetor com o caminho propriamente dividido e o cluster no qual o
    * último arquivo se encontra
    */
-  std::pair<std::vector<std::string>, DWORD>
-    verifyPathValidity(const std::string &path, EntryType searchType);
+  std::optional<Dentry> searchEntryByPath(const std::string &path,
+    std::vector<std::string> &listPath,
+    EntryType searchType);
 };
 
 #endif// CLUSTER_HPP

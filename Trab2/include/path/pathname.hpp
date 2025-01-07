@@ -26,7 +26,7 @@ public:
   PathName();
 
   /** @brief Retorna o caminho atual do sistema */
-  std::string getCurPath() const;
+  [[nodiscard]] std::string getCurPath() const;
 
   /**
    * @brief Atualiza o caminho atual do sistema
@@ -36,7 +36,7 @@ public:
   void setCurPath(const std::string &path);
 
   /** @brief Retorna o diretório raiz atual */
-  std::string getRootDir();
+  [[nodiscard]] std::string getRootDir() const;
 
   /**
    * @brief Dividi um caminho em suas partes
@@ -46,7 +46,8 @@ public:
    *
    * @return Um vetor contendo o nome de cada parte do caminho
    */
-  std::vector<std::string> split(const std::string &path, char delim) const;
+  [[nodiscard]] std::vector<std::string> split(const std::string &path,
+    char delim) const;
 
   /**
    * @brief Junta todas as partes de um caminho
@@ -55,7 +56,7 @@ public:
    *
    * @return Uma string com o caminho
    */
-  std::string merge(const std::vector<std::string> &path) const;
+  [[nodiscard]] std::string merge(const std::vector<std::string> &path) const;
 
   /**
    * @brief Gera o caminho completo a partir de um caminho qualquer
@@ -64,7 +65,17 @@ public:
    *
    * @return Uma lista com o caminho completo
    */
-  std::vector<std::string> generateFullPath(const std::string &path);
+  [[nodiscard]] std::vector<std::string> generateFullPath(
+    const std::string &path) const;
+
+  /**
+   * @brief Verifica se a lista de caminho é referente ao root
+   *
+   * @param listPath Lista com caminhos a ser verificada
+   *
+   * @return true se for o diretório raiz, false caso contrário
+   */
+  bool isRootDir(const std::vector<std::string> &listPath);
 };
 
 #endif// PATH_PARSER_HPP

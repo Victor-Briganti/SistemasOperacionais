@@ -22,7 +22,7 @@ std::string PathName::getCurPath() const { return curPath; }
 
 void PathName::setCurPath(const std::string &path) { curPath = path; }
 
-std::string PathName::getRootDir() { return ROOT_DIR; }
+std::string PathName::getRootDir() const { return ROOT_DIR; }
 
 std::vector<std::string> PathName::split(const std::string &path,
   char delim) const
@@ -57,7 +57,8 @@ std::string PathName::merge(const std::vector<std::string> &path) const
   return pathName;
 }
 
-std::vector<std::string> PathName::generateFullPath(const std::string &path)
+std::vector<std::string> PathName::generateFullPath(
+  const std::string &path) const
 {
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath = split(path, '/');
@@ -74,4 +75,9 @@ std::vector<std::string> PathName::generateFullPath(const std::string &path)
   }
 
   return listPath;
+}
+
+bool PathName::isRootDir(const std::vector<std::string> &listPath)
+{
+  return (listPath.size() == 1 && listPath[0] == ROOT_DIR);
 }

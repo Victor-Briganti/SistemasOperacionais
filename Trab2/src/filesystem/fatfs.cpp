@@ -67,18 +67,18 @@ bool FatFS::removeEntry(Dentry &entry, DWORD num)
 {
   entry.markFree();
 
-  // Remove as entradas da tabela FAT
-  int fatRm = fatTable->removeChain(entry.getDataCluster());
-  if (fatRm < 0) {
-    return false;
-  }
-
   // Remove a entrada do diretório
   bool entryRm = setDirEntries(num,
     entry.getInitPos(),
     entry.getEndPos(),
     entry.getShortEntry(),
     entry.getLongEntries());
+
+  // Remove as entradas da tabela FAT
+  int fatRm = fatTable->removeChain(entry.getDataCluster());
+  if (fatRm < 0) {
+    return false;
+  }
 
   // Salva a quantidade de clusters removidos no FSInfo
   bool result = (fatRm >= 0) && entryRm;
@@ -417,6 +417,18 @@ bool FatFS::insertDirEntries(DWORD num,
   return false;
 }
 
+void FatFS::listClusterDir(DWORD num)
+{
+  // Lista de entradas
+  std::vector<Dentry> dentries = clusterIO->getListEntries(num);
+
+  // Mostra todas as entradas
+  for (const auto &dtr : dentries) {
+    dtr.printInfo();
+  }
+}
+
+
 //===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
@@ -485,33 +497,15 @@ void FatFS::ls(const std::string &path)
 {
   try {
     // Lista de nomes nos caminhos
-    auto [listPath, _] = clusterIO->verifyPathValidity(path, DIRECTORY);
+    std::vector<std::string> listPath;
+    auto entry = clusterIO->searchEntryByPath(path, listPath, DIRECTORY);
 
-    // Diretório raiz
-    if (listPath.back() == pathName->getRootDir()) {
-      // Lista de entradas
-      std::vector<Dentry> dentries =
-        clusterIO->getListEntries(bios->getRootClus());
-
-      // Mostra todas as entradas
-      for (const auto &a : dentries) {
-        a.printInfo();
-      }
-
+    if (!entry.has_value()) {
+      listClusterDir(bios->getRootClus());
       return;
     }
 
-    // Busca pela entrada
-    auto [entry, _] = searchEntry(listPath, DIR_ENTRY);
-
-    // Lista de entradas
-    std::vector<Dentry> dentries =
-      clusterIO->getListEntries(entry.getDataCluster());
-
-    // Mostra todas as entradas
-    for (const auto &a : dentries) {
-      a.printInfo();
-    }
+    listClusterDir(entry->getDataCluster());
   } catch (const std::exception &error) {
     logger::logError(error.what());
     return;
@@ -522,19 +516,16 @@ void FatFS::rm(const std::string &path)
 {
   try {
     // Lista de nomes nos caminhos
-    auto [listPath, _] = clusterIO->verifyPathValidity(path, ARCHIVE);
-    listPath = parser(path, ARCH_ENTRY);
+    std::vector<std::string> listPath;
+    auto entry = clusterIO->searchEntryByPath(path, listPath, ARCHIVE);
 
     // Diretório raiz
-    if (listPath.back() == pathName->getRootDir()) {
+    if (!entry.has_value()) {
       logger::logError("rm espera um arquivo");
       return;
     }
 
-    // Busca pela entrada
-    std::pair<Dentry, DWORD> entry = searchEntry(listPath, ARCH_ENTRY);
-
-    if (!removeEntry(entry.first, entry.second)) {
+    if (!removeEntry(entry.value(), entry->getEntryCluster())) {
       logger::logError("rm " + path + " operação falhou");
       return;
     }
@@ -548,18 +539,16 @@ void FatFS::rmdir(const std::string &path)
 {
   try {
     // Lista de nomes nos caminhos
-    auto [listPath, _] = clusterIO->verifyPathValidity(path, ARCHIVE);
+    std::vector<std::string> listPath;
+    auto entry = clusterIO->searchEntryByPath(path, listPath, DIRECTORY);
 
     // Diretório raiz
-    if (listPath.back() == pathName->getRootDir()) {
+    if (!entry.has_value()) {
       logger::logError("operação não permitida");
       return;
     }
 
-    // Busca pela entrada
-    auto [entry, cluster] = searchEntry(listPath, DIR_ENTRY);
-
-    if (!removeEntry(entry, cluster)) {
+    if (!removeEntry(entry.value(), entry->getEntryCluster())) {
       logger::logError("rmdir " + path + " operação não permitida");
       return;
     }
@@ -577,7 +566,14 @@ void FatFS::pwd()
 void FatFS::cd(const std::string &path)
 {
   try {
-    auto [listPath, _] = clusterIO->verifyPathValidity(path, DIRECTORY);
+    std::vector<std::string> listPath;
+    auto entry = clusterIO->searchEntryByPath(path, listPath, DIRECTORY);
+
+    if (!entry.has_value()) {
+      pathName->setCurPath(listPath[0]);
+      return;
+    }
+
     pathName->setCurPath(pathName->merge(listPath));
   } catch (const std::exception &error) {
     logger::logError(error.what());
@@ -586,66 +582,64 @@ void FatFS::cd(const std::string &path)
 
 void FatFS::attr(const std::string &path)
 {
-  // Lista de nomes nos caminhos
-  std::vector<std::string> listPath;
   try {
-    auto [listPath, _] = clusterIO->verifyPathValidity(path, ALL);
+    // Lista de nomes nos caminhos
+    std::vector<std::string> listPath;
+    auto entry = clusterIO->searchEntryByPath(path, listPath, ANY);
 
     // Diretório raiz
-    if (listPath.back() == pathName->getRootDir()) {
+    if (!entry.has_value()) {
       logger::logError("operação não permitida");
       return;
     }
 
-    // Busca pela entrada
-    auto [entry, _] = searchEntry(listPath, ALL_ENTRY);
-
     std::fprintf(stdout,
       "Entrada: %s (%s)\n",
-      entry.getLongName().c_str(),
-      entry.getShortName());
+      entry->getLongName().c_str(),
+      entry->getShortName());
 
     std::fprintf(stdout,
       "Tamanho=%-8d Cluster=%-4d\n",
-      entry.getFileSize(),
-      entry.getDataCluster());
+      entry->getFileSize(),
+      entry->getDataCluster());
 
     std::fprintf(stdout,
       "Data Criação: %02d-%02d-%02d\n",
-      entry.getCreationDay(),
-      entry.getCreationMonth(),
-      entry.getCreationYear());
+      entry->getCreationDay(),
+      entry->getCreationMonth(),
+      entry->getCreationYear());
 
     std::fprintf(stdout,
       "Hora Criação: %02d:%02d:%04d\n",
-      entry.getCreationHour(),
-      entry.getCreationMinute(),
-      entry.getCreationSeconds());
+      entry->getCreationHour(),
+      entry->getCreationMinute(),
+      entry->getCreationSeconds());
 
     std::fprintf(stdout,
       "Data Escrita: %02d-%02d-%02d\n",
-      entry.getWriteDay(),
-      entry.getWriteMonth(),
-      entry.getWriteYear());
+      entry->getWriteDay(),
+      entry->getWriteMonth(),
+      entry->getWriteYear());
 
     std::fprintf(stdout,
       "Hora Escrita: %02d:%02d:%04d\n",
-      entry.getWriteHour(),
-      entry.getWriteMinute(),
-      entry.getWriteSeconds());
+      entry->getWriteHour(),
+      entry->getWriteMinute(),
+      entry->getWriteSeconds());
 
     std::fprintf(stdout,
       "Última Data de Acesso: %02d-%02d-%02d\n",
-      entry.getLstAccDay(),
-      entry.getLstAccMonth(),
-      entry.getLstAccYear());
+      entry->getLstAccDay(),
+      entry->getLstAccMonth(),
+      entry->getLstAccYear());
 
     std::fprintf(
-      stdout, "Tipo: %s", entry.isDirectory() ? "diretório\n" : "arquivo\n");
+      stdout, "Tipo: %s", entry->isDirectory() ? "diretório\n" : "arquivo\n");
 
     std::fprintf(
-      stdout, "%s", entry.isReadOnly() ? "Atributo: Somente leitura\n" : "");
-    std::fprintf(stdout, "%s", entry.isHidden() ? "Atributo: Escondido\n" : "");
+      stdout, "%s", entry->isReadOnly() ? "Atributo: Somente leitura\n" : "");
+    std::fprintf(
+      stdout, "%s", entry->isHidden() ? "Atributo: Escondido\n" : "");
   } catch (const std::exception &error) {
     logger::logError(error.what());
     return;

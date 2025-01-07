@@ -148,8 +148,9 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
   return dentries;
 }
 
-std::pair<std::vector<std::string>, DWORD>
-  ClusterIO::verifyPathValidity(const std::string &path, EntryType searchType)
+std::optional<Dentry> ClusterIO::searchEntryByPath(const std::string &path,
+  std::vector<std::string> &listPath,
+  EntryType searchType)
 {
   std::vector<std::string> fullPath = pathName->generateFullPath(path);
   if (fullPath.empty()) {
@@ -158,16 +159,17 @@ std::pair<std::vector<std::string>, DWORD>
 
   // Se o caminho é o root, não há o que verificar
   if (fullPath.size() == 1 && fullPath[0] == pathName->getRootDir()) {
-    return { { pathName->getRootDir() }, bios->getRootClus() };
+    listPath.push_back(pathName->getRootDir());
+    return {};
   }
 
-  // Caminho a ser criado
-  std::vector<std::string> listPath;
+  // O caminho se inicia pelo ROOT_DIR
   listPath.emplace_back(pathName->getRootDir());
 
   // Começa  a busca pelo "/"
   DWORD cluster = bios->getRootClus();
   std::vector<Dentry> dentries = getListEntries(cluster);
+  Dentry entry = dentries.back();
 
   bool found = false;
   for (size_t i = 1; i < fullPath.size(); i++, found = false) {
@@ -204,6 +206,7 @@ std::pair<std::vector<std::string>, DWORD>
           listPath.push_back(dtr.getLongName());
         }
 
+        entry = dtr;
         cluster = getEntryClus(dtr);
         found = true;
         break;
@@ -219,5 +222,9 @@ std::pair<std::vector<std::string>, DWORD>
     dentries = getListEntries(cluster);
   }
 
-  return { listPath, cluster };
+  if (pathName->isRootDir(listPath)) {
+    return {};
+  }
+
+  return entry;
 }

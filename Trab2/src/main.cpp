@@ -28,7 +28,9 @@ int main(int argc, char **argv)
     std::string image(argv[1]);
     std::string path(argv[2]);
     FatFS fat(image);
-    fat.ls(path);
+    fat.attr(path);
+    fat.rmdir(path);
+    fat.attr(path);
   } catch (const std::exception &error) {
     logger::logError(error.what());
   }

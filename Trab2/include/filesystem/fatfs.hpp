@@ -117,6 +117,16 @@ private:
     const ShortEntry &entry,
     const std::vector<LongEntry> &lentry);
 
+  /**
+   * @brief Helper para a listagem de diretórios
+   *
+   * @param num Número do cluster onde ocorrerá a listagem
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   */
+  void listClusterDir(DWORD num);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo
