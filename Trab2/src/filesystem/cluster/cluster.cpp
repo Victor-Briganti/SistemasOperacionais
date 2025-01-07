@@ -13,7 +13,7 @@
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
-#include "path/path_parser.hpp"
+#include "path/pathname.hpp"
 #include "utils/logger.hpp"
 
 #include <cstring>
@@ -27,9 +27,9 @@ ClusterIO::ClusterIO(std::shared_ptr<Image> image,
   std::shared_ptr<BiosBlock> bios,
   std::shared_ptr<FatTable> fatTable,
   std::shared_ptr<FileSysInfo> fsInfo,
-  std::shared_ptr<PathParser> pathParser)
+  std::shared_ptr<PathName> pathName)
   : image(image), bios(bios), fatTable(fatTable), fsInfo(fsInfo),
-    pathParser(pathParser)
+    pathName(pathName)
 {}
 
 bool ClusterIO::readCluster(void *buffer, DWORD num)
@@ -151,19 +151,19 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
 std::pair<std::vector<std::string>, DWORD>
   ClusterIO::verifyPathValidity(const std::string &path, EntryType searchType)
 {
-  std::vector<std::string> fullPath = pathParser->generateFullPath(path);
+  std::vector<std::string> fullPath = pathName->generateFullPath(path);
   if (fullPath.empty()) {
     throw std::runtime_error(path + " caminho inválido");
   }
 
   // Se o caminho é o root, não há o que verificar
-  if (fullPath.size() == 1 && fullPath[0] == pathParser->getRootDir()) {
-    return { { pathParser->getRootDir() }, bios->getRootClus() };
+  if (fullPath.size() == 1 && fullPath[0] == pathName->getRootDir()) {
+    return { { pathName->getRootDir() }, bios->getRootClus() };
   }
 
   // Caminho a ser criado
   std::vector<std::string> listPath;
-  listPath.emplace_back(pathParser->getRootDir());
+  listPath.emplace_back(pathName->getRootDir());
 
   // Começa  a busca pelo "/"
   DWORD cluster = bios->getRootClus();
@@ -198,7 +198,7 @@ std::pair<std::vector<std::string>, DWORD>
         }
 
         if (dtr.getNameType() == DOTDOT_NAME
-            && listPath.back() != pathParser->getRootDir()) {
+            && listPath.back() != pathName->getRootDir()) {
           listPath.pop_back();
         } else {
           listPath.push_back(dtr.getLongName());

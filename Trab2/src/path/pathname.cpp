@@ -8,7 +8,7 @@
  * Data: 05/01/2025
  */
 
-#include "path/path_parser.hpp"
+#include "path/pathname.hpp"
 
 #include <sstream>
 
@@ -16,15 +16,15 @@
 // PUBLIC
 //===------------------------------------------------------------------------===
 
-PathParser::PathParser() { curPath = ROOT_DIR; }
+PathName::PathName() { curPath = ROOT_DIR; }
 
-std::string PathParser::getCurPath() const { return curPath; }
+std::string PathName::getCurPath() const { return curPath; }
 
-void PathParser::setCurPath(const std::string &path) { curPath = path; }
+void PathName::setCurPath(const std::string &path) { curPath = path; }
 
-std::string PathParser::getRootDir() { return ROOT_DIR; }
+std::string PathName::getRootDir() { return ROOT_DIR; }
 
-std::vector<std::string> PathParser::split(const std::string &path,
+std::vector<std::string> PathName::split(const std::string &path,
   char delim) const
 {
   std::stringstream stream(path);
@@ -43,7 +43,7 @@ std::vector<std::string> PathParser::split(const std::string &path,
   return paths;
 }
 
-std::string PathParser::merge(const std::vector<std::string> &path) const
+std::string PathName::merge(const std::vector<std::string> &path) const
 {
   std::string pathName;
 
@@ -57,7 +57,7 @@ std::string PathParser::merge(const std::vector<std::string> &path) const
   return pathName;
 }
 
-std::vector<std::string> PathParser::generateFullPath(const std::string &path)
+std::vector<std::string> PathName::generateFullPath(const std::string &path)
 {
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath = split(path, '/');

@@ -12,7 +12,7 @@
 
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/structure/fsinfo.hpp"
-#include "path/path_parser.hpp"
+#include "path/pathname.hpp"
 
 #include <memory>
 #include <vector>
@@ -32,14 +32,14 @@ class ClusterIO
   std::shared_ptr<FatTable> fatTable;
 
   /* Caminho atual no sistema de arquivos */
-  std::shared_ptr<PathParser> pathParser;
+  std::shared_ptr<PathName> pathName;
 
 public:
   explicit ClusterIO(std::shared_ptr<Image> image,
     std::shared_ptr<BiosBlock> bios,
     std::shared_ptr<FatTable> fatTable,
     std::shared_ptr<FileSysInfo> fsInfo,
-    std::shared_ptr<PathParser> pathParser);
+    std::shared_ptr<PathName> pathName);
 
   /**
    * @brief Lê um cluster da memória em um buffer

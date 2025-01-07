@@ -18,7 +18,7 @@
 #include "filesystem/structure/fat_table.hpp"
 #include "filesystem/structure/fsinfo.hpp"
 #include "io/image.hpp"
-#include "path/path_parser.hpp"
+#include "path/pathname.hpp"
 
 #include <memory>
 #include <string>
@@ -44,7 +44,7 @@ private:
   std::shared_ptr<FileSysInfo> fsInfo;
 
   /* Caminho atual no sistema de arquivos */
-  std::shared_ptr<PathParser> pathParser;
+  std::shared_ptr<PathName> pathName;
 
   /* Classe para acesso aos clusters */
   std::shared_ptr<ClusterIO> clusterIO;

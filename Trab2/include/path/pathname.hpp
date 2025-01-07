@@ -8,13 +8,13 @@
  * Data: 05/01/2025
  */
 
-#ifndef PATH_PARSER_HPP
-#define PATH_PARSER_HPP
+#ifndef PATHNAME_HPP
+#define PATHNAME_HPP
 
 #include <string>
 #include <vector>
 
-class PathParser
+class PathName
 {
   /* Define o diretório raiz do sistema */
   const std::string ROOT_DIR = "img/";
@@ -23,7 +23,7 @@ class PathParser
   std::string curPath;
 
 public:
-  PathParser();
+  PathName();
 
   /** @brief Retorna o caminho atual do sistema */
   std::string getCurPath() const;
