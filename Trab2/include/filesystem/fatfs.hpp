@@ -11,8 +11,6 @@
 #define FAT_FS_HPP
 
 #include "filesystem/cluster/cluster.hpp"
-#include "filesystem/entry/long_entry.hpp"
-#include "filesystem/entry/short_entry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fat_table.hpp"
 #include "filesystem/structure/fsinfo.hpp"
@@ -42,21 +40,6 @@ private:
 
   /* Classe para acesso aos clusters */
   std::shared_ptr<ClusterIO> clusterIO;
-
-  /**
-   * @brief Insere as entradas no espaço do diretório
-   *
-   * @param num Número do cluster onde ocorrerá a busca
-   * @param dir Entrada curta
-   * @param lentry Entradas longas
-   *
-   * @exception Gera um exceção se houver algum problema durante a busca da
-   * entrada do caminho.
-   * @return true se houver espaço false caso contrário
-   */
-  bool insertDirEntries(DWORD num,
-    const ShortEntry &entry,
-    const std::vector<LongEntry> &lentry);
 
   /**
    * @brief Helper para a listagem de diretórios
