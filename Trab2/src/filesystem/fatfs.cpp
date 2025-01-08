@@ -210,10 +210,9 @@ bool FatFS::rmdir(const std::string &path)
   }
 }
 
-bool FatFS::pwd()
+void FatFS::pwd()
 {
   std::fprintf(stdout, "%s\n", pathName->getCurPath().c_str());
-  return true;
 }
 
 bool FatFS::cd(const std::string &path)
@@ -313,10 +312,45 @@ bool FatFS::touch(const std::string &path)
     auto entry = clusterIO->searchEntryByPath(filename, listPath, DIRECTORY);
 
     if (!entry.has_value()) {
-      return clusterIO->createEntry(bios->getRootClus(), name, ARCHIVE);
+      if (!clusterIO->createEntry(bios->getRootClus(), name, ARCHIVE)) {
+        logger::logError("Não foi possível criar entrada");
+        return false;
+      }
+
+      return true;
     }
 
     if (!clusterIO->createEntry(entry->getDataCluster(), name, ARCHIVE)) {
+      logger::logError("Não foi possível criar entrada");
+      return false;
+    }
+
+    if (!updateParentTimestamp(path)) {
+      logger::logWarning(
+        "Não foi possível atualizar as datas do diretório pai");
+    }
+
+    return true;
+  } catch (const std::exception &error) {
+    logger::logError(error.what());
+    return false;
+  }
+}
+
+bool FatFS::mkdir(const std::string &path)
+{
+  std::string filename = path;
+  try {
+    std::string name = pathName->getLastNameFromPath(filename);
+
+    std::vector<std::string> listPath;
+    auto entry = clusterIO->searchEntryByPath(filename, listPath, DIRECTORY);
+
+    if (!entry.has_value()) {
+      return clusterIO->createEntry(bios->getRootClus(), name, DIRECTORY);
+    }
+
+    if (!clusterIO->createEntry(entry->getDataCluster(), name, DIRECTORY)) {
       logger::logError("Não foi possível criar entrada");
       return false;
     }

@@ -15,34 +15,6 @@
 #include <stdexcept>
 
 //===------------------------------------------------------------------------===
-// PRIVATE
-//===------------------------------------------------------------------------===
-
-/**
- * @brief Dividi o cluster na parte menos significativa
- *
- * @param cluster Cluster que terá o seu valor dividido
- *
- * @return Valor menos significativo do cluster
- */
-static inline WORD lowCluster(DWORD cluster)
-{
-  return static_cast<WORD>(cluster);
-}
-
-/**
- * @brief Dividi o cluster na parte mais significativa
- *
- * @param cluster Cluster que terá o seu valor dividido
- *
- * @return Valor mais significativo do cluster
- */
-static inline WORD highCluster(DWORD cluster)
-{
-  return static_cast<WORD>(cluster >> 16);
-}
-
-//===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
 
@@ -174,3 +146,7 @@ bool randomizeShortname(char *shortName)
 
   return true;
 }
+
+WORD lowCluster(DWORD cluster) { return static_cast<WORD>(cluster); }
+
+WORD highCluster(DWORD cluster) { return static_cast<WORD>(cluster >> 16); }

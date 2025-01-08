@@ -164,9 +164,141 @@ bool ClusterIO::allocNewCluster(DWORD cluster)
     // Zera a entrada para não haver problemas
     memset(buffer.get(), 0, bios->totClusByts());
 
+    // Atualiza a estrutura do fsInfo
+    fsInfo->setFreeCount(fatTable->freeClusters());
+    fsInfo->setNextFree(freeCluster);
+
     return writeCluster(buffer.get(), freeCluster);
   } catch (std::bad_alloc &error) {
     logger::logError("Não foi possível alocar buffer");
+    return false;
+  }
+}
+
+bool ClusterIO::insertDotEntries(DWORD parentClt, Dentry &dentry)
+{
+  // Entradas vazias usadas para criação
+  std::vector<LongEntry> lentry;
+
+  // Cria e inicializa a estrutura DOT
+  ShortEntry dotEntry = dentry.getShortEntry();
+  strncpy(reinterpret_cast<char *>(dotEntry.name),
+    reinterpret_cast<const char *>(DOT),
+    NAME_FULL_SIZE);
+  std::vector<ClusterIndex> dotIndex = { { dentry.getDataCluster(), 0, 0 } };
+  Dentry dotDentry(dotEntry, lentry, dotIndex);
+
+  // Cria e inicializa a estrutura DOTDOT
+  ShortEntry dotDotEntry = dentry.getShortEntry();
+  strncpy(reinterpret_cast<char *>(dotDotEntry.name),
+    reinterpret_cast<const char *>(DOTDOT),
+    NAME_FULL_SIZE);
+  std::vector<ClusterIndex> dotDotIndex = { { dentry.getDataCluster(), 1, 1 } };
+  Dentry dotDotDentry(dotDotEntry, lentry, dotDotIndex);
+  dotDotDentry.setDataCluster(parentClt);
+
+  return updateEntry(dotDentry) && updateEntry(dotDotDentry);
+}
+
+bool ClusterIO::createDirectoryEntry(DWORD num, const std::string &name)
+{
+  ShortEntry sentry;
+  std::vector<LongEntry> lentry;
+
+  try {
+    if (!generateEntries(num, name, sentry, lentry, ATTR_DIRECTORY)) {
+      logger::logError("Não foi possível criar o diretório");
+      return false;
+    }
+
+    std::vector<ClusterIndex> indexes;
+    int missingEntries =
+      searchEmptyEntries(num, static_cast<DWORD>(lentry.size() + 1), indexes);
+
+    if (missingEntries == 0) {
+      Dentry dentry(sentry, lentry, indexes);
+
+      DWORD cluster = 0;
+      if (!fatTable->searchFreeEntry(cluster)) {
+        logger::logInfo("Não há clusters suficientes");
+        return false;
+      }
+
+      if (!allocNewCluster(cluster)) {
+        logger::logInfo("Não foi possível criar diretório");
+        return false;
+      }
+
+      dentry.setDataCluster(cluster);
+      return updateEntry(dentry) && insertDotEntries(num, dentry);
+    }
+
+    if (missingEntries < 0) {
+      DWORD clusterDir = 0;
+      if (!fatTable->searchFreeEntry(clusterDir)) {
+        logger::logInfo("Não há clusters suficientes");
+        return false;
+      }
+
+      // Não alterar a ordem de alocação em hipotese alguma
+      if (!allocNewCluster(clusterDir) || !allocNewCluster(num)) {
+        logger::logInfo("Não foi possível criar diretório");
+        return false;
+      }
+
+      auto chain = fatTable->listChain(num);
+      searchEmptyEntries(chain.back(), -missingEntries, indexes);
+      Dentry dentry(sentry, lentry, indexes);
+
+      dentry.setDataCluster(clusterDir);
+      return updateEntry(dentry) && insertDotEntries(num, dentry);
+    }
+
+    logger::logError("Algo deu errado durante a busca");
+    return false;
+  } catch (std::runtime_error &error) {
+    logger::logError(error.what());
+    return false;
+  }
+}
+
+bool ClusterIO::createArchiveEntry(DWORD num, const std::string &name)
+{
+  ShortEntry sentry;
+  std::vector<LongEntry> lentry;
+
+  try {
+    if (!generateEntries(num, name, sentry, lentry, ATTR_ARCHIVE)) {
+      logger::logError("Não foi possível criar o arquivo");
+      return false;
+    }
+
+    std::vector<ClusterIndex> indexes;
+    int missingEntries =
+      searchEmptyEntries(num, static_cast<DWORD>(lentry.size() + 1), indexes);
+
+    if (missingEntries == 0) {
+      Dentry dentry(sentry, lentry, indexes);
+      return updateEntry(dentry);
+    }
+
+    if (missingEntries < 0) {
+      if (!allocNewCluster(num)) {
+        logger::logInfo("Criação de entradas falhou");
+        return false;
+      }
+
+      auto chain = fatTable->listChain(num);
+      searchEmptyEntries(chain.back(), -missingEntries, indexes);
+
+      Dentry dentry(sentry, lentry, indexes);
+      return updateEntry(dentry);
+    }
+
+    logger::logError("Algo deu errado durante a busca");
+    return false;
+  } catch (std::runtime_error &error) {
+    logger::logError(error.what());
     return false;
   }
 }
@@ -453,50 +585,10 @@ bool ClusterIO::deleteEntry(Dentry &entry)
 
 bool ClusterIO::createEntry(DWORD num, const std::string &name, EntryType type)
 {
-  ShortEntry sentry;
-  std::vector<LongEntry> lentry;
-
   switch (type) {
   case DIRECTORY:
-    if (!generateEntries(num, name, sentry, lentry, ATTR_DIRECTORY)) {
-      logger::logError("Não foi possível criar o diretório");
-      return false;
-    }
-    break;
+    return createDirectoryEntry(num, name);
   default:
-    if (!generateEntries(num, name, sentry, lentry, ATTR_ARCHIVE)) {
-      logger::logError("Não foi possível criar o arquivo");
-      return false;
-    }
-  }
-
-  try {
-    std::vector<ClusterIndex> indexes;
-    int missingEntries =
-      searchEmptyEntries(num, static_cast<DWORD>(lentry.size() + 1), indexes);
-
-    if (missingEntries == 0) {
-      Dentry dentry(sentry, lentry, indexes);
-      return updateEntry(dentry);
-    }
-
-    if (missingEntries < 0) {
-      if (!allocNewCluster(num)) {
-        logger::logInfo("Criação de entradas falhou");
-        return false;
-      }
-
-      auto chain = fatTable->listChain(num);
-      searchEmptyEntries(chain.back(), -missingEntries, indexes);
-
-      Dentry dentry(sentry, lentry, indexes);
-      return updateEntry(dentry);
-    }
-
-    logger::logError("Algo deu errado durante a busca");
-    return false;
-  } catch (std::runtime_error &error) {
-    logger::logError(error.what());
-    return false;
+    return createArchiveEntry(num, name);
   }
 }

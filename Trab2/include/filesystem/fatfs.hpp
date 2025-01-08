@@ -83,6 +83,8 @@ public:
    * @brief Mostra as informações de um cluster no formato texto
    *
    * @param num Número do cluster no qual as informações serão mostradas
+   *
+   * @return true se foi possível ler, false caso contrário
    */
   bool cluster(DWORD num);
 
@@ -90,6 +92,8 @@ public:
    * @brief Lista todos os diretórios/arquivos de um caminho especificado
    *
    * @param path Caminho a ser listado
+   *
+   * @return true se foi possível listar diretório, false caso contrário
    */
   bool ls(const std::string &path);
 
@@ -97,6 +101,8 @@ public:
    * @brief Remove um arquivo do sistema
    *
    * @param path Caminho do arquivo a ser removido
+   *
+   * @return true se foi possível remover arquivo, false caso contrário
    */
   bool rm(const std::string &path);
 
@@ -104,18 +110,22 @@ public:
    * @brief Remove um diretório vazio do sistema
    *
    * @param path Caminho do diretório vazio a ser removido
+   *
+   * @return true se foi possível remover diretório, false caso contrário
    */
   bool rmdir(const std::string &path);
 
   /**
    * @brief Retorna o caminho atual do sistema
    */
-  bool pwd();
+  void pwd();
 
   /**
    * @brief Altera o caminho atual
    *
    * @param path Novo caminho base do sistema
+   *
+   * @return true se foi possível alterar caminho atual, false caso contrário
    */
   bool cd(const std::string &path);
 
@@ -123,6 +133,8 @@ public:
    * @brief Imprime os atributos de uma entrada
    *
    * @param path Caminho para a entrada a ser apresentada
+   *
+   * @return true se foi possível listar atributos, false caso contrário
    */
   bool attr(const std::string &path);
 
@@ -130,8 +142,19 @@ public:
    * @brief Cria um arquivo vazio
    *
    * @param path Caminho para a entrada a ser criada
+   *
+   * @return true se foi possível criar arquivo, false caso contrário
    */
   bool touch(const std::string &path);
+
+  /**
+   * @brief Cria um diretório
+   *
+   * @param path Caminho para o diretório a ser criado
+   *
+   * @return true se foi possível criar diretório, false caso contrário
+   */
+  bool mkdir(const std::string &path);
 };
 
 #endif// FAT_FS_HPP

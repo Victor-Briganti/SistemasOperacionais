@@ -75,4 +75,22 @@ std::unique_ptr<BYTE[]> generateShortName(const std::string &longName);
  */
 bool randomizeShortname(char *shortName);
 
+/**
+ * @brief Dividi o cluster na parte menos significativa
+ *
+ * @param cluster Cluster que terá o seu valor dividido
+ *
+ * @return Valor menos significativo do cluster
+ */
+WORD lowCluster(DWORD cluster);
+
+/**
+ * @brief Dividi o cluster na parte mais significativa
+ *
+ * @param cluster Cluster que terá o seu valor dividido
+ *
+ * @return Valor mais significativo do cluster
+ */
+WORD highCluster(DWORD cluster);
+
 #endif// SHORT_ENTRY_HPP

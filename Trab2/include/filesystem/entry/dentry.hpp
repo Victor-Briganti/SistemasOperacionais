@@ -107,6 +107,13 @@ public:
   }
 
   /**
+   * @brief Defini o cluster dessa entrada
+   *
+   * @param cluster Número do custer que esta entrada está relacionada
+   */
+  void setDataCluster(DWORD cluster);
+
+  /**
    * @brief Cluster onde está entrada está armazenada
    *
    * @return retorna o cluster referente ao cluster que armazena está entrada
@@ -318,26 +325,6 @@ public:
   [[nodiscard]] inline std::vector<LongEntry> getLongEntries() const
   {
     return longEntries;
-  }
-
-  /**
-   * @brief Retorna a posição inicial dessa entrada no cluster
-   *
-   * @return retorna o valor de initPos
-   */
-  [[nodiscard]] inline DWORD getInitPos() const
-  {
-    return clusterIndexes[0].initPos;
-  }
-
-  /**
-   * @brief Retorna a posição final dessa entrada no cluster
-   *
-   * @return retorna o valor de endPos
-   */
-  [[nodiscard]] inline DWORD getEndPos() const
-  {
-    return clusterIndexes[0].endPos;
   }
 
   /**

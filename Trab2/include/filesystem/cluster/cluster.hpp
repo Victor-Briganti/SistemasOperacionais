@@ -85,6 +85,39 @@ class ClusterIO
    */
   bool allocNewCluster(DWORD cluster);
 
+  /**
+   * @brief Inicializa e insere as entradas DOT e DOTDOT nod diretório criado
+   *
+   * @param parentClt Número do cluster onde a entrada será criada
+   * @param dentry Entrada que representa o diretório alocado
+   *
+   * @return true se foi possível alocar, false caso contrário.
+   */
+  bool insertDotEntries(DWORD parentClt, Dentry &dentry);
+
+  /**
+   * @brief Cria uma entrada do tipo diretório e insere no buffer de entrada
+   *
+   * Além da criação da entrada, no diretório também se faz necessário alocar um
+   * buffer para receber as demais entradas.
+   *
+   * @param num Número do cluster onde a entrada será criada
+   * @param name Nome do arquivo a ser criado
+   *
+   * @return true se foi possível criar, false caso contrário.
+   */
+  bool createDirectoryEntry(DWORD num, const std::string &name);
+
+  /**
+   * @brief Cria uma entrada do tipo arquivo e insere no buffer de entrada
+   *
+   * @param num Número do cluster onde a entrada será criada
+   * @param name Nome do arquivo a ser criado
+   *
+   * @return true se foi possível criar, false caso contrário.
+   */
+  bool createArchiveEntry(DWORD num, const std::string &name);
+
 public:
   explicit ClusterIO(std::shared_ptr<Image> image,
     std::shared_ptr<BiosBlock> bios,

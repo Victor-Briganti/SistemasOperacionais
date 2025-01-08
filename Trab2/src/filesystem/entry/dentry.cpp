@@ -135,3 +135,9 @@ void Dentry::updatedWrtTimestamp()
   entry.wrtDate = timefs::currentDate();
   entry.lstAccDate = timefs::currentDate();
 }
+
+void Dentry::setDataCluster(DWORD cluster)
+{
+  entry.fstClusHI = highCluster(cluster);
+  entry.fstClusLO = lowCluster(cluster);
+}
