@@ -133,54 +133,54 @@ public:
    *
    * @param num Número do cluster no qual as informações serão mostradas
    */
-  void cluster(DWORD num);
+  bool cluster(DWORD num);
 
   /**
    * @brief Lista todos os diretórios/arquivos de um caminho especificado
    *
    * @param path Caminho a ser listado
    */
-  void ls(const std::string &path);
+  bool ls(const std::string &path);
 
   /**
    * @brief Remove um arquivo do sistema
    *
    * @param path Caminho do arquivo a ser removido
    */
-  void rm(const std::string &path);
+  bool rm(const std::string &path);
 
   /**
    * @brief Remove um diretório vazio do sistema
    *
    * @param path Caminho do diretório vazio a ser removido
    */
-  void rmdir(const std::string &path);
+  bool rmdir(const std::string &path);
 
   /**
    * @brief Retorna o caminho atual do sistema
    */
-  void pwd();
+  bool pwd();
 
   /**
    * @brief Altera o caminho atual
    *
    * @param path Novo caminho base do sistema
    */
-  void cd(const std::string &path);
+  bool cd(const std::string &path);
 
   /**
    * @brief Imprime os atributos de uma entrada
    *
    * @param path Caminho para a entrada a ser apresentada
    */
-  void attr(const std::string &path);
+  bool attr(const std::string &path);
 
   /**
    * @brief Cria um arquivo vazio
    *
    * @param path Caminho para a entrada a ser criada
    */
-  void touch(const std::string &path);
+  bool touch(const std::string &path);
 };
 
 #endif// FAT_FS_HPP

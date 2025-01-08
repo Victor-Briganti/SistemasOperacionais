@@ -429,26 +429,28 @@ void FatFS::info()
   fatTable->printInfo();
 }
 
-void FatFS::cluster(DWORD num)
+bool FatFS::cluster(DWORD num)
 {
   auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
   if (buffer == nullptr) {
     logger::logError("Não foi possível alocar buffer");
-    return;
+    return false;
   }
 
   if (!clusterIO->readCluster(buffer.get(), num)) {
     logger::logError("Não foi possível ler cluster");
-    return;
+    return false;
   }
 
   char *bufferChar = reinterpret_cast<char *>(buffer.get());
   for (size_t i = 0; i < bios->totClusByts() * sizeof(char); i++) {
     std::fprintf(stdout, "%c", bufferChar[i]);
   }
+
+  return true;
 }
 
-void FatFS::ls(const std::string &path)
+bool FatFS::ls(const std::string &path)
 {
   try {
     // Lista de nomes nos caminhos
@@ -457,18 +459,18 @@ void FatFS::ls(const std::string &path)
 
     if (!entry.has_value()) {
       listClusterDir(bios->getRootClus());
-      return;
+    } else {
+      listClusterDir(entry->getDataCluster());
     }
 
-    listClusterDir(entry->getDataCluster());
+    return true;
   } catch (const std::exception &error) {
     logger::logError(error.what());
-    return;
+    return false;
   }
 }
 
-// TODO: Atualizar diretório onde houve a deleção do arquivo
-void FatFS::rm(const std::string &path)
+bool FatFS::rm(const std::string &path)
 {
   try {
     // Lista de nomes nos caminhos
@@ -478,26 +480,27 @@ void FatFS::rm(const std::string &path)
     // Diretório raiz
     if (!entry.has_value()) {
       logger::logError("rm espera um arquivo");
-      return;
+      return false;
     }
 
     if (!clusterIO->deleteEntry(entry.value())) {
       logger::logError("rm " + path + " operação falhou");
-      return;
+      return false;
     }
 
     if (!updateParentTimestamp(path)) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
     }
+
+    return true;
   } catch (const std::exception &error) {
     logger::logError(error.what());
-    return;
+    return false;
   }
 }
 
-// TODO: Atualizar diretório onde houve a deleção do arquivo
-void FatFS::rmdir(const std::string &path)
+bool FatFS::rmdir(const std::string &path)
 {
   try {
     // Lista de nomes nos caminhos
@@ -507,7 +510,7 @@ void FatFS::rmdir(const std::string &path)
     // Diretório raiz
     if (!entry.has_value()) {
       logger::logError("Operação não permitida");
-      return;
+      return false;
     }
 
     // Verifica se o diretório está vazio
@@ -516,30 +519,33 @@ void FatFS::rmdir(const std::string &path)
 
     if (dentries.size() != 2) {
       logger::logError("Diretório deve estar vazio");
-      return;
+      return false;
     }
 
     if (!clusterIO->deleteEntry(entry.value())) {
       logger::logError("rmdir " + path + " operação não permitida");
-      return;
+      return false;
     }
 
     if (!updateParentTimestamp(path)) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
     }
+
+    return true;
   } catch (const std::exception &error) {
     logger::logError(error.what());
-    return;
+    return false;
   }
 }
 
-void FatFS::pwd()
+bool FatFS::pwd()
 {
   std::fprintf(stdout, "%s\n", pathName->getCurPath().c_str());
+  return true;
 }
 
-void FatFS::cd(const std::string &path)
+bool FatFS::cd(const std::string &path)
 {
   try {
     std::vector<std::string> listPath;
@@ -547,16 +553,18 @@ void FatFS::cd(const std::string &path)
 
     if (!entry.has_value()) {
       pathName->setCurPath(listPath[0]);
-      return;
+      return false;
     }
 
     pathName->setCurPath(pathName->merge(listPath));
+    return true;
   } catch (const std::exception &error) {
     logger::logError(error.what());
+    return false;
   }
 }
 
-void FatFS::attr(const std::string &path)
+bool FatFS::attr(const std::string &path)
 {
   try {
     // Lista de nomes nos caminhos
@@ -566,7 +574,7 @@ void FatFS::attr(const std::string &path)
     // Diretório raiz
     if (!entry.has_value()) {
       logger::logError("operação não permitida");
-      return;
+      return false;
     }
 
     std::fprintf(stdout,
@@ -616,19 +624,21 @@ void FatFS::attr(const std::string &path)
       stdout, "%s", entry->isReadOnly() ? "Atributo: Somente leitura\n" : "");
     std::fprintf(
       stdout, "%s", entry->isHidden() ? "Atributo: Escondido\n" : "");
+
+    return true;
   } catch (const std::exception &error) {
     logger::logError(error.what());
-    return;
+    return false;
   }
 }
 
-void FatFS::touch(const std::string &path)
+bool FatFS::touch(const std::string &path)
 {
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath = pathName->split(path, '/');
   if (listPath.size() == 1 && listPath[0] == pathName->getRootDir()) {
     logger::logError("operação inválida");
-    return;
+    return false;
   }
 
   // Salva o nome do arquivo a ser criado
@@ -637,7 +647,7 @@ void FatFS::touch(const std::string &path)
 
   if (filename.size() > FILENAME_MAX) {
     logger::logError("nome muito longo");
-    return;
+    return false;
   }
 
   try {
@@ -645,7 +655,7 @@ void FatFS::touch(const std::string &path)
     listPath = parser(newPath, DIR_ENTRY);
   } catch (const std::exception &error) {
     logger::logError(error.what());
-    return;
+    return false;
   }
 
   // Diretório raiz
@@ -659,7 +669,7 @@ void FatFS::touch(const std::string &path)
     for (const auto &dtr : dentries) {
       if (dtr.getLongName() == filename) {
         logger::logError("Arquivo já existe");
-        return;
+        return false;
       }
 
       while (!std::strncmp(dtr.getShortName(),
@@ -676,7 +686,7 @@ void FatFS::touch(const std::string &path)
       logger::logError("operação falhou");
     }
 
-    return;
+    return true;
   }
 
   // Busca pela entrada
@@ -692,7 +702,7 @@ void FatFS::touch(const std::string &path)
   for (const auto &dtr : dentries) {
     if (dtr.getLongName() == filename) {
       logger::logError(filename + " arquivo já existe");
-      return;
+      return false;
     }
 
     while (!std::strncmp(dtr.getShortName(),
@@ -707,6 +717,8 @@ void FatFS::touch(const std::string &path)
 
   if (!insertDirEntries(dentry.getDataCluster(), entry, lentry)) {
     logger::logError("operação falhou");
-    return;
+    return false;
   }
+
+  return true;
 }
