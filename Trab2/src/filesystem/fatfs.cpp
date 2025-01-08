@@ -29,67 +29,6 @@
 // PRIVATE
 //===------------------------------------------------------------------------===
 
-bool FatFS::setDirEntries(DWORD num,
-  DWORD startPos,
-  DWORD endPos,
-  const ShortEntry &entry,
-  const std::vector<LongEntry> &lentry)
-{
-  // Aloca o buffer do diretório
-  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
-  if (buffer == nullptr) {
-    logger::logError("Não foi possível alocar buffer");
-    return {};
-  }
-
-  // Lê o cluster no qual o diretório se encontra
-  if (!clusterIO->readCluster(buffer.get(), num)) {
-    logger::logError("Não foi possível ler cluster");
-    return {};
-  }
-
-  // Cast para facilitar manuseio do buffer
-  ShortEntry *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
-
-  // Caminha pelo buffer escrevendo os novos valores.
-  for (size_t i = startPos, j = 0; i <= endPos; i++, j++) {
-    if (j < lentry.size()) {
-      memcpy(&bufferEntry[i], &lentry[j], sizeof(entry));
-    } else {
-      memcpy(&bufferEntry[i], &entry, sizeof(entry));
-    }
-  }
-
-  return clusterIO->writeCluster(buffer.get(), num);
-}
-
-bool FatFS::removeEntry(Dentry &entry, DWORD num)
-{
-  entry.markFree();
-
-  // Remove a entrada do diretório
-  bool entryRm = setDirEntries(num,
-    entry.getInitPos(),
-    entry.getEndPos(),
-    entry.getShortEntry(),
-    entry.getLongEntries());
-
-  // Remove as entradas da tabela FAT
-  int fatRm = fatTable->removeChain(entry.getDataCluster());
-  if (fatRm < 0) {
-    return false;
-  }
-
-  // Salva a quantidade de clusters removidos no FSInfo
-  bool result = (fatRm >= 0) && entryRm;
-  if (result) {
-    DWORD freeClusters = fsInfo->getFreeCount() + static_cast<DWORD>(fatRm);
-    return fsInfo->setFreeCount(freeClusters);
-  }
-
-  return false;
-}
-
 std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
 {
   // Lista de nomes nos caminhos

@@ -50,33 +50,6 @@ private:
   std::shared_ptr<ClusterIO> clusterIO;
 
   /**
-   * @brief Retorna uma lista com todas as entradas de um diretório
-   *
-   * @param num Número do cluster a ser lido
-   * @param startPos Posição inicial no cluster
-   * @param endPos Posição final no cluster
-   * @param dir Entrada curta que será escrita
-   * @param lentry Entrada longa que será escrita
-   *
-   * @return true se foi possível escrever, false caso contrário.
-   */
-  bool setDirEntries(DWORD num,
-    DWORD startPos,
-    DWORD endPos,
-    const ShortEntry &entry,
-    const std::vector<LongEntry> &lentry);
-
-  /**
-   * @brief Remove uma entrada do diretório e da FAT table
-   *
-   * @param entry Entrada a ser removida
-   * @param num Número do cluster onde a entrada está localizada
-   *
-   * @return true se foi possível remover, false caso contrário.
-   */
-  bool removeEntry(Dentry &entry, DWORD num);
-
-  /**
    * @brief Realiza o parser de um caminho
    *
    * @param path Caminho a ser dividido e verificado
