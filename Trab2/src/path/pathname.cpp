@@ -81,3 +81,22 @@ bool PathName::isRootDir(const std::vector<std::string> &listPath)
 {
   return (listPath.size() == 1 && listPath[0] == ROOT_DIR);
 }
+
+std::string PathName::getLastNameFromPath(std::string &path)
+{
+  if (path == "") {
+    throw std::runtime_error("Caminho não pode ser vazio");
+  }
+
+  // Divide o caminho
+  std::vector<std::string> listPath = split(path, '/');
+
+  if (isRootDir(listPath)) {
+    throw std::runtime_error("Não é possível remover caminho do " + ROOT_DIR);
+  }
+
+  std::string name = listPath.back();
+  listPath.pop_back();
+  path = merge(listPath);
+  return name;
+}

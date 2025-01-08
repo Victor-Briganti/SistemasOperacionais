@@ -76,6 +76,18 @@ public:
    * @return true se for o diretório raiz, false caso contrário
    */
   bool isRootDir(const std::vector<std::string> &listPath);
+
+  /**
+   * @brief Dividi o caminho do arquivo
+   *
+   * @param path Referência o caminho que precisa ser divido em duas partes.
+   * Durante a divisão este caminho e alterado.
+   *
+   * @exception Gera uma exceção se o caminho não for válido.
+   *
+   * @return O último nome dentro do caminho
+   */
+  std::string getLastNameFromPath(std::string &path);
 };
 
 #endif// PATH_PARSER_HPP

@@ -237,10 +237,9 @@ std::optional<Dentry> ClusterIO::searchEntryByPath(const std::string &path,
   return entry;
 }
 
-bool ClusterIO::removeEntry(Dentry &entry)
+bool ClusterIO::updateEntry(Dentry &entry)
 {
   try {
-    entry.markFree();
     auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
 
     // Informações sobre as entradas longas
@@ -276,6 +275,12 @@ bool ClusterIO::removeEntry(Dentry &entry)
   }
 
   return true;
+}
+
+bool ClusterIO::removeEntry(Dentry &entry)
+{
+  entry.markFree();
+  return updateEntry(entry);
 }
 
 bool ClusterIO::deleteEntry(Dentry &entry)

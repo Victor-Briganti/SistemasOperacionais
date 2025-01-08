@@ -367,6 +367,22 @@ void FatFS::listClusterDir(DWORD num)
   }
 }
 
+// TODO: Verificar se é necessário atualizar o DOT e o DOTDOT
+bool FatFS::updateParentTimestamp(std::string path)
+{
+  std::string _ = pathName->getLastNameFromPath(path);
+
+  // Lista de nomes nos caminhos
+  std::vector<std::string> listPath;
+  auto entry = clusterIO->searchEntryByPath(path, listPath, DIRECTORY);
+  if (!entry.has_value()) {
+    logger::logError("Tentando atualizar o diretório raiz");
+    return false;
+  }
+
+  entry->updatedWrtTimestamp();
+  return clusterIO->updateEntry(entry.value());
+}
 
 //===------------------------------------------------------------------------===
 // PUBLIC
@@ -469,6 +485,11 @@ void FatFS::rm(const std::string &path)
       logger::logError("rm " + path + " operação falhou");
       return;
     }
+
+    if (!updateParentTimestamp(path)) {
+      logger::logWarning(
+        "Não foi possível atualizar as datas do diretório pai");
+    }
   } catch (const std::exception &error) {
     logger::logError(error.what());
     return;
@@ -501,6 +522,11 @@ void FatFS::rmdir(const std::string &path)
     if (!clusterIO->deleteEntry(entry.value())) {
       logger::logError("rmdir " + path + " operação não permitida");
       return;
+    }
+
+    if (!updateParentTimestamp(path)) {
+      logger::logWarning(
+        "Não foi possível atualizar as datas do diretório pai");
     }
   } catch (const std::exception &error) {
     logger::logError(error.what());

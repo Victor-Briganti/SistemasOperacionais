@@ -377,6 +377,11 @@ public:
    * livres
    */
   void markFree();
+
+  /**
+   * @brief Atualiza a timestamp e a datestamp relacionadas a escrita
+   */
+  void updatedWrtTimestamp();
 };
 
 #endif// DENTRY_HPP

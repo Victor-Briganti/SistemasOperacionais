@@ -100,6 +100,16 @@ private:
    */
   void listClusterDir(DWORD num);
 
+  /**
+   * @brief Atualiza as timestamps do diretório pai
+   *
+   * @param path Caminho para o diretório que precisa ter o seu tempo atualizado
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   */
+  bool updateParentTimestamp(std::string path);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo

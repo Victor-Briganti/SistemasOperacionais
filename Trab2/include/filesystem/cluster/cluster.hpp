@@ -105,6 +105,18 @@ public:
     EntryType searchType);
 
   /**
+   * @brief Atualiza uma entrada dentro do cluster
+   *
+   * Reescreve a entrada passada nos clusters em que suas entradas são
+   * localizadas.
+   *
+   * @param entry Entrada a ser atualizada
+   *
+   * @return true se foi possível atualizar, false caso contrário.
+   */
+  bool updateEntry(Dentry &entry);
+
+  /**
    * @brief Remove uma entrada do cluster
    *
    * @param entry Entrada a ser removida

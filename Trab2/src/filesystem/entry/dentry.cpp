@@ -128,3 +128,10 @@ void Dentry::markFree()
     a.ord = FREE_ENTRY;
   }
 }
+
+void Dentry::updatedWrtTimestamp()
+{
+  entry.wrtTime = timefs::currentTime();
+  entry.wrtDate = timefs::currentDate();
+  entry.lstAccDate = timefs::currentDate();
+}
