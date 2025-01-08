@@ -103,6 +103,26 @@ public:
   std::optional<Dentry> searchEntryByPath(const std::string &path,
     std::vector<std::string> &listPath,
     EntryType searchType);
+
+  /**
+   * @brief Remove uma entrada do cluster
+   *
+   * @param entry Entrada a ser removida
+   *
+   * @return true se foi possível remover, false caso contrário.
+   */
+  bool removeEntry(Dentry &entry);
+
+  /**
+   * @brief Deleta a entrada do sistema de arquivo
+   *
+   * A entrada é removida tanto do cluster quanto do FAT.
+   *
+   * @param entry Entrada a ser removida
+   *
+   * @return true se foi possível deletar, false caso contrário.
+   */
+  bool deleteEntry(Dentry &entry);
 };
 
 #endif// CLUSTER_HPP

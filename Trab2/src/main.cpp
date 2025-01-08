@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     std::string path(argv[2]);
     FatFS fat(image);
     fat.attr(path);
-    fat.rmdir(path);
+    fat.rm(path);
     fat.attr(path);
   } catch (const std::exception &error) {
     logger::logError(error.what());

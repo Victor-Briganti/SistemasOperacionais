@@ -11,12 +11,17 @@
 #include "filesystem/cluster/cluster_index.hpp"
 #include "filesystem/default.hpp"
 #include "filesystem/entry/dentry.hpp"
+#include "filesystem/entry/long_entry.hpp"
+#include "filesystem/entry/short_entry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
 #include "path/pathname.hpp"
 #include "utils/logger.hpp"
+#include "utils/types.hpp"
 
 #include <cstring>
+#include <memory>
+#include <new>
 #include <stdexcept>
 
 //===------------------------------------------------------------------------===
@@ -227,4 +232,64 @@ std::optional<Dentry> ClusterIO::searchEntryByPath(const std::string &path,
   }
 
   return entry;
+}
+
+bool ClusterIO::removeEntry(Dentry &entry)
+{
+  try {
+    entry.markFree();
+    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+
+    // Informações sobre as entradas longas
+    size_t entryIdx = 0;
+    std::vector<LongEntry> lentry = entry.getLongEntries();
+    ShortEntry sentry = entry.getShortEntry();
+
+    // Lê cluster a cluster para escrever as entradas
+    for (auto &clt : entry.getClusterIndexes()) {
+      if (!readCluster(buffer.get(), clt.clusterNum)) {
+        logger::logError("Não foi possível ler cluster");
+        return false;
+      }
+
+      ShortEntry *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
+
+      for (size_t i = clt.initPos; i <= clt.endPos; i++, entryIdx++) {
+        if (entryIdx < lentry.size()) {
+          memcpy(&bufferEntry[i], &lentry[entryIdx], sizeof(sentry));
+        } else {
+          memcpy(&bufferEntry[i], &sentry, sizeof(sentry));
+        }
+      }
+
+      if (!writeCluster(buffer.get(), clt.clusterNum)) {
+        logger::logError("Não foi possível escrever no cluster");
+        return false;
+      }
+    }
+  } catch (const std::bad_alloc &error) {
+    logger::logError("Não foi possível ler buffer");
+    return false;
+  }
+
+  return true;
+}
+
+bool ClusterIO::deleteEntry(Dentry &entry)
+{
+  if (!removeEntry(entry)) {
+    logger::logError("Entrada não pode ser removida");
+    return false;
+  }
+
+  // Remove as entradas da tabela FAT
+  int fatRm = fatTable->removeChain(entry.getDataCluster());
+  if (fatRm < 0) {
+    logger::logError("Tabela FAT não pode ser escrita");
+    return false;
+  }
+
+  // Salva a quantidade de clusters removidos no FSInfo
+  DWORD freeClusters = fsInfo->getFreeCount() + static_cast<DWORD>(fatRm);
+  return fsInfo->setFreeCount(freeClusters);
 }

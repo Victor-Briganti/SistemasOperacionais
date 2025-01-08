@@ -512,6 +512,7 @@ void FatFS::ls(const std::string &path)
   }
 }
 
+// TODO: Atualizar diretório onde houve a deleção do arquivo
 void FatFS::rm(const std::string &path)
 {
   try {
@@ -525,7 +526,7 @@ void FatFS::rm(const std::string &path)
       return;
     }
 
-    if (!removeEntry(entry.value(), entry->getEntryCluster())) {
+    if (!clusterIO->deleteEntry(entry.value())) {
       logger::logError("rm " + path + " operação falhou");
       return;
     }
@@ -535,6 +536,7 @@ void FatFS::rm(const std::string &path)
   }
 }
 
+// TODO: Atualizar diretório onde houve a deleção do arquivo
 void FatFS::rmdir(const std::string &path)
 {
   try {

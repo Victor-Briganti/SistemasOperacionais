@@ -341,6 +341,16 @@ public:
   }
 
   /**
+   * @brief Retorna a lista de indexação desta entrada nos clusters
+   *
+   * @return retorna a lista de indexação
+   */
+  [[nodiscard]] inline std::vector<ClusterIndex> getClusterIndexes() const
+  {
+    return clusterIndexes;
+  }
+
+  /**
    * @brief Tipo do arquivo
    *
    * Função usada para identificar se o arquivo é do tipo DOT ou um nome longo
