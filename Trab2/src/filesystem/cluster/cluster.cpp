@@ -174,6 +174,9 @@ std::optional<Dentry> ClusterIO::searchEntryByPath(const std::string &path,
   // Começa  a busca pelo "/"
   DWORD cluster = bios->getRootClus();
   std::vector<Dentry> dentries = getListEntries(cluster);
+  if (dentries.empty()) {
+    throw std::runtime_error(pathName->getRootDir() + " está vazio");
+  }
   Dentry entry = dentries.back();
 
   bool found = false;
