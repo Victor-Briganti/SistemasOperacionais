@@ -546,11 +546,20 @@ void FatFS::rmdir(const std::string &path)
 
     // Diretório raiz
     if (!entry.has_value()) {
-      logger::logError("operação não permitida");
+      logger::logError("Operação não permitida");
       return;
     }
 
-    if (!removeEntry(entry.value(), entry->getEntryCluster())) {
+    // Verifica se o diretório está vazio
+    std::vector<Dentry> dentries =
+      clusterIO->getListEntries(entry->getDataCluster());
+
+    if (dentries.size() != 2) {
+      logger::logError("Diretório deve estar vazio");
+      return;
+    }
+
+    if (!clusterIO->deleteEntry(entry.value())) {
       logger::logError("rmdir " + path + " operação não permitida");
       return;
     }
