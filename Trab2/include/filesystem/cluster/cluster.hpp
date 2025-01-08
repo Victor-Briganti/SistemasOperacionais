@@ -35,6 +35,56 @@ class ClusterIO
   /* Caminho atual no sistema de arquivos */
   std::shared_ptr<PathName> pathName;
 
+  /* Define a quantidade de entradas por cluster */
+  size_t NUM_ENTRIES;
+
+  /**
+   * @brief Gera as entradas relacionadas ao nome especificado
+   *
+   * @param num Número do cluster onde a entrada será criada
+   * @param name Nome da entrada a ser criada
+   * @param sentry Referência a entrada curta a ser criada
+   * @param lentry Referência a entrada longa a ser criada
+   * @param attrs Atributos da entrada a ser criada
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   * @return true se foi possível criar, false caso contrário
+   */
+  bool generateEntries(DWORD num,
+    const std::string &name,
+    ShortEntry &sentry,
+    std::vector<LongEntry> &lentry,
+    BYTE attrs);
+
+  /**
+   * @brief Busca entradas vazias e continuas
+   *
+   * @param cluster Número do cluster onde ocorrerá a busca
+   * @param numEntries Quantidade de entradas a serem alocadas
+   * @param clusterIndexes Lista com as posições para escrever a entrada
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   * @return 0 se o espaço vazio suporta todas as entradas, 0< se o espaço não é
+   * suficiente.
+   */
+  int searchEmptyEntries(DWORD cluster,
+    DWORD numEntries,
+    std::vector<ClusterIndex> &clusterIndexes);
+
+  /**
+   * @brief Aloca um novo cluster
+   *
+   * @param cluster Número do cluster que será estendido. Se o valor for 0, uma
+   * nova cadeia será criada
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   * @return true se foi possível alocar o cluster, false caso contrário.
+   */
+  bool allocNewCluster(DWORD cluster);
+
 public:
   explicit ClusterIO(std::shared_ptr<Image> image,
     std::shared_ptr<BiosBlock> bios,
@@ -135,6 +185,16 @@ public:
    * @return true se foi possível deletar, false caso contrário.
    */
   bool deleteEntry(Dentry &entry);
+
+  /**
+   * @brief Aloca a entrada e insere no buffer
+   *
+   * @param name Nome do arquivo a ser criado
+   * @param num Número do cluster onde a entrada será criada
+   *
+   * @return true se foi possível criar, false caso contrário.
+   */
+  bool createEntry(DWORD num, const std::string &name, EntryType type);
 };
 
 #endif// CLUSTER_HPP

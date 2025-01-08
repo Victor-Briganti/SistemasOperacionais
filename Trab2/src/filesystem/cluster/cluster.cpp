@@ -25,6 +25,153 @@
 #include <stdexcept>
 
 //===------------------------------------------------------------------------===
+// PRIVATE
+//===------------------------------------------------------------------------===
+
+bool ClusterIO::generateEntries(DWORD num,
+  const std::string &name,
+  ShortEntry &sentry,
+  std::vector<LongEntry> &lentry,
+  BYTE attrs)
+{
+  // Lista de entradas
+  std::vector<Dentry> dentries = getListEntries(num);
+
+  // Gera a entrada curta
+  sentry = createShortEntry(name, 0, 0, attrs);
+
+  for (const auto &dtr : dentries) {
+    if (dtr.getLongName() == name) {
+      logger::logError(name + " já existe");
+      return false;
+    }
+
+    while (!std::strncmp(dtr.getShortName(),
+      reinterpret_cast<const char *>(sentry.name),
+      NAME_FULL_SIZE)) {
+      randomizeShortname(reinterpret_cast<char *>(sentry.name));
+    }
+  }
+
+  // Gera as entradas longas
+  lentry = createLongEntries(sentry, name);
+  return true;
+}
+
+int ClusterIO::searchEmptyEntries(DWORD cluster,
+  DWORD numEntries,
+  std::vector<ClusterIndex> &clusterIndexes)
+{
+  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+  auto *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
+  std::vector<DWORD> chain = fatTable->listChain(cluster);
+  DWORD emptyEntries = 0;
+
+  for (auto clt : chain) {
+    if (!readCluster(static_cast<void *>(bufferEntry), clt)) {
+      throw std::runtime_error("Não foi possível ler cluster");
+    }
+
+    ClusterIndex index = { 0, 0, 0 };
+
+    // Caminha por todo o buffer até encontrar o EOD_ENTRY ou alcançar o limite
+    // de tamanho do cluster
+    for (size_t i = 0; i < NUM_ENTRIES; i++) {
+      // Diretório vazio
+      if (bufferEntry[i].name[0] == FREE_ENTRY) {
+        if (index.clusterNum == 0) {
+          index.clusterNum = clt;
+          index.initPos = static_cast<DWORD>(i);
+        }
+        emptyEntries++;
+
+        // Tamanho já encontrado
+        if (index.clusterNum != 0 && emptyEntries == numEntries) {
+          clusterIndexes.push_back(index);
+          return 0;
+        }
+
+        continue;
+      }
+
+      // Diretório vazio
+      if (bufferEntry[i].name[0] == EOD_ENTRY) {
+        if (index.clusterNum == 0) {
+          index.clusterNum = clt;
+          index.initPos = static_cast<DWORD>(i);
+        }
+
+        if (numEntries + index.initPos - 1 > NUM_ENTRIES) {
+          index.endPos = static_cast<DWORD>(NUM_ENTRIES - 1);
+        } else {
+          index.endPos = numEntries + index.initPos - 1;
+        }
+
+        clusterIndexes.push_back(index);
+        return (index.endPos - index.initPos + 1) - numEntries;
+      }
+
+      // Se o espaço encontrado até agora não satisfaz reseta o index
+      if (index.clusterNum != 0) {
+        index.clusterNum = 0;
+        index.initPos = 0;
+        clusterIndexes.clear();
+      }
+    }
+
+    // O index desse cluster chegou ao fim. Salva e continua verificação.
+    if (index.clusterNum != 0) {
+      index.endPos = NUM_ENTRIES;
+      clusterIndexes.push_back(index);
+    }
+  }
+
+  return -static_cast<int>(numEntries);
+}
+
+bool ClusterIO::allocNewCluster(DWORD cluster)
+{
+  DWORD freeCluster = fsInfo->getNextFree();
+  if (!fatTable->searchFreeEntry(freeCluster)) {
+    logger::logError("Não há entradas livres");
+    return false;
+  }
+
+  if (cluster == 0) {
+    if (!fatTable->allocClusters(freeCluster, { freeCluster })) {
+      logger::logError("Não foi possível alocar clusters");
+      return false;
+    }
+  } else {
+    auto chain = fatTable->listChain(cluster);
+    if (!fatTable->allocClusters(chain.back(), { freeCluster })) {
+      logger::logError("Não foi possível alocar clusters");
+      return false;
+    }
+  }
+
+  try {
+    // Aloca buffer do novo diretório
+    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+
+
+    // Lê o cluster no qual o diretório se encontra
+    if (!readCluster(buffer.get(), freeCluster)) {
+      logger::logError("Não foi possível ler cluster");
+      return false;
+    }
+
+    // Zera a entrada para não haver problemas
+    memset(buffer.get(), 0, bios->totClusByts());
+
+    return writeCluster(buffer.get(), freeCluster);
+  } catch (std::bad_alloc &error) {
+    logger::logError("Não foi possível alocar buffer");
+    return false;
+  }
+}
+
+//===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
 
@@ -35,7 +182,9 @@ ClusterIO::ClusterIO(std::shared_ptr<Image> image,
   std::shared_ptr<PathName> pathName)
   : image(image), bios(bios), fatTable(fatTable), fsInfo(fsInfo),
     pathName(pathName)
-{}
+{
+  NUM_ENTRIES = bios->totClusByts() / sizeof(ShortEntry);
+}
 
 bool ClusterIO::readCluster(void *buffer, DWORD num)
 {
@@ -78,79 +227,79 @@ DWORD ClusterIO::getEntryClus(const Dentry &entry)
 
 std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
 {
-  auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
-  if (buffer == nullptr) {
+  try {
+    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+    auto *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
+    std::vector<LongEntry> longDirs;
+    std::vector<ClusterIndex> clusterIndexes;
+    std::vector<Dentry> dentries;
+
+    std::vector<DWORD> chain = fatTable->listChain(num);
+    for (auto cluster : chain) {
+      if (!readCluster(static_cast<void *>(bufferEntry), cluster)) {
+        logger::logError("Não foi possível ler cluster");
+        return {};
+      }
+
+      // Caminha por todo o buffer até encontrar o EOD_ENTRY ou alcançar o
+      // limite de tamanho do cluster.
+      bool foundDir = false;
+      for (size_t i = 0; i < NUM_ENTRIES; i++) {
+        // Final do diretório
+        if (bufferEntry[i].name[0] == EOD_ENTRY) {
+          if (!longDirs.empty()) {
+            logger::logWarning("Nome longo não está continuo");
+            longDirs.clear();
+            clusterIndexes.clear();
+          }
+
+          return dentries;
+        }
+
+        // Diretório vazio
+        if (bufferEntry[i].name[0] == FREE_ENTRY) {
+          continue;
+        }
+
+        if (bufferEntry[i].attr == ATTR_LONG_NAME) {
+          // Se esse é a primeira parte do nome longo salva sua posição
+          if (!foundDir) {
+            foundDir = true;
+            clusterIndexes.push_back({ cluster, static_cast<DWORD>(i), 0 });
+          }
+
+          // Se este for o final deste cluster salva a posição do cluster
+          if (i == (bios->totClusByts() / sizeof(ShortEntry)) - 1) {
+            clusterIndexes.back().endPos = static_cast<DWORD>(i);
+          }
+
+          // Salva o diretório longo na lista
+          LongEntry lentry = {};
+          memcpy(&lentry, &bufferEntry[i], sizeof(lentry));
+          longDirs.push_back(lentry);
+        } else {
+          auto endPos = static_cast<DWORD>(i);
+          if (clusterIndexes.empty()) {
+            clusterIndexes.push_back({ cluster, endPos, endPos });
+          } else {
+            clusterIndexes.back().endPos = endPos;
+          }
+
+          Dentry entry(bufferEntry[i], longDirs, clusterIndexes);
+          dentries.push_back(entry);
+
+          longDirs.clear();
+          clusterIndexes.clear();
+          foundDir = false;
+        }
+      }
+    }
+
+    return dentries;
+  } catch (const std::bad_alloc &) {
     logger::logError("Não foi possível alocar buffer");
     return {};
   }
-  auto *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
-
-  std::vector<LongEntry> longDirs;
-  std::vector<ClusterIndex> clusterIndexes;
-  std::vector<Dentry> dentries;
-
-  std::vector<DWORD> chain = fatTable->listChain(num);
-  for (auto cluster : chain) {
-    if (!readCluster(static_cast<void *>(bufferEntry), cluster)) {
-      logger::logError("Não foi possível alocar cluster");
-      return {};
-    }
-
-    // Caminha por todo o buffer até encontrar o EOD_ENTRY ou alcançar o limite
-    // de tamanho do cluster.
-    bool foundDir = false;
-    for (size_t i = 0; i < (bios->totClusByts() / sizeof(ShortEntry)); i++) {
-      // Final do diretório
-      if (bufferEntry[i].name[0] == EOD_ENTRY) {
-        if (!longDirs.empty()) {
-          logger::logWarning("Nome longo não está continuo");
-          longDirs.clear();
-          clusterIndexes.clear();
-        }
-
-        break;
-      }
-
-      // Diretório vazio
-      if (bufferEntry[i].name[0] == FREE_ENTRY) {
-        continue;
-      }
-
-      if (bufferEntry[i].attr == ATTR_LONG_NAME) {
-        // Se esse é a primeira parte do nome longo salva sua posição
-        if (!foundDir) {
-          foundDir = true;
-          clusterIndexes.push_back({ cluster, static_cast<DWORD>(i), 0 });
-        }
-
-        // Se este for o final deste cluster salva a posição do cluster
-        if (i == (bios->totClusByts() / sizeof(ShortEntry)) - 1) {
-          clusterIndexes.back().endPos = static_cast<DWORD>(i);
-        }
-
-        // Salva o diretório longo na lista
-        LongEntry lentry = {};
-        memcpy(&lentry, &bufferEntry[i], sizeof(lentry));
-        longDirs.push_back(lentry);
-      } else {
-        auto endPos = static_cast<DWORD>(i);
-        if (clusterIndexes.empty()) {
-          clusterIndexes.push_back({ cluster, endPos, endPos });
-        } else {
-          clusterIndexes.back().endPos = endPos;
-        }
-
-        Dentry entry(bufferEntry[i], longDirs, clusterIndexes);
-        dentries.push_back(entry);
-
-        longDirs.clear();
-        clusterIndexes.clear();
-        foundDir = false;
-      }
-    }
-  }
-
-  return dentries;
 }
 
 std::optional<Dentry> ClusterIO::searchEntryByPath(const std::string &path,
@@ -269,12 +418,12 @@ bool ClusterIO::updateEntry(Dentry &entry)
         return false;
       }
     }
+
+    return true;
   } catch (const std::bad_alloc &error) {
     logger::logError("Não foi possível ler buffer");
     return false;
   }
-
-  return true;
 }
 
 bool ClusterIO::removeEntry(Dentry &entry)
@@ -300,4 +449,54 @@ bool ClusterIO::deleteEntry(Dentry &entry)
   // Salva a quantidade de clusters removidos no FSInfo
   DWORD freeClusters = fsInfo->getFreeCount() + static_cast<DWORD>(fatRm);
   return fsInfo->setFreeCount(freeClusters);
+}
+
+bool ClusterIO::createEntry(DWORD num, const std::string &name, EntryType type)
+{
+  ShortEntry sentry;
+  std::vector<LongEntry> lentry;
+
+  switch (type) {
+  case DIRECTORY:
+    if (!generateEntries(num, name, sentry, lentry, ATTR_DIRECTORY)) {
+      logger::logError("Não foi possível criar o diretório");
+      return false;
+    }
+    break;
+  default:
+    if (!generateEntries(num, name, sentry, lentry, ATTR_ARCHIVE)) {
+      logger::logError("Não foi possível criar o arquivo");
+      return false;
+    }
+  }
+
+  try {
+    std::vector<ClusterIndex> indexes;
+    int missingEntries =
+      searchEmptyEntries(num, static_cast<DWORD>(lentry.size() + 1), indexes);
+
+    if (missingEntries == 0) {
+      Dentry dentry(sentry, lentry, indexes);
+      return updateEntry(dentry);
+    }
+
+    if (missingEntries < 0) {
+      if (!allocNewCluster(num)) {
+        logger::logInfo("Criação de entradas falhou");
+        return false;
+      }
+
+      auto chain = fatTable->listChain(num);
+      searchEmptyEntries(chain.back(), -missingEntries, indexes);
+
+      Dentry dentry(sentry, lentry, indexes);
+      return updateEntry(dentry);
+    }
+
+    logger::logError("Algo deu errado durante a busca");
+    return false;
+  } catch (std::runtime_error &error) {
+    logger::logError(error.what());
+    return false;
+  }
 }

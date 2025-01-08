@@ -11,7 +11,6 @@
 #define FAT_FS_HPP
 
 #include "filesystem/cluster/cluster.hpp"
-#include "filesystem/entry/dentry.hpp"
 #include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
 #include "filesystem/structure/bpb.hpp"
@@ -22,11 +21,6 @@
 
 #include <memory>
 #include <string>
-
-/* Definições para os tipos de arquivos */
-#define DIR_ENTRY 1
-#define ARCH_ENTRY 0
-#define ALL_ENTRY -1
 
 class FatFS
 {
@@ -48,32 +42,6 @@ private:
 
   /* Classe para acesso aos clusters */
   std::shared_ptr<ClusterIO> clusterIO;
-
-  /**
-   * @brief Realiza o parser de um caminho
-   *
-   * @param path Caminho a ser dividido e verificado
-   * @param expectDir Diz ao parser  qual o tipo de arquivo sendo buscado.
-   *
-   * @exception Gera um exceção se houver algum problema durante a verificação
-   * do caminho.
-   * @return Um vetor com o caminho devidamente dividido.
-   */
-  std::vector<std::string> parser(const std::string &path, int expectDir);
-
-  /**
-   * @brief Busca a entrada e o cluster do diretório onde essa entrada se
-   * encontra
-   *
-   * @param path Caminho para buscar a entrada
-   * @param expectDir Diz ao parser  qual o tipo de arquivo sendo buscado.
-   *
-   * @exception Gera um exceção se houver algum problema durante a busca da
-   * entrada do caminho.
-   * @return Um par com a entrada e o número do cluster
-   */
-  std::pair<Dentry, DWORD> searchEntry(const std::vector<std::string> &listPath,
-    int expectDir);
 
   /**
    * @brief Insere as entradas no espaço do diretório

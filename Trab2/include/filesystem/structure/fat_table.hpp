@@ -52,16 +52,6 @@ class FatTable
   bool writeFatTable(int num);
 
   /**
-   * @brief Lê uma entrada da tabela FAT em memória
-   *
-   * @param offset Posição a ser lida da tabela
-   * @param value Variável que recebe valor a ser lido da tabela
-   *
-   * @return true se foi possível ler, false caso contrário
-   */
-  [[nodiscard]] DWORD readFromTable(DWORD offset) const;
-
-  /**
    * @brief Escreve em uma das entradas da tabela FAT em memória
    *
    * @param offset Posição a ser escrita na tabela
@@ -70,6 +60,16 @@ class FatTable
    * @return true se foi possível escrever, false caso contrário
    */
   void writeInTable(DWORD num, DWORD value);
+
+  /**
+   * @brief Lê uma entrada da tabela FAT em memória
+   *
+   * @param offset Posição a ser lida da tabela
+   * @param value Variável que recebe valor a ser lido da tabela
+   *
+   * @return true se foi possível ler, false caso contrário
+   */
+  [[nodiscard]] DWORD readFromTable(DWORD offset) const;
 
 public:
   /**

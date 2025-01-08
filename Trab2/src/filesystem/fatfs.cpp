@@ -29,153 +29,6 @@
 // PRIVATE
 //===------------------------------------------------------------------------===
 
-std::vector<std::string> FatFS::parser(const std::string &path, int expectDir)
-{
-  // Lista de nomes nos caminhos
-  std::vector<std::string> listPath = pathName->split(path, '/');
-
-  if (path[0] == '/') {
-    throw std::runtime_error(pathName->merge(listPath) + " caminho inválido");
-  }
-
-  // Se necessário monta o caminho completo
-  if (listPath.empty() || listPath[0] != pathName->getRootDir()) {
-    std::vector<std::string> fullPath =
-      pathName->split(pathName->getCurPath(), '/');
-    fullPath.insert(fullPath.end(), listPath.begin(), listPath.end());
-    listPath = fullPath;
-  }
-
-  // Se o caminho é o root, não há o que verificar
-  if (listPath.size() == 1 && listPath[0] == pathName->getRootDir()) {
-    return listPath;
-  }
-
-  // Caminho que será criado
-  std::vector<std::string> newPath;
-  newPath.emplace_back(pathName->getRootDir());
-
-  // Começa a busca pelo "/"
-  DWORD clt = bios->getRootClus();
-  bool found = false;
-
-  // Lista de entradas
-  std::vector<Dentry> dentries = clusterIO->getListEntries(clt);
-
-  // Caminha pela lista de nomes
-  for (size_t i = 1; i < listPath.size(); i++, found = false) {
-    // Caminha por todas as entradas até encontrar o diretório
-    for (const auto &a : dentries) {
-      if (listPath[i] == a.getLongName()) {
-        if (i == listPath.size() - 1 && expectDir != ALL_ENTRY
-            && expectDir != static_cast<int>(a.isDirectory())) {
-          std::string error = pathName->merge(listPath) + " esperava um ";
-
-          if (DIR_ENTRY) {
-            error += "diretório";
-          } else {
-            error += "arquivo";
-          }
-
-          throw std::runtime_error(error);
-        }
-
-        if ((i != listPath.size() - 1) && !a.isDirectory()) {
-          std::string error = pathName->merge(listPath) + " caminho inválido\n";
-          throw std::runtime_error(error);
-        }
-
-        if (a.getNameType() == DOT_NAME) {
-          found = true;
-          break;
-        }
-
-        if (a.getNameType() == DOTDOT_NAME && newPath.size() == 1) {
-          throw std::runtime_error(
-            pathName->merge(listPath) + " caminho inválido");
-        }
-
-        if (a.getNameType() == DOTDOT_NAME
-            && newPath.back() != pathName->getRootDir()) {
-          newPath.pop_back();
-        } else {
-          newPath.push_back(a.getLongName());
-        }
-
-        // Altera o cluster em que ocorre a busca
-        clt = clusterIO->getEntryClus(a);
-        found = true;
-        break;
-      }
-    }
-
-    // Se não foi encontrado, gera um erro
-    if (!found) {
-      throw std::runtime_error(pathName->merge(listPath) + " caminho inválido");
-    }
-
-    // Atualiza a lista de entradas
-    dentries = clusterIO->getListEntries(clt);
-  }
-
-  return newPath;
-}
-
-std::pair<Dentry, DWORD>
-  FatFS::searchEntry(const std::vector<std::string> &listPath, int expectDir)
-{
-  // Começa a busca pelo "/"
-  DWORD clt = bios->getRootClus();
-  bool found = false;
-
-  // Lista de entradas
-  std::vector<Dentry> dentries = clusterIO->getListEntries(clt);
-
-  // Entrada e cluster a ser retornado
-  std::pair<Dentry, DWORD> entry = { dentries[0], 0 };
-
-  // Caminha pela lista de nomes
-  for (size_t i = 1; i < listPath.size(); i++, found = false) {
-    for (auto &a : dentries) {
-      if (listPath[i] == a.getLongName()) {
-
-        // Última parte do caminho está de acordo com o tipo de arquivo
-        if (i == listPath.size() - 1 && expectDir != ALL_ENTRY
-            && expectDir != static_cast<int>(a.isDirectory())) {
-          std::string error = "Esperava um ";
-          error += a.isDirectory() ? "diretório" : "arquivo";
-          throw std::runtime_error(error);
-        }
-
-        // Se no meio do caminho temos um arquivo gera um erro
-        if ((i != listPath.size() - 1) && !a.isDirectory()) {
-          throw std::runtime_error(
-            pathName->merge(listPath) + " caminho inválido");
-        }
-
-        // Atualiza a entrada
-        entry.first = a;
-        entry.second = clt;
-
-        // Altera o cluster em que ocorre a busca
-        clt = clusterIO->getEntryClus(a);
-        found = true;
-        break;
-      }
-    }
-
-    // Se não foi encontrado gera um erro
-    if (!found) {
-      throw std::runtime_error(pathName->merge(listPath) + " não encontrado");
-    }
-
-    // Atualiza a lista de entradas
-    dentries = clusterIO->getListEntries(clt);
-  }
-
-  return entry;
-}
-
 // TODO: Criação de um diretório deve atualizar suas informações
 bool FatFS::insertDirEntries(DWORD num,
   const ShortEntry &entry,
@@ -634,91 +487,30 @@ bool FatFS::attr(const std::string &path)
 
 bool FatFS::touch(const std::string &path)
 {
-  // Lista de nomes nos caminhos
-  std::vector<std::string> listPath = pathName->split(path, '/');
-  if (listPath.size() == 1 && listPath[0] == pathName->getRootDir()) {
-    logger::logError("operação inválida");
-    return false;
-  }
-
-  // Salva o nome do arquivo a ser criado
-  std::string filename = listPath.back();
-  listPath.pop_back();
-
-  if (filename.size() > FILENAME_MAX) {
-    logger::logError("nome muito longo");
-    return false;
-  }
-
+  std::string filename = path;
   try {
-    std::string newPath = pathName->merge(listPath);
-    listPath = parser(newPath, DIR_ENTRY);
+    std::string name = pathName->getLastNameFromPath(filename);
+
+    std::vector<std::string> listPath;
+    auto entry = clusterIO->searchEntryByPath(filename, listPath, DIRECTORY);
+
+    if (!entry.has_value()) {
+      return clusterIO->createEntry(bios->getRootClus(), name, ARCHIVE);
+    }
+
+    if (!clusterIO->createEntry(entry->getDataCluster(), name, ARCHIVE)) {
+      logger::logError("Não foi possível criar entrada");
+      return false;
+    }
+
+    if (!updateParentTimestamp(path)) {
+      logger::logWarning(
+        "Não foi possível atualizar as datas do diretório pai");
+    }
+
+    return true;
   } catch (const std::exception &error) {
     logger::logError(error.what());
     return false;
   }
-
-  // Diretório raiz
-  if (listPath.back() == pathName->getRootDir()) {
-    DWORD cluster = bios->getRootClus();
-
-    std::vector<Dentry> dentries = clusterIO->getListEntries(cluster);
-
-    // Gera a entrada curta
-    ShortEntry entry = createShortEntry(filename, 0, 0, ATTR_ARCHIVE);
-    for (const auto &dtr : dentries) {
-      if (dtr.getLongName() == filename) {
-        logger::logError("Arquivo já existe");
-        return false;
-      }
-
-      while (!std::strncmp(dtr.getShortName(),
-        reinterpret_cast<const char *>(entry.name),
-        NAME_FULL_SIZE)) {
-        randomizeShortname(reinterpret_cast<char *>(entry.name));
-      }
-    }
-
-    // Gera as entradas longas
-    std::vector<LongEntry> lentry = createLongEntries(entry, filename);
-
-    if (!insertDirEntries(cluster, entry, lentry)) {
-      logger::logError("operação falhou");
-    }
-
-    return true;
-  }
-
-  // Busca pela entrada
-  auto [dentry, _] = searchEntry(listPath, DIR_ENTRY);
-
-  // Lista de entradas
-  std::vector<Dentry> dentries =
-    clusterIO->getListEntries(dentry.getDataCluster());
-
-  // Gera a entrada curta
-  ShortEntry entry = createShortEntry(filename, 0, 0, ATTR_ARCHIVE);
-
-  for (const auto &dtr : dentries) {
-    if (dtr.getLongName() == filename) {
-      logger::logError(filename + " arquivo já existe");
-      return false;
-    }
-
-    while (!std::strncmp(dtr.getShortName(),
-      reinterpret_cast<const char *>(entry.name),
-      NAME_FULL_SIZE)) {
-      randomizeShortname(reinterpret_cast<char *>(entry.name));
-    }
-  }
-
-  // Gera as entradas longas
-  std::vector<LongEntry> lentry = createLongEntries(entry, filename);
-
-  if (!insertDirEntries(dentry.getDataCluster(), entry, lentry)) {
-    logger::logError("operação falhou");
-    return false;
-  }
-
-  return true;
 }
