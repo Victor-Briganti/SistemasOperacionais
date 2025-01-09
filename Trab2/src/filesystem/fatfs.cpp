@@ -189,6 +189,11 @@ bool FatFS::copyExternalData(const std::string &from, const std::string &to)
   }
 }
 
+bool FatFS::copyInSystemData(const std::string &from, const std::string &to)
+{
+  return false;
+}
+
 //===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
@@ -575,6 +580,30 @@ bool FatFS::mv(const std::string &from, const std::string &to)
     }
 
     logger::logError("mv não suporta operações entre dois arquivos externos");
+    return false;
+  } catch (const std::exception &error) {
+    logger::logError(error.what());
+    return false;
+  }
+}
+
+bool FatFS::cp(const std::string &from, const std::string &to)
+{
+  try {
+    if (!pathName->isExternalPath(from) && !pathName->isExternalPath(to)) {
+      logger::logInfo("Aqui");
+      return false;
+    }
+
+    if (!pathName->isExternalPath(from) && pathName->isExternalPath(to)) {
+      return copyInternalData(from, to);
+    }
+
+    if (pathName->isExternalPath(from) && !pathName->isExternalPath(to)) {
+      return copyExternalData(from, to);
+    }
+
+    logger::logError("cp não suporta operações entre dois arquivos externos");
     return false;
   } catch (const std::exception &error) {
     logger::logError(error.what());

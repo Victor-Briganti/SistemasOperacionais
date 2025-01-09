@@ -85,6 +85,18 @@ private:
    */
   bool copyExternalData(const std::string &from, const std::string &to);
 
+  /**
+   * @brief Cópia dados de um caminho interno para outro interno
+   *
+   * @param from Caminho do arquivo interno
+   * @param to Caminho para o arquivo interno
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   * @return true se foi possível copiar, false caso contrário
+   */
+  bool copyInSystemData(const std::string &from, const std::string &to);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo
@@ -191,7 +203,7 @@ public:
   bool rename(const std::string &from, const std::string &to);
 
   /**
-   * @brief Move um arquivo de um lado a outro
+   * @brief Move um arquivo de um caminho a outro
    *
    * @param from Caminho do arquivo original
    * @param to Caminho do destino
@@ -199,6 +211,16 @@ public:
    * @return true se foi possível mover, false caso contrário
    */
   bool mv(const std::string &from, const std::string &to);
+
+  /**
+   * @brief Copia um arquivo de um caminho a outro
+   *
+   * @param from Caminho do arquivo original
+   * @param to Caminho do destino
+   *
+   * @return true se foi possível copiar, false caso contrário
+   */
+  bool cp(const std::string &from, const std::string &to);
 };
 
 #endif// FAT_FS_HPP
