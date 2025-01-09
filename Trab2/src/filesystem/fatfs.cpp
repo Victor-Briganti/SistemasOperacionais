@@ -120,6 +120,8 @@ bool FatFS::copyExternalData(const std::string &from, const std::string &to)
       return false;
     }
 
+    // Soma-se 2 na verificação para garantir que vá haver espaço ao alocar a
+    // entrada
     if (fileSize > MAX_FILE_SZ
         || (fileSize + 2) > fatTable->maxFreeClusByts()) {
       logger::logError("Arquivo é maior do que o suportado pelo sistema");
@@ -191,7 +193,83 @@ bool FatFS::copyExternalData(const std::string &from, const std::string &to)
 
 bool FatFS::copyInSystemData(const std::string &from, const std::string &to)
 {
-  return false;
+  std::vector<std::string> listPath;
+  try {
+    auto fromDentry = clusterIO->searchEntryByPath(from, listPath, ARCHIVE);
+
+    // Diretório raiz
+    if (!fromDentry.has_value()) {
+      logger::logError("Operação não permitida");
+      return false;
+    }
+
+    if ((fromDentry->getFileSize() + 2) > fatTable->maxFreeClusByts()) {
+      logger::logError("Não há espaço no sistema");
+      return false;
+    }
+
+    if (!touch(to)) {
+      return false;
+    }
+
+    auto toDentry = clusterIO->searchEntryByPath(to, listPath, ARCHIVE);
+    if (!toDentry.has_value()) {
+      return false;
+    }
+
+    // Aloca todos os clusters necessários
+    DWORD cluster = 0;
+    for (size_t i = 0; i * bios->totClusByts() < fromDentry->getFileSize();
+         i++) {
+      if (!clusterIO->allocNewCluster(cluster)) {
+        return false;
+      }
+
+      if (i == 0) {
+        toDentry->setDataCluster(cluster);
+      }
+    }
+
+    toDentry->setFileSize(static_cast<DWORD>(fromDentry->getFileSize()));
+    if (!clusterIO->updateEntry(toDentry.value())) {
+      logger::logError("Não foi possível atualizar entrada");
+      return false;
+    }
+
+    // Cadeia de clusters e buffer para leitura
+    auto toChain = fatTable->listChain(toDentry->getDataCluster());
+    auto fromChain = fatTable->listChain(fromDentry->getDataCluster());
+    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+
+    // Posição no arquivo de escrita
+    DWORD fileSize = fromDentry->getFileSize();
+
+    for (size_t i = 0; i < toChain.size(); i++) {
+      size_t size = 0;
+      if (fileSize < bios->totClusByts()) {
+        size = fileSize;
+      } else {
+        size = bios->totClusByts();
+      }
+
+      if (!clusterIO->readCluster(buffer.get(), fromChain[i])) {
+        logger::logError("Não foi possível ler arquivo");
+        return false;
+      }
+
+      if (!clusterIO->writeCluster(buffer.get(), toChain[i])) {
+        logger::logError("Não foi possível escrever no cluster");
+        return false;
+      }
+
+      fileSize -= bios->totClusByts();
+    }
+
+    return true;
+  } catch (std::runtime_error &error) {
+    logger::logError(error.what());
+    return false;
+  }
 }
 
 //===------------------------------------------------------------------------===
@@ -591,8 +669,7 @@ bool FatFS::cp(const std::string &from, const std::string &to)
 {
   try {
     if (!pathName->isExternalPath(from) && !pathName->isExternalPath(to)) {
-      logger::logInfo("Aqui");
-      return false;
+      return copyInSystemData(from, to);
     }
 
     if (!pathName->isExternalPath(from) && pathName->isExternalPath(to)) {
