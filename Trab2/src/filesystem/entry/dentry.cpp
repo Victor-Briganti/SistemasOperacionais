@@ -141,3 +141,5 @@ void Dentry::setDataCluster(DWORD cluster)
   entry.fstClusHI = highCluster(cluster);
   entry.fstClusLO = lowCluster(cluster);
 }
+
+void Dentry::setFileSize(DWORD fileSize) { entry.fileSize = fileSize; }

@@ -366,3 +366,50 @@ bool FatFS::mkdir(const std::string &path)
     return false;
   }
 }
+
+bool FatFS::rename(const std::string &from, const std::string &to)
+{
+  std::vector<std::string> listPath;
+  try {
+    auto oldEntry = clusterIO->searchEntryByPath(from, listPath, ARCHIVE);
+    listPath.pop_back();
+
+    // Diretório raiz
+    if (!oldEntry.has_value()) {
+      logger::logError("rename espera um arquivo");
+      return false;
+    }
+
+    // Salva os valores antigos do diretório antes de excluir
+    DWORD oldDataCluster = oldEntry->getDataCluster();
+    DWORD oldFileSize = oldEntry->getFileSize();
+
+    if (!clusterIO->removeEntry(oldEntry.value())) {
+      logger::logError("rename " + from + " " + to + " operação falhou");
+      return false;
+    }
+
+    if (!pathName->isRootDir(listPath) && !listPath.empty()
+        && !updateParentTimestamp(from)) {
+      logger::logWarning(
+        "Não foi possível atualizar as datas do diretório pai");
+    }
+
+    if (!touch(to)) {
+      return false;
+    }
+
+    auto newEntry = clusterIO->searchEntryByPath(to, listPath, ARCHIVE);
+    if (!newEntry.has_value()) {
+      logger::logError("rename não pode ser concluído");
+      return false;
+    }
+
+    newEntry->setDataCluster(oldDataCluster);
+    newEntry->setFileSize(oldFileSize);
+    return clusterIO->updateEntry(newEntry.value());
+  } catch (const std::exception &error) {
+    logger::logError(error.what());
+    return false;
+  }
+}

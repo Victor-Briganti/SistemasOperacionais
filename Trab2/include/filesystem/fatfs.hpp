@@ -155,6 +155,16 @@ public:
    * @return true se foi possível criar diretório, false caso contrário
    */
   bool mkdir(const std::string &path);
+
+  /**
+   * @brief Renomeia um arquivo
+   *
+   * @param from Caminho do arquivo original
+   * @param to Caminho do destino
+   *
+   * @return true se foi possível renomear, false caso contrário
+   */
+  bool rename(const std::string &from, const std::string &to);
 };
 
 #endif// FAT_FS_HPP

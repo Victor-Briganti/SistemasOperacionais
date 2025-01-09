@@ -114,6 +114,13 @@ public:
   void setDataCluster(DWORD cluster);
 
   /**
+   * @brief Defini o tamanho do arquivo
+   *
+   * @param size Tamanho dessa entrada dentro do sistema
+   */
+  void setFileSize(DWORD fileSize);
+
+  /**
    * @brief Cluster onde está entrada está armazenada
    *
    * @return retorna o cluster referente ao cluster que armazena está entrada
