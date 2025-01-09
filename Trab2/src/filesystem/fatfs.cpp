@@ -12,6 +12,7 @@
 #include "filesystem/entry/dentry.hpp"
 #include "filesystem/structure/bpb.hpp"
 #include "filesystem/structure/fsinfo.hpp"
+#include "io/fs_adapter.hpp"
 #include "path/pathname.hpp"
 #include "utils/logger.hpp"
 
@@ -53,6 +54,58 @@ bool FatFS::updateParentTimestamp(std::string path)
 
   entry->updatedWrtTimestamp();
   return clusterIO->updateEntry(entry.value());
+}
+
+bool FatFS::copyInternalData(const std::string &from, const std::string &to)
+{
+  std::vector<std::string> listPath;
+  try {
+    auto dentry = clusterIO->searchEntryByPath(from, listPath, ARCHIVE);
+
+    // Diretório raiz
+    if (!dentry.has_value()) {
+      logger::logError("Operação não permitida");
+      return false;
+    }
+
+    // Arquivo que vai ser escrito
+    FileSystemAdapter fsAdapter(to, WRITE);
+
+    // Tamanho e posição do arquivo
+    DWORD fileSize = dentry->getFileSize();
+    DWORD offset = 0;
+
+    // Cadeia de clusters e buffer para leitura
+    auto chain = fatTable->listChain(dentry->getDataCluster());
+    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+
+    for (auto &clt : chain) {
+      if (!clusterIO->readCluster(buffer.get(), clt)) {
+        logger::logError("Não foi possível ler cluster");
+        return false;
+      }
+
+      if (fileSize < bios->totClusByts()) {
+        if (!fsAdapter.write(offset, buffer.get(), fileSize)) {
+          logger::logError("Não foi possível escrever no arquivo");
+          return false;
+        }
+      } else {
+        if (!fsAdapter.write(offset, buffer.get(), bios->totClusByts())) {
+          logger::logError("Não foi possível escrever no arquivo");
+          return false;
+        }
+      }
+
+      offset += bios->totClusByts();
+      fileSize -= bios->totClusByts();
+    }
+
+    return true;
+  } catch (const std::runtime_error &error) {
+    logger::logError(error.what());
+    return false;
+  }
 }
 
 //===------------------------------------------------------------------------===
@@ -408,6 +461,30 @@ bool FatFS::rename(const std::string &from, const std::string &to)
     newEntry->setDataCluster(oldDataCluster);
     newEntry->setFileSize(oldFileSize);
     return clusterIO->updateEntry(newEntry.value());
+  } catch (const std::exception &error) {
+    logger::logError(error.what());
+    return false;
+  }
+}
+
+bool FatFS::mv(const std::string &from, const std::string &to)
+{
+  try {
+    if (!pathName->isExternalPath(from) && !pathName->isExternalPath(to)) {
+      return rename(from, to);
+    }
+
+    if (!pathName->isExternalPath(from) && pathName->isExternalPath(to)) {
+      return copyInternalData(from, to);
+    }
+
+    if (pathName->isExternalPath(from) && !pathName->isExternalPath(to)) {
+      logger::logInfo("De lá pra cá");
+      return false;
+    }
+
+    logger::logError("mv não suporta operações entre dois arquivos externos");
+    return false;
   } catch (const std::exception &error) {
     logger::logError(error.what());
     return false;

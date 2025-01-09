@@ -61,6 +61,18 @@ private:
    */
   bool updateParentTimestamp(std::string path);
 
+  /**
+   * @brief Cópia dados internos para uma localização externa
+   *
+   * @param from Caminho do arquivo interno
+   * @param to Caminho para o arquivo externo
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   * @return true se foi possível copiar, false caso contrário
+   */
+  bool copyInternalData(const std::string &from, const std::string &to);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo
@@ -165,6 +177,16 @@ public:
    * @return true se foi possível renomear, false caso contrário
    */
   bool rename(const std::string &from, const std::string &to);
+
+  /**
+   * @brief Move um arquivo de um lado a outro
+   *
+   * @param from Caminho do arquivo original
+   * @param to Caminho do destino
+   *
+   * @return true se foi possível mover, false caso contrário
+   */
+  bool mv(const std::string &from, const std::string &to);
 };
 
 #endif// FAT_FS_HPP

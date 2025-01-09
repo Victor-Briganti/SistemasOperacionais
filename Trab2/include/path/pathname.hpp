@@ -19,6 +19,9 @@ class PathName
   /* Define o diretório raiz do sistema */
   const std::string ROOT_DIR = "img/";
 
+  /* Define o diretório raiz do sistema */
+  const char EXTERNAL_PATH = '/';
+
   /* Define o caminho atual do sistema */
   std::string curPath;
 
@@ -88,6 +91,15 @@ public:
    * @return O último nome dentro do caminho
    */
   std::string getLastNameFromPath(std::string &path);
+
+  /**
+   * @brief Verifica se é um caminho externo
+   *
+   * @param path Caminho a ser verificado
+   *
+   * @return true se for um caminho externo, false caso contrário
+   */
+  bool isExternalPath(const std::string &path) const;
 };
 
 #endif// PATH_PARSER_HPP

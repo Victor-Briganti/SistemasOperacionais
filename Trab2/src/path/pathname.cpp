@@ -63,7 +63,7 @@ std::vector<std::string> PathName::generateFullPath(
   // Lista de nomes nos caminhos
   std::vector<std::string> listPath = split(path, '/');
 
-  if (path[0] == '/') {
+  if (path[0] == EXTERNAL_PATH) {
     return {};
   }
 
@@ -99,4 +99,9 @@ std::string PathName::getLastNameFromPath(std::string &path)
   listPath.pop_back();
   path = merge(listPath);
   return name;
+}
+
+bool PathName::isExternalPath(const std::string &path) const
+{
+  return path[0] == EXTERNAL_PATH;
 }

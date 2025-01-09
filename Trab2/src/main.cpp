@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     std::string path1(argv[2]);
     std::string path2(argv[3]);
     FatFS fat(image);
-    fat.rename(path1, path2);
+    fat.mv(path1, path2);
   } catch (const std::exception &error) {
     logger::logError(error.what());
   }
