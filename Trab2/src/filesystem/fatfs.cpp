@@ -556,11 +556,22 @@ bool FatFS::mv(const std::string &from, const std::string &to)
     }
 
     if (!pathName->isExternalPath(from) && pathName->isExternalPath(to)) {
-      return copyInternalData(from, to);
+      if (!copyInternalData(from, to)) {
+        logger::logError("mv operação falhou");
+        return false;
+      }
+
+      return rm(from);
     }
 
     if (pathName->isExternalPath(from) && !pathName->isExternalPath(to)) {
-      return copyExternalData(from, to);
+      if (!copyExternalData(from, to)) {
+        logger::logError("mv operação falhou");
+        return false;
+      }
+
+      FileSystemAdapter adapter(from, READ);
+      return adapter.remove();
     }
 
     logger::logError("mv não suporta operações entre dois arquivos externos");
