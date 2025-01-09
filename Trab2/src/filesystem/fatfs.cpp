@@ -108,6 +108,87 @@ bool FatFS::copyInternalData(const std::string &from, const std::string &to)
   }
 }
 
+bool FatFS::copyExternalData(const std::string &from, const std::string &to)
+{
+  std::vector<std::string> listPath;
+  try {
+    // Arquivo que vai ser escrito
+    FileSystemAdapter fsAdapter(from, READ);
+
+    size_t fileSize = 0;
+    if (!fsAdapter.getFileSize(fileSize)) {
+      return false;
+    }
+
+    if (fileSize > MAX_FILE_SZ
+        || (fileSize + 2) > fatTable->maxFreeClusByts()) {
+      logger::logError("Arquivo é maior do que o suportado pelo sistema");
+      return false;
+    }
+
+    if (!touch(to)) {
+      return false;
+    }
+
+    auto dentry = clusterIO->searchEntryByPath(to, listPath, ARCHIVE);
+    if (!dentry.has_value()) {
+      return false;
+    }
+
+    // Aloca todos os clusters necessários
+    DWORD cluster = 0;
+    for (size_t i = 0; i * bios->totClusByts() < fileSize; i++) {
+      if (!clusterIO->allocNewCluster(cluster)) {
+        return false;
+      }
+
+      if (i == 0) {
+        dentry->setDataCluster(cluster);
+      }
+    }
+
+    dentry->setFileSize(static_cast<DWORD>(fileSize));
+    if (!clusterIO->updateEntry(dentry.value())) {
+      logger::logError("Não foi possível atualizar entrada");
+      return false;
+    }
+
+    // Posição no arquivo de escrita
+    DWORD offset = 0;
+
+    // Cadeia de clusters e buffer para leitura
+    auto chain = fatTable->listChain(dentry->getDataCluster());
+    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+
+    for (auto &clt : chain) {
+      size_t size = 0;
+      if (fileSize < bios->totClusByts()) {
+        size = fileSize;
+      } else {
+        size = bios->totClusByts();
+      }
+
+      if (!fsAdapter.read(offset, buffer.get(), size)) {
+        logger::logError("Não foi possível ler arquivo");
+        return false;
+      }
+
+      if (!clusterIO->writeCluster(buffer.get(), clt)) {
+        logger::logError("Não foi possível escrever no cluster");
+        return false;
+      }
+
+      offset += bios->totClusByts();
+      fileSize -= bios->totClusByts();
+    }
+
+    return true;
+  } catch (std::runtime_error &error) {
+    logger::logError(error.what());
+    return false;
+  }
+}
+
 //===------------------------------------------------------------------------===
 // PUBLIC
 //===------------------------------------------------------------------------===
@@ -479,8 +560,7 @@ bool FatFS::mv(const std::string &from, const std::string &to)
     }
 
     if (pathName->isExternalPath(from) && !pathName->isExternalPath(to)) {
-      logger::logInfo("De lá pra cá");
-      return false;
+      return copyExternalData(from, to);
     }
 
     logger::logError("mv não suporta operações entre dois arquivos externos");

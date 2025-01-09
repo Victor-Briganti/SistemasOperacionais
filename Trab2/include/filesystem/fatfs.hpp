@@ -73,6 +73,18 @@ private:
    */
   bool copyInternalData(const std::string &from, const std::string &to);
 
+  /**
+   * @brief Cópia dados externos para uma localização interna
+   *
+   * @param from Caminho do arquivo externo
+   * @param to Caminho para o arquivo interno
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   * @return true se foi possível copiar, false caso contrário
+   */
+  bool copyExternalData(const std::string &from, const std::string &to);
+
 public:
   /**
    * @brief Inicia a estrutura do sistema de arquivo

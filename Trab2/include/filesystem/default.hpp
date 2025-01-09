@@ -110,4 +110,11 @@ constexpr int NUM_TAIL_POS = 6;
     && 0x3E != (c) && 0x3F != (c) && 0x5B != (c) && 0x5C != (c) && 0x5D != (c) \
     && 0x7C && ((c) > 0x20 || (c) == 0x05))
 
+//===-----------------------------------------------------------------------===
+// DEFINIÇÕES PADRÕES
+//===-----------------------------------------------------------------------===
+
+/* Define o tamanho máximo que um arquivo pode ter */
+#define MAX_FILE_SZ 4294967296 /* 4 GB */
+
 #endif// DEFAULT_HPP

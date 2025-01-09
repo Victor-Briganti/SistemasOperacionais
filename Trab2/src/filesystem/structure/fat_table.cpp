@@ -228,3 +228,8 @@ bool FatTable::allocClusters(DWORD tail, const std::vector<DWORD> &clusters)
 
   return true;
 }
+
+size_t FatTable::maxFreeClusByts()
+{
+  return freeClusters() * bios->totClusByts();
+}

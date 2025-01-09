@@ -131,52 +131,6 @@ int ClusterIO::searchEmptyEntries(DWORD cluster,
   return -static_cast<int>(numEntries);
 }
 
-bool ClusterIO::allocNewCluster(DWORD cluster)
-{
-  DWORD freeCluster = fsInfo->getNextFree();
-  if (!fatTable->searchFreeEntry(freeCluster)) {
-    logger::logError("Não há entradas livres");
-    return false;
-  }
-
-  if (cluster == 0) {
-    if (!fatTable->allocClusters(freeCluster, { freeCluster })) {
-      logger::logError("Não foi possível alocar clusters");
-      return false;
-    }
-  } else {
-    auto chain = fatTable->listChain(cluster);
-    if (!fatTable->allocClusters(chain.back(), { freeCluster })) {
-      logger::logError("Não foi possível alocar clusters");
-      return false;
-    }
-  }
-
-  try {
-    // Aloca buffer do novo diretório
-    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
-
-
-    // Lê o cluster no qual o diretório se encontra
-    if (!readCluster(buffer.get(), freeCluster)) {
-      logger::logError("Não foi possível ler cluster");
-      return false;
-    }
-
-    // Zera a entrada para não haver problemas
-    memset(buffer.get(), 0, bios->totClusByts());
-
-    // Atualiza a estrutura do fsInfo
-    fsInfo->setFreeCount(fatTable->freeClusters());
-    fsInfo->setNextFree(freeCluster);
-
-    return writeCluster(buffer.get(), freeCluster);
-  } catch (std::bad_alloc &error) {
-    logger::logError("Não foi possível alocar buffer");
-    return false;
-  }
-}
-
 bool ClusterIO::insertDotEntries(DWORD parentClt, Dentry &dentry)
 {
   // Entradas vazias usadas para criação
@@ -592,5 +546,50 @@ bool ClusterIO::createEntry(DWORD num, const std::string &name, EntryType type)
     return createDirectoryEntry(num, name);
   default:
     return createArchiveEntry(num, name);
+  }
+}
+bool ClusterIO::allocNewCluster(DWORD &cluster)
+{
+  DWORD freeCluster = fsInfo->getNextFree();
+  if (!fatTable->searchFreeEntry(freeCluster)) {
+    logger::logError("Não há entradas livres");
+    return false;
+  }
+
+  if (cluster == 0) {
+    if (!fatTable->allocClusters(freeCluster, { freeCluster })) {
+      logger::logError("Não foi possível alocar clusters");
+      return false;
+    }
+  } else {
+    auto chain = fatTable->listChain(cluster);
+    if (!fatTable->allocClusters(chain.back(), { freeCluster })) {
+      logger::logError("Não foi possível alocar clusters");
+      return false;
+    }
+  }
+
+  try {
+    // Aloca buffer do novo diretório
+    auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
+
+    // Lê o cluster no qual o diretório se encontra
+    if (!readCluster(buffer.get(), freeCluster)) {
+      logger::logError("Não foi possível ler cluster");
+      return false;
+    }
+
+    // Zera a entrada para não haver problemas
+    memset(buffer.get(), 0, bios->totClusByts());
+
+    // Atualiza a estrutura do fsInfo
+    fsInfo->setFreeCount(fatTable->freeClusters());
+    fsInfo->setNextFree(freeCluster);
+    cluster = freeCluster;
+
+    return writeCluster(buffer.get(), freeCluster);
+  } catch (std::bad_alloc &error) {
+    logger::logError("Não foi possível alocar buffer");
+    return false;
   }
 }

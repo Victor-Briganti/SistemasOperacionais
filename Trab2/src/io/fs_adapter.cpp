@@ -12,16 +12,19 @@
 #include "utils/types.hpp"
 
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
+namespace fs = std::filesystem;
+
 //===----------------------------------------------------------------------===//
 // PRIVATE
 //===----------------------------------------------------------------------===//
 
-bool FileSystemAdapter::clean(const std::string &path)
+bool FileSystemAdapter::clean(const std::string &path) const
 {
   std::fstream cleanFile(path, std::ios::out);
   if (!cleanFile.is_open()) {
@@ -34,17 +37,9 @@ bool FileSystemAdapter::clean(const std::string &path)
   return true;
 }
 
-bool FileSystemAdapter::open(const std::string &path, FileOption option)
+bool FileSystemAdapter::open(const std::string &path)
 {
-  std::ios_base::openmode mode;
-
-  if (option == WRITE) {
-    mode = std::ios::in | std::ios::binary | std::ios::app;
-  } else {
-    mode = std::ios::out | std::ios::binary;
-  }
-
-  file.open(path, mode);
+  file.open(path, std::ios::out | std::ios::in | std::ios::binary);
   if (!file.is_open()) {
     logger::logError("Não foi possível abrir arquivo " + path);
     return false;
@@ -68,11 +63,11 @@ FileSystemAdapter::FileSystemAdapter(const std::string &path, FileOption option)
   isDeleted = false;
 
   if (fileOption == WRITE) {
-    if (!clean(path) || !open(path, fileOption)) {
+    if (!clean(path) || !open(path)) {
       throw std::runtime_error("Erro durante construtor do arquivo " + path);
     }
   } else {
-    if (!open(path, fileOption)) {
+    if (!open(path)) {
       throw std::runtime_error("Erro durante construtor do arquivo " + path);
     }
   }
@@ -180,4 +175,16 @@ bool FileSystemAdapter::remove()
   isDeleted = true;
 
   return true;
+}
+
+bool FileSystemAdapter::getFileSize(size_t &fileSize)
+{
+  try {
+    auto size = fs::file_size(filePath);
+    fileSize = static_cast<DWORD>(size);
+    return true;
+  } catch (fs::filesystem_error &e) {
+    logger::logError(e.what());
+    return false;
+  }
 }

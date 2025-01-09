@@ -45,7 +45,7 @@ class FileSystemAdapter
    *
    * @return true se foi possível limpar o arquivo, false caso contrário
    */
-  bool clean(const std::string &path);
+  bool clean(const std::string &path) const;
 
   /**
    * @brief Abre o arquivo conforme a opção passada
@@ -54,7 +54,7 @@ class FileSystemAdapter
    *
    * @return true se foi possível abrir o arquivo, false caso contrário
    */
-  bool open(const std::string &path, FileOption option);
+  bool open(const std::string &path);
 
 public:
   /**
@@ -100,6 +100,15 @@ public:
    * @return true se foi possível remover, false caso contrário
    */
   bool remove();
+
+  /**
+   * @brief Retorna o tamanho do arquivo
+   *
+   * @param fileSize Referência que recebe o tamanho do arquivo
+   *
+   * @return true se foi possível ler o tamanho do arquivo, false caso contrário
+   */
+  bool getFileSize(size_t &fileSize);
 };
 
 #endif// FILESYSTEM_ADAPTER_HPP

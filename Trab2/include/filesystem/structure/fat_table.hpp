@@ -152,6 +152,11 @@ public:
    * @return true se foi possível escrever na tabela, false caso contrário
    */
   bool allocClusters(DWORD tail, const std::vector<DWORD> &clusters);
+
+  /**
+   * @brief Tamanho máximo em bytes dos clusters livres
+   */
+  size_t maxFreeClusByts();
 };
 
 #endif// FAT_TABLE_HPP

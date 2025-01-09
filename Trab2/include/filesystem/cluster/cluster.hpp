@@ -74,18 +74,6 @@ class ClusterIO
     std::vector<ClusterIndex> &clusterIndexes);
 
   /**
-   * @brief Aloca um novo cluster
-   *
-   * @param cluster Número do cluster que será estendido. Se o valor for 0, uma
-   * nova cadeia será criada
-   *
-   * @exception Gera um exceção se houver algum problema durante a busca do
-   * cluster.
-   * @return true se foi possível alocar o cluster, false caso contrário.
-   */
-  bool allocNewCluster(DWORD cluster);
-
-  /**
    * @brief Inicializa e insere as entradas DOT e DOTDOT nod diretório criado
    *
    * @param parentClt Número do cluster onde a entrada será criada
@@ -144,6 +132,18 @@ public:
    * @return true se foi possível escrever, false caso contrário
    */
   bool writeCluster(const void *buffer, DWORD num);
+
+  /**
+   * @brief Aloca um novo cluster
+   *
+   * @param cluster Número do cluster que será estendido. Se o valor for 0, uma
+   * nova cadeia será criada
+   *
+   * @exception Gera um exceção se houver algum problema durante a busca do
+   * cluster.
+   * @return true se foi possível alocar o cluster, false caso contrário.
+   */
+  bool allocNewCluster(DWORD &cluster);
 
   /**
    * @brief Retorna o cluster da entrada corrente
