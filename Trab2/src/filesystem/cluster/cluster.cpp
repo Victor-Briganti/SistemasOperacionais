@@ -83,10 +83,12 @@ int ClusterIO::searchEmptyEntries(DWORD cluster,
           index.clusterNum = clt;
           index.initPos = static_cast<DWORD>(i);
         }
+
         emptyEntries++;
 
         // Tamanho já encontrado
         if (index.clusterNum != 0 && emptyEntries == numEntries) {
+          index.endPos = static_cast<DWORD>(i);
           clusterIndexes.push_back(index);
           return 0;
         }
