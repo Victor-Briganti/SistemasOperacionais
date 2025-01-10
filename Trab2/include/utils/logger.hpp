@@ -64,6 +64,15 @@ void logInfo(const char *info);
  * @return Valor transformado em hexadeciaml
  */
 std::string to_hex(uint64_t value);
+
+/**
+ * @brief Transforma uma string em verde
+ *
+ * @param str String que vai ser transformada em verde
+ *
+ * @return Valor string passada para a cor verde
+ */
+std::string to_green(std::string str);
 }// namespace logger
 
 #endif// LOGGER_HPP

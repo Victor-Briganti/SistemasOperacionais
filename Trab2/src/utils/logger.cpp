@@ -49,3 +49,8 @@ std::string logger::to_hex(uint64_t value)
   ss << std::hex << std::uppercase << value;
   return ss.str();
 }
+
+std::string logger::to_green(std::string str)
+{
+  return "\033[32m" + str + "\033[0m";
+}

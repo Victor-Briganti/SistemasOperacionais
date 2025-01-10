@@ -8,6 +8,7 @@
  */
 
 #include "filesystem/fatfs.hpp"
+#include "shell/shell.hpp"
 #include "utils/logger.hpp"
 
 #include <cstring>
@@ -26,10 +27,9 @@ int main(int argc, char **argv)
 
   try {
     std::string image(argv[1]);
-    std::string path1(argv[2]);
-    std::string path2(argv[3]);
-    FatFS fat(image);
-    fat.cp(path1, path2);
+    std::unique_ptr<FatFS> fat = std::make_unique<FatFS>(image);
+    Shell shell(std::move(fat));
+    shell.interpreter();
   } catch (const std::exception &error) {
     logger::logError(error.what());
   }

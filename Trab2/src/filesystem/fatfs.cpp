@@ -20,6 +20,7 @@
 #include <cstring>
 #include <exception>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -343,7 +344,12 @@ bool FatFS::ls(const std::string &path)
   try {
     // Lista de nomes nos caminhos
     std::vector<std::string> listPath;
-    auto entry = clusterIO->searchEntryByPath(path, listPath, DIRECTORY);
+    std::optional<Dentry> entry;
+    if (path == "") {
+      entry = clusterIO->searchEntryByPath(pwd(), listPath, DIRECTORY);
+    } else {
+      entry = clusterIO->searchEntryByPath(path, listPath, DIRECTORY);
+    }
 
     if (!entry.has_value()) {
       listClusterDir(bios->getRootClus());
@@ -427,10 +433,7 @@ bool FatFS::rmdir(const std::string &path)
   }
 }
 
-void FatFS::pwd()
-{
-  std::fprintf(stdout, "%s\n", pathName->getCurPath().c_str());
-}
+std::string FatFS::pwd() { return pathName->getCurPath().c_str(); }
 
 bool FatFS::cd(const std::string &path)
 {

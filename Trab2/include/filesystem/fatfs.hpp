@@ -154,7 +154,7 @@ public:
   /**
    * @brief Retorna o caminho atual do sistema
    */
-  void pwd();
+  std::string pwd();
 
   /**
    * @brief Altera o caminho atual
