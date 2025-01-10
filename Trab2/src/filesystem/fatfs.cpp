@@ -181,6 +181,7 @@ bool FatFS::copyExternalData(const std::string &from, const std::string &to)
         return false;
       }
 
+      memset(buffer.get(), 0, bios->totClusByts());
       offset += bios->totClusByts();
       fileSize -= bios->totClusByts();
     }
@@ -263,6 +264,7 @@ bool FatFS::copyInSystemData(const std::string &from, const std::string &to)
         return false;
       }
 
+      memset(buffer.get(), 0, bios->totClusByts());
       fileSize -= bios->totClusByts();
     }
 
@@ -334,6 +336,9 @@ bool FatFS::cluster(DWORD num)
   char *bufferChar = reinterpret_cast<char *>(buffer.get());
   for (size_t i = 0; i < bios->totClusByts() * sizeof(char); i++) {
     std::fprintf(stdout, "%c", bufferChar[i]);
+    if (i == bios->totClusByts() * sizeof(char) - 1 && bufferChar[i] != '\n') {
+      std::fprintf(stdout, "\n");
+    } 
   }
 
   return true;
