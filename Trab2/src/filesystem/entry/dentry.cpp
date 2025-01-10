@@ -98,7 +98,7 @@ void Dentry::printInfo() const
   // Informações sobre tipo e permissão da entrada
   std::fprintf(stdout, "%-2c ", isDirectory() ? 'd' : 'f');
   std::fprintf(stdout, "%-2c ", isReadOnly() ? 'r' : '-');
-  std::fprintf(stdout, "%-2c ", isHidden() ? '-' : 'H');
+  std::fprintf(stdout, "%-2c ", isHidden() ? 'H' : '-');
 
   // Informações sobre do cluster e tamanho
   std::fprintf(stdout, "cluster=%-4d  ", getDataCluster());

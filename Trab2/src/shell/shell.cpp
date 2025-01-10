@@ -99,6 +99,10 @@ void Shell::exec(FSApi cmd, std::vector<std::string> params)
     std::cout << fatFS->pwd() << "\n";
     return;
   case CLUSTER: {
+    if (params.size() < 2) {
+      logger::logError("rm número inválido de parâmetros");
+      return;
+    }
     DWORD num = static_cast<DWORD>(std::atoi(params[1].c_str()));
     fatFS->cluster(num);
     return;
