@@ -58,8 +58,9 @@ private:
    *
    * @exception Gera um exceção se houver algum problema durante a busca do
    * cluster.
+   * @return 0 se foi possível atualizar, 1 se foi tentado atualizar o pai e -1 caso tenha algum erro.
    */
-  bool updateParentTimestamp(std::string path);
+  int updateParentTimestamp(std::string path);
 
   /**
    * @brief Cópia dados internos para uma localização externa

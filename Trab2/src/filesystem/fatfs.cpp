@@ -41,7 +41,7 @@ void FatFS::listClusterDir(DWORD num)
 }
 
 // TODO: Verificar se é necessário atualizar o DOT e o DOTDOT
-bool FatFS::updateParentTimestamp(std::string path)
+int FatFS::updateParentTimestamp(std::string path)
 {
   std::string _ = pathName->getLastNameFromPath(path);
 
@@ -49,12 +49,15 @@ bool FatFS::updateParentTimestamp(std::string path)
   std::vector<std::string> listPath;
   auto entry = clusterIO->searchEntryByPath(path, listPath, DIRECTORY);
   if (!entry.has_value()) {
-    logger::logError("Tentando atualizar o diretório raiz");
-    return false;
+    return 1;
   }
 
   entry->updatedWrtTimestamp();
-  return clusterIO->updateEntry(entry.value());
+  if (clusterIO->updateEntry(entry.value())) {
+    return 0;
+  }
+
+  return -1;
 }
 
 bool FatFS::copyInternalData(const std::string &from, const std::string &to)
@@ -387,7 +390,7 @@ bool FatFS::rm(const std::string &path)
       return false;
     }
 
-    if (!updateParentTimestamp(path)) {
+    if (updateParentTimestamp(path) < 0) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
     }
@@ -412,6 +415,11 @@ bool FatFS::rmdir(const std::string &path)
       return false;
     }
 
+    if (pathName->merge(listPath) == pwd()) {
+      logger::logError("Diretório atual não pode ser excluido");
+      return false;
+    }
+
     // Verifica se o diretório está vazio
     std::vector<Dentry> dentries =
       clusterIO->getListEntries(entry->getDataCluster());
@@ -426,7 +434,7 @@ bool FatFS::rmdir(const std::string &path)
       return false;
     }
 
-    if (!updateParentTimestamp(path)) {
+    if (updateParentTimestamp(path) < 0) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
     }
@@ -550,7 +558,7 @@ bool FatFS::touch(const std::string &path)
       return false;
     }
 
-    if (!updateParentTimestamp(path)) {
+    if (updateParentTimestamp(path) < 0) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
     }
@@ -580,7 +588,7 @@ bool FatFS::mkdir(const std::string &path)
       return false;
     }
 
-    if (!updateParentTimestamp(path)) {
+    if (updateParentTimestamp(path) < 0) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
     }
@@ -615,7 +623,7 @@ bool FatFS::rename(const std::string &from, const std::string &to)
     }
 
     if (!pathName->isRootDir(listPath) && !listPath.empty()
-        && !updateParentTimestamp(from)) {
+        && (updateParentTimestamp(from) < 0)) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
     }

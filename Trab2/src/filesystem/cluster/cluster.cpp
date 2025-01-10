@@ -174,18 +174,19 @@ bool ClusterIO::createDirectoryEntry(DWORD num, const std::string &name)
     if (missingEntries == 0) {
       Dentry dentry(sentry, lentry, indexes);
 
-      DWORD cluster = 0;
-      if (!fatTable->searchFreeEntry(cluster)) {
+      DWORD savedCluster = 0;
+      if (!fatTable->searchFreeEntry(savedCluster)) {
         logger::logInfo("Não há clusters suficientes");
         return false;
       }
 
+      DWORD cluster = 0;
       if (!allocNewCluster(cluster)) {
         logger::logInfo("Não foi possível criar diretório");
         return false;
       }
 
-      dentry.setDataCluster(cluster);
+      dentry.setDataCluster(savedCluster);
       return updateEntry(dentry) && insertDotEntries(num, dentry);
     }
 
@@ -198,7 +199,7 @@ bool ClusterIO::createDirectoryEntry(DWORD num, const std::string &name)
 
       // Não alterar a ordem de alocação em hipotese alguma
       if (!allocNewCluster(clusterDir) || !allocNewCluster(num)) {
-        logger::logInfo("Não foi possível criar diretório");
+        logger::logError("Não foi possível criar diretório");
         return false;
       }
 
@@ -548,6 +549,7 @@ bool ClusterIO::createEntry(DWORD num, const std::string &name, EntryType type)
     return createArchiveEntry(num, name);
   }
 }
+
 bool ClusterIO::allocNewCluster(DWORD &cluster)
 {
   DWORD freeCluster = fsInfo->getNextFree();

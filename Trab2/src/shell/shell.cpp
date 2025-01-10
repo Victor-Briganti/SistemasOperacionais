@@ -103,7 +103,8 @@ void Shell::exec(FSApi cmd, std::vector<std::string> params)
       logger::logError("rm número inválido de parâmetros");
       return;
     }
-    DWORD num = static_cast<DWORD>(std::atoi(params[1].c_str()));
+    
+    auto num = static_cast<DWORD>(std::atoi(params[1].c_str()));
     fatFS->cluster(num);
     return;
   }
