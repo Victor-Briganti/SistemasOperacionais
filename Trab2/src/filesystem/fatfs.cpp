@@ -16,6 +16,7 @@
 #include "path/pathname.hpp"
 #include "utils/logger.hpp"
 
+#include <cctype>
 #include <cstdio>
 #include <cstring>
 #include <exception>
@@ -336,12 +337,19 @@ bool FatFS::cluster(DWORD num)
     return false;
   }
 
+  // Usado para verificar se o último print foi uma nova linha
+  bool wasNewLine = false;
+
   char *bufferChar = reinterpret_cast<char *>(buffer.get());
   for (size_t i = 0; i < bios->totClusByts() * sizeof(char); i++) {
     std::fprintf(stdout, "%c", bufferChar[i]);
-    if (i == bios->totClusByts() * sizeof(char) - 1 && bufferChar[i] != '\n') {
-      std::fprintf(stdout, "\n");
-    } 
+    if (std::isprint(bufferChar[i]) || (bufferChar[i] == '\n')) {
+      wasNewLine = (bufferChar[i] == '\n');
+    }
+  }
+
+  if (!wasNewLine) {
+    std::fprintf(stdout, "\n");
   }
 
   return true;
