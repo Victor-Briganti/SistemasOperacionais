@@ -49,7 +49,7 @@ std::string PathName::merge(const std::vector<std::string> &path) const
 
   for (size_t i = 0; i < path.size(); i++) {
     pathName += path[i];
-    if (i < path.size() - 1 && (i != 0 && path[i] != ROOT_DIR)) {
+    if (i < path.size() - 1 && (path[i] != ROOT_DIR)) {
       pathName += "/";
     }
   }
