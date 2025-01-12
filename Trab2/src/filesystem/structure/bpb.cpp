@@ -65,7 +65,6 @@ int BiosBlock::bpbInit()
   this->firstDataSector =
     bpb.RsvdSecCnt + (bpb.NumFATs * this->fatSz) + this->rootDirSectors;
 
-
   return 0;
 }
 

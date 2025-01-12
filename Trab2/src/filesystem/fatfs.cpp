@@ -16,6 +16,7 @@
 #include "path/pathname.hpp"
 #include "utils/logger.hpp"
 
+#include <climits>
 #include <cctype>
 #include <cstdio>
 #include <cstring>
@@ -549,6 +550,11 @@ bool FatFS::touch(const std::string &path)
   try {
     std::string name = pathName->getLastNameFromPath(filename);
 
+    if (name.size() > NAME_MAX) {
+      logger::logError("Arquivo com nome maior do que o permitido");
+      return false;
+    }
+
     std::vector<std::string> listPath;
     auto entry = clusterIO->searchEntryByPath(filename, listPath, DIRECTORY);
 
@@ -583,6 +589,11 @@ bool FatFS::mkdir(const std::string &path)
   std::string filename = path;
   try {
     std::string name = pathName->getLastNameFromPath(filename);
+
+    if (name.size() > NAME_MAX) {
+      logger::logError("Arquivo com nome maior do que o permitido");
+      return false;
+    }
 
     std::vector<std::string> listPath;
     auto entry = clusterIO->searchEntryByPath(filename, listPath, DIRECTORY);
