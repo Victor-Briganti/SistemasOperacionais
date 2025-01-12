@@ -143,6 +143,17 @@ public:
   bool searchFreeEntry(DWORD &num);
 
   /**
+   * @brief Busca por uma cadeia de entradas livres na tabela fat
+   *
+   * @param initPos Posição inicial para realizar a busca. A posição do cluster
+   * encontrado é salvo aqui.
+   * @param num Número de entradas sendo buscadas
+   *
+   * @return Uma lista com todas as cadeias livres
+   */
+  std::vector<DWORD> searchListFreeEntry(DWORD initPos, DWORD num);
+
+  /**
    * @brief Aloca os clusters
    *
    * @param tail Último cluster da antiga cadeia. Está função considera que seu

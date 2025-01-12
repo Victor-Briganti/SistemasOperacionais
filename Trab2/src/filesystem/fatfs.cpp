@@ -16,8 +16,8 @@
 #include "path/pathname.hpp"
 #include "utils/logger.hpp"
 
-#include <climits>
 #include <cctype>
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <exception>
@@ -613,6 +613,9 @@ bool FatFS::mkdir(const std::string &path)
     }
 
     return true;
+  } catch (const std::bad_alloc &error) {
+    logger::logError(error.what());
+    return false;
   } catch (const std::exception &error) {
     logger::logError(error.what());
     return false;

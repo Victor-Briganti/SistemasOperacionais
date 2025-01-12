@@ -1,4 +1,4 @@
-/*
+/**
  * Descrição: Arquivo main para o FAT32 shell
  *
  * Autores: João Victor Briganti, Luiz Takeda

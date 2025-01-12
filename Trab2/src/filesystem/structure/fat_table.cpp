@@ -9,6 +9,7 @@
 
 #include "filesystem/structure/fat_table.hpp"
 #include "filesystem/structure/bpb.hpp"
+#include "utils/logger.hpp"
 
 #include <cstdlib>
 #include <memory>
@@ -213,8 +214,11 @@ bool FatTable::allocClusters(DWORD tail, const std::vector<DWORD> &clusters)
   // Escreve a nova cadeia de clusters
   for (size_t i = 0; i < clusters.size(); i++) {
     if (i < clusters.size() - 1) {
+      logger::logInfo("Escrevendo " + std::to_string(clusters[i + 1]) + " em "
+                      + std::to_string(clusters[i + 1]));
       writeInTable(clusters[i], clusters[i + 1]);
     } else {
+      logger::logInfo("Escrevendo EOC em " + std::to_string(clusters[i]));
       writeInTable(clusters[i], EOC);
     }
   }
@@ -232,4 +236,36 @@ bool FatTable::allocClusters(DWORD tail, const std::vector<DWORD> &clusters)
 size_t FatTable::maxFreeClusByts()
 {
   return freeClusters() * bios->totClusByts();
+}
+
+std::vector<DWORD> FatTable::searchListFreeEntry(DWORD initPos, DWORD num)
+{
+  // Cadeia de clusters livres
+  std::vector<DWORD> chain;
+
+  // Total de clusters na tablea
+  DWORD totalClus = bios->getDataSecTotal() / bios->getSecPerCluster();
+
+  // Busca por um cluster que esteja livre
+  DWORD i = (initPos + 1) % totalClus;
+  while (i != initPos) {
+    if (i == 0 || i == 1) {
+      i = 2;
+    }
+
+    if (readFromTable(i) == 0) {
+      chain.push_back(i);
+      if (chain.size() == num) {
+        break;
+      }
+    }
+
+    i++;
+  }
+
+  if (chain.size() != num) {
+    return {};
+  }
+
+  return chain;
 }

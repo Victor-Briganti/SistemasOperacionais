@@ -21,8 +21,8 @@
 
 #include <cstring>
 #include <memory>
-#include <new>
 #include <stdexcept>
+#include <string>
 
 //===------------------------------------------------------------------------===
 // PRIVATE
@@ -103,7 +103,7 @@ int ClusterIO::searchEmptyEntries(DWORD cluster,
           index.initPos = static_cast<DWORD>(i);
         }
 
-        if (numEntries + index.initPos - 1 > NUM_ENTRIES) {
+        if (numEntries + index.initPos - 1 > (NUM_ENTRIES - 1)) {
           index.endPos = static_cast<DWORD>(NUM_ENTRIES - 1);
         } else {
           index.endPos = numEntries + index.initPos - 1;
@@ -245,8 +245,7 @@ bool ClusterIO::createArchiveEntry(DWORD num, const std::string &name)
         return false;
       }
 
-      auto chain = fatTable->listChain(num);
-      searchEmptyEntries(chain.back(), -missingEntries, indexes);
+      searchEmptyEntries(num, -missingEntries, indexes);
 
       Dentry dentry(sentry, lentry, indexes);
       return updateEntry(dentry);
@@ -479,38 +478,43 @@ bool ClusterIO::updateEntry(Dentry &entry)
 {
   try {
     auto buffer = std::make_unique<BYTE[]>(bios->totClusByts());
-
-    // Informações sobre as entradas longas
     size_t entryIdx = 0;
     std::vector<LongEntry> lentry = entry.getLongEntries();
     ShortEntry sentry = entry.getShortEntry();
 
-    // Lê cluster a cluster para escrever as entradas
     for (auto &clt : entry.getClusterIndexes()) {
       if (!readCluster(buffer.get(), clt.clusterNum)) {
-        logger::logError("Não foi possível ler cluster");
+        logger::logError(
+          "Não foi possível ler cluster: " + std::to_string(clt.clusterNum));
         return false;
       }
 
       ShortEntry *bufferEntry = reinterpret_cast<ShortEntry *>(buffer.get());
 
       for (size_t i = clt.initPos; i <= clt.endPos; i++, entryIdx++) {
+        if (i * sizeof(ShortEntry) >= bios->totClusByts()) {
+          logger::logError("Out-of-bounds buffer access "
+                           + std::to_string(i * sizeof(ShortEntry)));
+          return false;
+        }
+
         if (entryIdx < lentry.size()) {
-          memcpy(&bufferEntry[i], &lentry[entryIdx], sizeof(sentry));
+          memcpy(&bufferEntry[i], &lentry[entryIdx], sizeof(LongEntry));
         } else {
-          memcpy(&bufferEntry[i], &sentry, sizeof(sentry));
+          memcpy(&bufferEntry[i], &sentry, sizeof(ShortEntry));
         }
       }
 
       if (!writeCluster(buffer.get(), clt.clusterNum)) {
-        logger::logError("Não foi possível escrever no cluster");
+        logger::logError(
+          "Não foi possível escrever no cluster cluster: " + std::to_string(clt.clusterNum));
         return false;
       }
     }
 
     return true;
   } catch (const std::bad_alloc &error) {
-    logger::logError("Não foi possível ler buffer");
+    logger::logError("Falha ao alocar buffer");
     return false;
   }
 }
