@@ -191,22 +191,28 @@ bool ClusterIO::createDirectoryEntry(DWORD num, const std::string &name)
     }
 
     if (missingEntries < 0) {
-      DWORD clusterDir = 0;
-      if (!fatTable->searchFreeEntry(clusterDir)) {
+      if (((-missingEntries) + 1) / NUM_ENTRIES > fatTable->freeClusters()) {
         logger::logInfo("Não há clusters suficientes");
         return false;
       }
 
-      // Não alterar a ordem de alocação em hipotese alguma
-      if (!allocNewCluster(clusterDir) || !allocNewCluster(num)) {
+      DWORD clt = num;
+      while (missingEntries < 0) {
+        if (!allocNewCluster(clt)) {
+          logger::logInfo("Criação de entradas falhou");
+          return false;
+        }
+
+        missingEntries = searchEmptyEntries(clt, -missingEntries, indexes);
+      }
+
+      DWORD clusterDir = 0;
+      if (!allocNewCluster(clusterDir)) {
         logger::logError("Não foi possível criar diretório");
         return false;
       }
 
-      auto chain = fatTable->listChain(num);
-      searchEmptyEntries(chain.back(), -missingEntries, indexes);
       Dentry dentry(sentry, lentry, indexes);
-
       dentry.setDataCluster(clusterDir);
       return updateEntry(dentry) && insertDotEntries(num, dentry);
     }
@@ -240,12 +246,19 @@ bool ClusterIO::createArchiveEntry(DWORD num, const std::string &name)
     }
 
     if (missingEntries < 0) {
-      if (!allocNewCluster(num)) {
-        logger::logInfo("Criação de entradas falhou");
+      if ((-missingEntries) % NUM_ENTRIES > fatTable->freeClusters()) {
+        logger::logInfo("Não há clusters suficientes");
         return false;
       }
 
-      searchEmptyEntries(num, -missingEntries, indexes);
+      while (missingEntries < 0) {
+        if (!allocNewCluster(num)) {
+          logger::logInfo("Criação de entradas falhou");
+          return false;
+        }
+
+        missingEntries = searchEmptyEntries(num, -missingEntries, indexes);
+      }
 
       Dentry dentry(sentry, lentry, indexes);
       return updateEntry(dentry);
@@ -506,8 +519,8 @@ bool ClusterIO::updateEntry(Dentry &entry)
       }
 
       if (!writeCluster(buffer.get(), clt.clusterNum)) {
-        logger::logError(
-          "Não foi possível escrever no cluster cluster: " + std::to_string(clt.clusterNum));
+        logger::logError("Não foi possível escrever no cluster cluster: "
+                         + std::to_string(clt.clusterNum));
         return false;
       }
     }
