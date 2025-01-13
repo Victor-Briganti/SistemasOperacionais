@@ -29,7 +29,14 @@ std::vector<std::string> Shell::parser(const std::string &cmd) const
     commands.push_back(entry);
   }
 
-  return commands;
+  std::vector<std::string> results;
+  for (const auto &a : commands) {
+    if (a != "") {
+      results.push_back(a);
+    }
+  }
+
+  return results;
 }
 
 FSApi Shell::command(const std::string &cmd) const
@@ -103,7 +110,7 @@ void Shell::exec(FSApi cmd, std::vector<std::string> params)
       logger::logError("rm número inválido de parâmetros");
       return;
     }
-    
+
     auto num = static_cast<DWORD>(std::atoi(params[1].c_str()));
     fatFS->cluster(num);
     return;
