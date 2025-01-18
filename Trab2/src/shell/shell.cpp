@@ -195,6 +195,9 @@ void Shell::exec(FSApi cmd, std::vector<std::string> params)
     fatFS->cp(params[1], params[2]);
     return;
   }
+  case FAIL:
+  default:
+    logger::logError("Comando não reconhecido");
   }
 }
 
