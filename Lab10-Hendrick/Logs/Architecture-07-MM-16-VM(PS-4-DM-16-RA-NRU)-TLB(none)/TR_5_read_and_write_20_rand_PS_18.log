@@ -1,0 +1,758 @@
+------------------------------------
+--- File created by Amnesia tool ---
+------------------------------------
+
+
+----------------------------------
+--- Architecture Configuration ---
+----------------------------------
+
+--- Main Memory ---
+
+Memory size: 16 word(s) 
+Block size: 1 word(s)/block 
+Cycles per access read: 1 unity 
+Cycles per access write: 2 unity 
+Time cycle: 10 time unity 
+
+--- Virtual Memory ---
+Page size: 4 word(s) 
+Replacement algorithm: NRU 
+
+---      Disk     ---
+Memory size: 16 word(s) 
+Cycles per access read: 1 unity 
+Cycles per access write: 2 unity 
+Time cycle: 100 time unity 
+
+-------------------------
+---       Trace       ---
+-------------------------
+
+2 b
+2 a
+1 0
+1 1
+2 c
+2 d
+2 10
+2 11
+0 7
+1 6
+1 0
+1 1
+2 9
+2 8
+1 4
+1 5
+2 6
+2 9
+2 c
+2 d
+
+------------------------------
+---      Execution Log     ---
+------------------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 0 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 1 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 2 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 3 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 4 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 5 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 6 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 7 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 8 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 9 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 10 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 11 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 12 
+
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 13 
+
+
+Location: DISK
+Action = Storing page in Disk 
+Address = 0x00000000 - Page 0
+
+
+Location: DISK
+Action = Storing page in Disk 
+Address = 0x00000004 - Page 1
+
+
+Location: DISK
+Action = Storing page in Disk 
+Address = 0x00000008 - Page 2
+
+
+Location: DISK
+Action = Storing page in Disk 
+Address = 0x0000000c - Page 3
+
+
+----------------------- Step: 001 to 020 || Trace: 2 b -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000002
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000010|        11|       XX |     |  0000000000000000000000000010|        11|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 11 
+
+
+----------------------- Step: 002 to 020 || Trace: 2 a -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000002
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000010|        10|       XX |     |  0000000000000000000000000010|        10|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 10 
+
+
+----------------------- Step: 003 to 020 || Trace: 1 0 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000000
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000000|        00|       XX |     |  0000000000000000000000000000|        00|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 0 
+
+
+----------------------- Step: 004 to 020 || Trace: 1 1 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000000
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000000|        01|       XX |     |  0000000000000000000000000000|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 1 
+
+
+----------------------- Step: 005 to 020 || Trace: 2 c -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000003
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000011|        00|       XX |     |  0000000000000000000000000001|        00|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 4 
+
+
+----------------------- Step: 006 to 020 || Trace: 2 d -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000003
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000011|        01|       XX |     |  0000000000000000000000000001|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 5 
+
+
+----------------------- Step: 007 to 020 || Trace: 2 10 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000004
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000100|        00|       XX |     |  0000000000000000000000000011|        00|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 12 
+
+
+----------------------- Step: 008 to 020 || Trace: 2 11 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000004
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000100|        01|       XX |     |  0000000000000000000000000011|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 13 
+
+
+----------------------- Step: 009 to 020 || Trace: 0 7 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000001
+Page Fault
+
+----------------------      Beginning of paging        ----------------------
+
+Location: DISK
+Action = Loading page from Disk and store page in the aux vector 
+|--------------------|       |--------------------|
+|     aux vector     |  <--  |    disk    - Page 0|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000004|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000005|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000006|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000007|
+|--------------------|       |--------------------|
+
+
+Location: DISK
+Action = Loading page from Main Memory and storing page in Disk 
+|--------------------|       |--------------------|
+|    disk    - Page 0|  <--  |Main Memory - Page 3|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000010|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000011|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000000|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000000|
+|--------------------|       |--------------------|
+
+
+Location: MAINMEMORY
+Action = Store page in the Main Memory 
+|--------------------|       |--------------------|
+|Main Memory - Page 3|  <--  |     aux vector     |
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000004|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000005|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000006|
+|--------------------|       |--------------------|
+|               xxxxx|       |          0x00000007|
+|--------------------|       |--------------------|
+
+
+Location: PAGETABLE
+Action = Update the Page Table 
+|--------------------|       |--------------------|
+|          0x00000001|  <->  |          0x00000004|
+|--------------------|       |--------------------|
+
+
+----------------------         End of paging           ----------------------
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000001|        11|       XX |     |  0000000000000000000000000011|        11|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 15 
+
+
+----------------------- Step: 010 to 020 || Trace: 1 6 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000001
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000001|        10|       XX |     |  0000000000000000000000000011|        10|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 14 
+
+
+----------------------- Step: 011 to 020 || Trace: 1 0 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000000
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000000|        00|       XX |     |  0000000000000000000000000000|        00|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 0 
+
+
+----------------------- Step: 012 to 020 || Trace: 1 1 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000000
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000000|        01|       XX |     |  0000000000000000000000000000|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 1 
+
+
+----------------------- Step: 013 to 020 || Trace: 2 9 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000002
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000010|        01|       XX |     |  0000000000000000000000000010|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 9 
+
+
+----------------------- Step: 014 to 020 || Trace: 2 8 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000002
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000010|        00|       XX |     |  0000000000000000000000000010|        00|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 8 
+
+
+----------------------- Step: 015 to 020 || Trace: 1 4 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000001
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000001|        00|       XX |     |  0000000000000000000000000011|        00|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 12 
+
+
+----------------------- Step: 016 to 020 || Trace: 1 5 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000001
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000001|        01|       XX |     |  0000000000000000000000000011|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Stored data in Main Memory  
+Block = 13 
+
+
+----------------------- Step: 017 to 020 || Trace: 2 6 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000001
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000001|        10|       XX |     |  0000000000000000000000000011|        10|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 14 
+
+
+----------------------- Step: 018 to 020 || Trace: 2 9 -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000002
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000010|        01|       XX |     |  0000000000000000000000000010|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 9 
+
+
+----------------------- Step: 019 to 020 || Trace: 2 c -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000003
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000011|        00|       XX |     |  0000000000000000000000000001|        00|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 4 
+
+
+----------------------- Step: 020 to 020 || Trace: 2 d -----------------------
+
+-----------------------    Beginning of translation   -----------------------
+
+Location: PAGETABLE
+Action = loading data in the Page Table 
+Virtual Page = 0x00000003
+
+Location: TRANSLATION
+Action = Translation Address  - Using = Page Table
+|----------------------------------------------------|     |----------------------------------------------------|
+|                  Virtual Address                   |     |                    Real Address                    |
+|----------------------------------------------------|     |----------------------------------------------------|
+|        Virtual Page          |PageOffSet|ByteOffSet| --> |           Frame Page         |PageOffSet|ByteOffSet|
+|------------------------------|----------|----------|     |-----------------------------------------|----------|
+|  0000000000000000000000000011|        01|       XX |     |  0000000000000000000000000001|        01|       XX |
+|----------------------------------------------------|     |----------------------------------------------------|
+
+
+-----------------------       End of translation        -----------------------
+
+Location: MAINMEMORY
+Action = Loading data from Main Memory  
+Block = 5 
+
+
+------------------------------
+---       Statistics       ---
+------------------------------
+
+Main Memory
+  Read Access: 41
+  Read Cycles: 41
+  Read Time: 410
+  Write Access: 17
+  Write Cycles: 34
+  Write Time: 340
+  Total Access: 58
+  Total Time: 750
+
+Disk
+  Read Access: 1
+  Read Cycles: 1
+  Read Time: 100
+  Write Access: 1
+  Write Cycles: 2
+  Write Time: 200
+  Total Time: 300
+
+Page Table
+  Read Access: 20
+  Read Cycles: 20
+  Read Time: 200
+  Write Access: 2
+  Write Cycles: 4
+  Write Time: 40
+  Total Access: 20
+  Page Fault: 1
+  Total Time: 240
+
+ Total Time: 1050
