@@ -174,19 +174,13 @@ bool ClusterIO::createDirectoryEntry(DWORD num, const std::string &name)
     if (missingEntries == 0) {
       Dentry dentry(sentry, lentry, indexes);
 
-      DWORD savedCluster = 0;
-      if (!fatTable->searchFreeEntry(savedCluster)) {
-        logger::logInfo("Não há clusters suficientes");
-        return false;
-      }
-
       DWORD cluster = 0;
       if (!allocNewCluster(cluster)) {
         logger::logInfo("Não foi possível criar diretório");
         return false;
       }
 
-      dentry.setDataCluster(savedCluster);
+      dentry.setDataCluster(cluster);
       return updateEntry(dentry) && insertDotEntries(num, dentry);
     }
 
