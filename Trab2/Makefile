@@ -3,56 +3,14 @@ CXXFLAGS:=-Wextra -Wno-unused-parameter -Wno-unused-function -Wno-sign-conversio
 DEBFLAGS:=-g3 -fstandalone-debug
 INCLUDE:=-Iinclude/
 
-# Definição de diretórios
-SRC_DIR:=src
-BUILD_DIR:=build
-RELEASE_DIR:=$(BUILD_DIR)/release
-DEBUG_DIR:=$(BUILD_DIR)/debug
+all:
+	$(CXX) $(INCLUDE) ./src/filesystem/cluster/cluster.cpp ./src/filesystem/entry/dentry.cpp ./src/filesystem/entry/long_entry.cpp ./src/filesystem/entry/short_entry.cpp ./src/filesystem/fatfs.cpp ./src/filesystem/structure/bpb.cpp ./src/filesystem/structure/fat_table.cpp ./src/filesystem/structure/fsinfo.cpp ./src/io/fs_adapter.cpp ./src/io/image.cpp ./src/main.cpp ./src/path/pathname.cpp ./src/shell/shell.cpp ./src/utils/logger.cpp ./src/utils/time.cpp -o main
 
-# Arquivos .cpp e .o
-SRCS:=$(shell find src -type f)
-
-# Diretórios padrões
-DIRS:=$(sort $(dir $(SRCS)))
-
-# Caminhos para compilação de debug
-DEBUG_DIRS=$(patsubst $(SRC_DIR)/%, $(DEBUG_DIR)/%, $(DIRS))
-DEBUG_OBJS=$(SRCS:$(SRC_DIR)/%.cpp=$(DEBUG_DIR)/%.o)
-
-# Caminhos para compilação de release
-RELEASE_DIRS=$(patsubst $(SRC_DIR)/%, $(RELEASE_DIR)/%, $(DIRS))
-RELEASE_OBJS=$(SRCS:$(SRC_DIR)/%.cpp=$(RELEASE_DIR)/%.o)
-
-$(DEBUG_DIRS):
-	@mkdir -p $(DEBUG_DIRS)
-
-$(DEBUG_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) -c $< -o $@ $(INCLUDE) $(CXXFLAGS) $(DEBFLAGS)
-
-$(DEBUG_DIR)/main: $(DEBUG_OBJS)
-	$(CXX) -o $@ $(INCLUDE) $(CXXFLAGS) $(DEBFLAGS) $^
-
-debug: $(DEBUG_DIRS) $(DEBUG_DIR)/main
-
-$(RELEASE_DIRS):
-	@mkdir -p $(RELEASE_DIRS)
-
-$(RELEASE_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) -c $< -o $@ $(INCLUDE) $(CXXFLAGS) $(DEBFLAGS)
-
-$(RELEASE_DIR)/main: $(RELEASE_OBJS)
-	$(CXX) -o $@ $(INCLUDE) $(CXXFLAGS) $(DEBFLAGS) $^
-
-release: $(RELEASE_DIRS) $(RELEASE_DIR)/main
 
 valgrind: debug
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --verbose $(DEBUG_DIR)/main fat32.img img/tres_tigres_tristes_dividindo_tristando_um_tristador
 
-image:
-	dd if=/dev/zero of=fat.img bs=1M count=40
-	mkfs.fat -F 32 fat.img
-
 clean:
 	rm -rf build/
 
-.PHONY: all release debug clean valgrind image
+.PHONY: all valgrind
