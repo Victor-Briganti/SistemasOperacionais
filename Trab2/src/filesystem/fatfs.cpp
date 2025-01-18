@@ -639,6 +639,10 @@ bool FatFS::rename(const std::string &from, const std::string &to)
     DWORD oldDataCluster = oldEntry->getDataCluster();
     DWORD oldFileSize = oldEntry->getFileSize();
 
+    if (!touch(to)) {
+      return false;
+    }
+
     if (!clusterIO->removeEntry(oldEntry.value())) {
       logger::logError("rename " + from + " " + to + " operação falhou");
       return false;
@@ -648,10 +652,6 @@ bool FatFS::rename(const std::string &from, const std::string &to)
         && (updateParentTimestamp(from) < 0)) {
       logger::logWarning(
         "Não foi possível atualizar as datas do diretório pai");
-    }
-
-    if (!touch(to)) {
-      return false;
     }
 
     auto newEntry = clusterIO->searchEntryByPath(to, listPath, ARCHIVE);

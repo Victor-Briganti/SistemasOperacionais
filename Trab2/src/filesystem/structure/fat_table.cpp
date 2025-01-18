@@ -214,11 +214,8 @@ bool FatTable::allocClusters(DWORD tail, const std::vector<DWORD> &clusters)
   // Escreve a nova cadeia de clusters
   for (size_t i = 0; i < clusters.size(); i++) {
     if (i < clusters.size() - 1) {
-      logger::logInfo("Escrevendo " + std::to_string(clusters[i + 1]) + " em "
-                      + std::to_string(clusters[i + 1]));
       writeInTable(clusters[i], clusters[i + 1]);
     } else {
-      logger::logInfo("Escrevendo EOC em " + std::to_string(clusters[i]));
       writeInTable(clusters[i], EOC);
     }
   }
