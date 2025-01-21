@@ -1,0 +1,471 @@
+%% abtex2-modelo-relatorio-tecnico.tex, v-1.7.1 laurocesar
+%% Copyright 2012-2013 by abnTeX2 group at http://abntex2.googlecode.com/ 
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% 
+%% The Current Maintainer of this work is the abnTeX2 team, led
+%% by Lauro César Araujo. Further information are available on 
+%% http://abntex2.googlecode.com/
+%%
+%% This work consists of the files abntex2-modelo-relatorio-tecnico.tex,
+%% abntex2-modelo-include-comandos and abntex2-modelo-references.bib
+%%
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% abnTeX2: Modelo de Relatório Técnico/Acadêmico em conformidade com 
+% ABNT NBR 10719:2011 Informação e documentação - Relatório técnico e/ou
+% científico - Apresentação
+% ------------------------------------------------------------------------ 
+% ------------------------------------------------------------------------
+
+% Alterado por Rodrigo Campiolo para apresentação de relatórios na disciplina
+% de Redes de Computadores II do Bacharelado em Ciência da Computação da UTFPR-CM.
+
+
+\documentclass[
+    % -- opções da classe memoir --
+    12pt,				% tamanho da fonte
+    %openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+    oneside,   	        % para impressão em verso e anverso use twoside. Oposto a oneside
+    a4paper,			% tamanho do papel. 
+    % -- opções da classe abntex2 --
+    %chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+    %section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+    %subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+    %subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+    % -- opções do pacote babel --
+    english,			% idioma adicional para hifenização
+    french,				% idioma adicional para hifenização
+    spanish,			% idioma adicional para hifenização
+    brazil,				% o último idioma é o principal do documento
+    ]{pacotes/abntex2}
+
+
+% ---
+% PACOTES
+% ---
+
+% ---
+% Pacotes fundamentais 
+% ---
+\usepackage{cmap}				% Mapear caracteres especiais no PDF
+\usepackage{lmodern}			% Usa a fonte Latin Modern
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+% ---
+
+% ---
+% Pacotes adicionais, usados no anexo do modelo de folha de identificação
+% ---
+\usepackage{multicol}
+\usepackage{multirow}
+% ---
+    
+% ---
+% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+% ---
+\usepackage{lipsum}				% para geração de dummy text
+% ---
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{pacotes/abntex2cite}	% Citações padrão ABNT
+\usepackage{comment}
+% ---
+
+% ---
+% Meus pacotes
+% ---
+\usepackage{float}
+% ---
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+    \ifcase #1 %
+        Nenhuma citação no texto.%
+    \or
+        Citado na página #2.%
+    \else
+        Citado #1 vezes nas páginas #2.%
+    \fi}%
+% ---
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{Implementação do Sistema de Arquivos FAT32}
+\autor{João Victor Briganti\\Luiz Gustavo Takeda}
+\local{Campo Mourão}
+\data{Fevereiro / 2025}
+\instituicao{%
+  Universidade Tecnológica Federal do Paraná -- UTFPR
+  \par
+  Departa           mento Acadêmico de Computação -- DACOM
+  \par
+  Bacharelado em Ciência da Computação -- BCC
+}
+\tipotrabalho{Relatório técnico}
+% O preambulo deve conter o tipo do trabalho, o objetivo, 
+% o nome da instituição e a área de concentração 
+\preambulo{Relatório técnico de atividade prática solicitado pelo professor Rodrigo Campiolo na disciplina de Sistemas Operacionais do Bacharelado em Ciência da Computação da Universidade Tecnológica Federal do Paraná.}
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+        %pagebackref=true,
+        pdftitle={\@title}, 
+        pdfauthor={\@author},
+        pdfsubject={\imprimirpreambulo},
+        pdfcreator={LaTeX with abnTeX2},
+        pdfkeywords={abnt}{latex}{abntex}{abntex2}{relatório técnico}, 
+        colorlinks=true,       		% false: boxed links; true: colored links
+        linkcolor=blue,          	% color of internal links
+        citecolor=blue,        		% color of links to bibliography
+        filecolor=magenta,      		% color of file links
+        urlcolor=blue,
+        bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% Omite a numeração de capítulos
+\renewcommand*\thesection{\arabic{section}}
+
+
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+% \pretextual
+
+% ---
+% Capa
+% ---
+%\imprimircapa
+% ---
+
+% ---
+% Folha de rosto
+% (o * indica que haverá a ficha bibliográfica)
+% ---
+\imprimirfolhaderosto
+% ---
+
+
+% ---
+% RESUMO
+% ---
+
+% resumo na língua vernácula (obrigatório)
+\begin{resumo}
+FAZER
+% Este trabalho teve como objetivo compreender e aplicar conceitos e recursos de segurança em Sistemas Operacionais GNU/Linux. Para isso, foi utilizado um sistema operacional GNU/Linux em uma máquina virtual executada no hipervisor VirtualBox. As atividades incluíram a configuração de mecanismos fundamentais de segurança no sistema operacional, a análise de arquivos essenciais para o gerenciamento desses recursos e a proteção de dados sensíveis. O trabalho foi concluído com êxito, resultando em uma compreensão prática e teórica sólida sobre segurança básica em um sistema GNU/Linux. Os resultados destacam a relevância da aplicação de medidas de segurança para proteger informações e recursos do sistema operacional, especialmente dados sensíveis, reforçando a importância de uma abordagem estruturada e prática.
+
+ \vspace{\onelineskip}
+    
+ \noindent
+ \textbf{Palavras-chave}: palavra1; palavra2; palavra3.
+\end{resumo}
+% ---
+
+% ---
+% inserir lista de ilustrações
+% ---
+%\pdfbookmark[0]{\listfigurename}{lof}
+%\listoffigures*
+%\cleardoublepage
+% ---
+
+% ---
+% inserir lista de tabelas
+% ---
+%\pdfbookmark[0]{\listtablename}{lot}
+%\listoftables*
+%\cleardoublepage
+% ---
+
+% ---
+% inserir lista de abreviaturas e siglas
+% ---
+%\begin{siglas}
+%  \item[IP] Internet Protocol
+%  \item[TCP] Transmission Control Protocol
+%  \item[UDP] User Datagram Protocol
+%\end{siglas}
+% ---
+
+% ---
+% inserir o sumario
+% ---
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+\makeatletter
+\renewcommand{\chapter}{\@gobbletwo}
+\makeatother
+
+\section{Introdução}
+\label{sec:introducao}
+
+Um sistema de arquivos é uma parte fundamental dos sistemas operacionais, responsável por organizar, armazenar e gerenciar os dados de forma eficiente e confiável em dispositivos de armazenamento, como discos rígidos e SSDs. Ele desempenha um papel crucial ao permitir que aplicativos e usuários armazenem informações que precisam ser acessadas e preservadas mesmo após o encerramento de um processo ou desligamento do computador~\cite{tanenbaum2016}.
+
+O sistema de arquivos FAT (File Allocation Table) foi desenvolvido no final da década de 1970. Originalmente utilizado no sistema operacional MS-DOS, o FAT evoluiu ao longo do tempo para suportar mídias maiores, resultando em três variantes principais: FAT12, FAT16 e FAT32. A principal diferença entre essas versões está no tamanho, em bits, das entradas na tabela de alocação, que variam de 12 a 32 bits~\cite{microsoft2000}.
+
+\section{Objetivo}
+\label{sec:objetivos}
+
+O objetivo deste trabalho é compreender de forma aprofundada o funcionamento do sistema de arquivos FAT32. Busca-se explorar seus detalhes de implementação, incluindo a estrutura da tabela de alocação, a organização dos dados no disco e os mecanismos de gerenciamento de espaço.
+
+\section{Fundamentação}
+\label{sec:fundamentacao}
+
+O sistema de arquivos é um componente essencial de qualquer sistema operacional, sendo responsável pela organização, armazenamento e recuperação de dados em dispositivos de armazenamento. Oferece uma abstração que permite ao usuário interagir com os dados sem se preocupar com os detalhes de baixo nível sobre sua disposição física no dispositivo. O sistema de arquivos define a estrutura e as regras para a criação, organização e manipulação de arquivos, que são as unidades básicas de dados persistentes. Um arquivo é um conjunto de dados armazenados de forma duradoura em dispositivos como discos rígidos e SSDs. Esses dados podem assumir várias formas, como documentos, imagens, vídeos ou bancos de dados, acessados por meio de uma interface fornecida pelo sistema de arquivos, que traduz as operações do usuário em comandos de leitura e escrita no dispositivo.
+
+O sistema de arquivos organiza o espaço de armazenamento dividindo-o em blocos ou setores, mapeados para os arquivos eficientemente. Para facilitar a navegação e o gerenciamento de dados, a estrutura do sistema de arquivos inclui diretórios, que permitem organizar arquivos de maneira hierárquica. Cada arquivo ou diretório possui um nome único, e o sistema de arquivos mantém uma tabela de alocação ou uma estrutura de metadados que indica a localização física de cada arquivo.
+
+ Existem várias estratégias na alocação de arquivos que impactam diretamente o desempenho e a eficiência do sistema. A alocação contígua organiza os blocos de um arquivo sequencialmente, garantindo um acesso rápido e eficiente, principalmente para leituras sequenciais. Contudo, ela sofre com a fragmentação externa, o que pode dificultar a alocação de novos arquivos ou a expansão dos existentes. A alocação encadeada resolve esse problema ao permitir que os blocos de um arquivo sejam armazenados em locais dispersos, com ponteiros em cada bloco indicando a sequência. Essa abordagem aumenta a flexibilidade, mas torna o acesso aleatório mais complexo e menos eficiente. A alocação FAT é uma variação da alocação encadeada, onde os ponteiros são armazenados em uma tabela centralizada, facilitando o acesso e a recuperação dos arquivos, evitando a necessidade de ler bloco a bloco para encontrar suas posições no disco. Em todos os casos, o desafio do sistema de arquivos é balancear eficiência no acesso, segurança e flexibilidade no gerenciamento dos dados, criando uma solução otimizada para as necessidades do usuário e as características do dispositivo de armazenamento~\cite{maziero2019}.
+
+\section{Materiais}
+\label{sec:materiais}
+
+\begin{itemize}
+  \item Especificações do computador utilizado:
+  \begin{itemize}
+    \item Modelo: Lenovo Ideapad S145
+    \item CPU: Intel Core i$5$-$12500$H
+    \item Memória Principal: $16$GB RAM
+    \item Memória Secundária: SSD $512$GB
+    \item Sistema Operacional: Arch
+  \item Núcleo: Linux $6.6.70$ 
+  \end{itemize}
+\end{itemize}
+
+O sistema foi implementado na linguagem C++, e sua compilação foi testada utilizando tanto o Clang (versão 19.1.6) quanto o GCC (versão 14.2.1).
+
+\section{Detalhes de Implementação}
+\label{sec:implementacao}
+
+\subsection{Estruturas do FAT32}
+\label{subsubsec:estrutura_fat}
+
+O FAT32 é uma evolução dos antigos sistemas e cujo objetivo é permitir a utilização de discos rígidos maiores e melhorar a alocação de clusters. Uma das principais melhorias do FAT32 em relação a versões anteriores é o uso de 32 bits para representar os números de cluster, embora apenas 28 bits sejam utilizados para o endereçamento real. Isso permite que o FAT32 suporte um número significativamente maior de clusters, tornando-o capaz de lidar com volumes muito grandes. Contudo, o sistema apresenta a limitação de tamanho de arquivo poderem ter no máximo de 4 GB~\cite{osdev}.
+
+\subsubsection{\textit{BIOS Parameter Block}}
+\label{subsubsec:bpb}
+
+O BIOS Parameter Block (BPB) é uma estrutura de dados presente no primeiro setor do volumes FAT, essa estrutura contém informações fundamentais sobre a configuração e organização do sistema de arquivos no volume, os atributos dessa estrutura descrevem:
+
+\begin{itemize}
+    \item Tamanho dos setores: Quantidade de bytes por setor no disco.
+    \item Tamanho dos \textit{clusters}: Quantidade de setores por unidade de alocação.
+    \item Número de FATs: Número de tabelas FAT no volume (geralmente 2 para redundância).
+    \item Número de setores reservados: Setores reservados no início do volume antes das tabelas FAT.
+    \item Tamanho total do volume: Definido pelos campos \textit{BPB\_TotSec16} ou \textit{BPB\_TotSec32} dependendo do tamanho do volume.
+    \item Outras informações específicas: Como número de cabeças, setores por trilha e setores ocultos.
+\end{itemize}
+
+Essa estrutura possui algumas diferenças entre a versão do FAT12/16 para a do FAT32, como o campo \textit{BPB\_RootClus} que existe somente na FAT32 e que armazena o \textit{cluster} onde o diretório raiz se encontra~\cite{microsoft2000}.
+
+\subsubsection{FSInfo}
+\label{subsubsec:fsinfo}
+
+Devido ao tamanho dos volumes no FAT32, a estrutura FSInfo foi projetada para facilitar a manipulação de clusters no sistema. Os atributos dessa estrutura são:
+
+\begin{itemize}
+    \item \textit{FSI\_LeadSig} e \textit{FSI\_StrucSig}: Assinaturas (\texttt{0x41615252} e \texttt{0x61417272}) que validam o setor FSInfo.
+    \item \textit{FSI\_Free\_Count}: Armazena a última contagem conhecida de \textit{clusters} livres.
+    \item \textit{FSI\_Nxt\_Free}: Indica onde a busca por \textit{clusters} livres deve começar.
+    \item \textit{FSI\_TrailSig}: Assinatura final (\texttt{0xAA550000}) para validar o setor.
+\end{itemize}
+
+\subsubsection{\textit{FAT}}
+\label{subsubsec:fsinfo}
+
+O FAT é uma estrutura de dados localizada no início do disco que funciona como uma lista encadeada simples para gerenciar a alocação de espaço. Cada entrada na tabela corresponde a um \textit{cluster} e pode apontar para o próximo \textit{cluster} ou indicar o final de um arquivo, que no FAT32 é marcado pelo valor especial \texttt{0x0FFFFFFF}.
+
+Para garantir maior robustez e prevenir perda de dados, a FAT é geralmente redundante, mantendo ao menos duas cópias da tabela. Isso reduz o risco de corrupção do sistema em caso de falha ou dano à tabela principal~\cite{microsoft2000}.
+
+\subsubsection{Entrada do Diretório}
+\label{subsubsec:dentry}
+
+No sistema FAT, as entradas de diretório são estruturas de 32 bytes que representam arquivos e diretórios. Cada entrada é composta por uma série de campos que descrevem as características do arquivo ou diretório, incluindo seu nome, atributos, data e hora de criação, último acesso e \textit{clusters} alocados.
+
+A estrutura de uma entrada de diretório é definida da seguinte forma:
+
+\begin{itemize} 
+    \item \textit{DIR\_Name}: Contém o nome do arquivo, com até 8 caracteres para o nome e 3 para a extensão. 
+    \item \textit{DIR\_Attr}: Especifica os atributos do arquivo, como se é de somente leitura, oculto, sistema, diretório, ou arquivo normal.
+    \item \textit{DIR\_FstClusHI} e \textit{DIR\_FstClusLO}: Contêm o número do \textit{cluster} onde o arquivo ou diretório começa no disco. Juntos, formam um valor de 32 bits que aponta para o início do arquivo. 
+    \item \textit{DIR\_FileSize}: Armazena o tamanho do arquivo em bytes, sendo sempre 0 para diretórios. 
+    \item Campos de data e hora: Incluem informações sobre a data e hora de criação, última modificação e último acesso do arquivo. 
+\end{itemize}
+
+Além das entradas de diretório padrão, o sistema FAT também permite a utilização de entradas de diretório com nomes longos. Essas entradas são armazenadas imediatamente antes da entrada de diretório curta. Essas entradas são divididas em vários campos que formam partes do nome longo do arquivo, permitindo o uso de nomes mais extensos e que incluem caracteres especiais. A estrutura dessas entradas segue a seguinte organização:
+
+\begin{itemize} 
+    \item \textit{LDIR\_Ord}: Indica a ordem da entrada no conjunto de entradas de nome longo associadas à entrada de diretório curta.
+    \item \textit{LDIR\_Name1}, \textit{LDIR\_Name2}, \textit{LDIR\_Name3}: Contêm partes do nome longo do arquivo, armazenadas em subcomponentes de até 13 caracteres no total. 
+    \item \textit{LDIR\_Attr}: Este campo deve ser \texttt{ATTR\_LONG\_NAME}, o que indica que a entrada corresponde a um nome longo.
+    \item \textit{LDIR\_Chksum}: Armazena um valor de verificação de soma do nome, utilizado para validar a correspondência entre as entradas de nome longo e a entrada de nome curto. 
+    \item \textit{LDIR\_FstClusLO}: Este campo deve ser zero. Serve somente para manter a compatibilidade com as entradas de de diretório curtas. 
+\end{itemize}
+
+Cada parte do nome longo é armazenada em uma entrada de diretório distinta, e o conjunto de entradas longas é vinculado à entrada curta correspondente. Assim, o sistema permite a coexistência de nomes curtos (usados por versões antigas do MS-DOS) e nomes longos (permitidos por sistemas modernos), sem causar perda de dados ou interferir na compatibilidade com utilitários antigos. As entradas de diretório longo são identificadas por um atributo especial, \texttt{ATTR\_LONG\_NAME}.
+
+\subsection{Organização do Código}
+\label{subsubsec:code}
+
+Devido à complexidade no desenvolvimento de um sistema de arquivos, a implementação do FAT32 foi estruturada em módulos independentes. Cada módulo é responsável por uma estrutura do sistema. Está sessão é organizada de maneira a explicar cada um desses módulos.
+
+\subsubsection{Entrada e Saída}
+\label{subsubsec:io}
+
+O módulo de entrada e saída, é uma abstração as chamadas de sistema que lidam com leitura e escrita de arquivos no \textit{host} e na imagem onde o sistema FAT32 está gravado.
+
+O primeiro arquivo é o \textit{fs\_adapter.cpp}, que contém a implementação da classe \texttt{FileSystemAdapter} responsável pela manipulação de arquivos binários no sistema de arquivos do \textit{host}. Essa classe permite a abertura, leitura, escrita, limpeza, remoção e obtenção do tamanho de arquivos.
+
+E o segundo arquivo é o \textit{image.cpp}, que contém a implementação da classe \texttt{Image}, que fornece funcionalidades para ler e escrever dados em imagens, especialmente relacionadas a sistemas de arquivos em FAT32. Assim como o \texttt{FileSystemAdapter}, essa classe utiliza operações de leitura e escrita binária, com a adição de métodos para manipulação da imagem FAT32.
+
+\subsubsection{Caminhos do Sistema}
+\label{subsubsec:parser}
+
+Este módulo é referente á manipulação de caminhos no sistema de arquivos. O arquivo encontrado neste módulo é o \textit{pathname.cpp} que implementa a classe \texttt{PathName}, que fornece métodos como obter o caminho atual do sistema, dividir o caminho em partes menores com base no ``/'' do caminho, além de algumas funções de validação para determinar a validade de um caminho ou o nome de um arquivo.  
+
+\subsubsection{Sistema de Arquivos}
+\label{subsubsec:fs}
+
+O módulo do sistema de arquivos é responsável por implementar os detalhes e funcionalidades específicas do sistema, dividido em submódulos que abstraem diferentes estruturas. 
+
+\begin{itemize} 
+    \item \textit{structure/}: Submódulo onde se encontram as abstrações das estruturas do sistema de arquivo. São eles:
+    \begin{itemize} 
+        \item \textit{bpb.cpp}: Implementa a classe \texttt{BPB}, que abstrai as informações de metadados do disco, como o cálculo do tamanho de setores, a definição do tipo de FAT (FAT12, FAT16, FAT32, etc.) e a exibição das informações contidas no \textit{BIOS Parameter Block}. 
+        
+        \item \textit{fsinfo.cpp}: Implementa a classe \texttt{FSInfo}, que gerencia os metadados dinâmicos do sistema de arquivos, mantendo e atualizando informações conforme operações, como criação, exclusão ou alteração de arquivos, são realizadas. 
+        
+        \item \textit{fat\_table.cpp}: Implementa a classe \texttt{FatTable}, que traz abstrações para leitura e escrita na tabela FAT, busca por entradas livres e garante a integridade das operações de escrita, replicando-as em ambas as tabelas FAT para aumentar a robustez do sistema.
+    \end{itemize}
+
+    \item \textit{entry/}: Submódulo onde se encontram as abstrações, as entradas do sistema. São eles:
+    \begin{itemize} 
+        \item\textit{short\_entry.cpp}: contém a definição da estrutura \texttt{ShortEntry}, que representa uma entrada de nome curto no sistema FAT. Além disso, implementa funções associadas para criar essa estrutura, gerar nomes curtos (incluindo randomização para evitar conflitos), e manipular atributos específicos, como \textit{clusters} associados e tamanhos de arquivos. A estrutura facilita a representação e o gerenciamento eficiente de diretórios ou arquivos de nomes curtos em memória.
+
+        \item \textit{long\_entry.cpp}: define a estrutura \texttt{LongEntry}, utilizada para gerenciar nomes longos no sistema FAT, complementando as entradas de nome curto. Inclui funções para gerar a sequência de estruturas que compõem o nome longo, além de calcular e verificar \textit{checksums} para garantir a integridade dos dados armazenados.
+
+        \item \textit{dentry.cpp}: implementa a classe \texttt{Dentry}, que fornece uma abstração unificada sobre as estruturas \texttt{ShortEntry} e \texttt{LongEntry}. Essa classe facilita o gerenciamento de entradas em memória, permitindo configurar e extrair informações relacionadas a arquivos ou diretórios. Também introduz metadados adicionais que não estão presentes diretamente no disco, mas que simplificam operações como criação, atualização e manipulação dessas entradas em um contexto de sistema de arquivos FAT.
+    \end{itemize}
+\end{itemize}
+
+A abstração final está localizada na raiz deste módulo, no arquivo \textit{fatfs.cpp}, e implementa a classe \texttt{FatFS}, que funciona como um \textit{wrapper} para todas as outras classes. Nela, são implementados os métodos que definem as interfaces para interação com o sistema de arquivos.
+
+\subsubsection{\textit{Shell}}
+\label{subsubsec:shell}
+
+O módulo do \textit{Shell} implementa a interface em linha de comando que permite que o usuário interaja com o sistema de arquivos. O arquivo principal deste módulo é o \textit{shell.cpp}, que contém a implementação da classe \texttt{Shell}. Essa classe executa em um \textit{loop} contínuo, que interpreta os comandos e utiliza as interfaces públicas de \textit{FatFS} para interagir com o sistema de arquivos.
+
+\subsubsection{Utilitários}
+\label{subsubsec:utils}
+
+O módulo de utilitários do sistema fornece funcionalidades essenciais em várias áreas do sistema. Esse módulo inclui \textit{log} de mensagens, funções de manipulação de tempo e definição de tipos de dados.
+
+O arquivo \textit{logger.hpp} define funções de \textit{log} para registrar mensagens de erro, aviso e informação, usados principalmente para alerta e depuração do sistema.
+
+O arquivo \textit{time.hpp} define funções para manipulação e extração de informações de data e hora, essenciais para registrar quando eventos ocorrem, bem como para gerar \textit{timestamps} e \textit{datestamps} usadas pelo submódulo \textit{entry/}.
+
+O arquivo \textit{types.hpp} define tipos de dados fundamentais para o sistema, usados em toda a base de código. Ele assegura consistência na manipulação de dados binários e estruturas de dados de tamanho fixo, com base nos tipos de dados utilizados no sistema. Os tipos são definidos como:
+
+\begin{itemize}
+    \item \texttt{BYTE}: Define um byte (8 bits), utilizado para armazenar dados de pequeno porte ou caracteres.
+    
+    \item \texttt{WORD}: Define um valor de 16 bits (2 bytes), geralmente utilizado para armazenar valores mais curtos, como datas ou horas.
+    
+    \item \textit{DWORD}: Define um valor de 32 bits (4 bytes), usado para armazenar valores maiores, como \textit{timestamps} completos ou endereços de memória.
+\end{itemize}
+
+\section{Resultados e Discussões}
+\label{sec:discussao}
+
+\section{Conclusões}
+\label{sec:conclusoes}
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\renewcommand{\bibsection}{%
+\section{\bibname}
+\bibmark
+%\ifnobibintoc\else
+%\phantomsection
+%\addcontentsline{toc}{section}{\bibname}
+%\fi
+\prebibhook}
+
+\bibliography{abntex2-modelo-references}
+
+\end{document}
