@@ -1,483 +1,218 @@
-/*
- * Descrição: Arquivo principal do shell
+/**
+ * Descrição: Implementação da classe do Shell iterativo.
  *
- * Autores: Hendrick Felipe Scheifer, João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Takeda
  * Licença: BSD 2
  *
- * Data: 15/11/2024
+ * Data: 10/01/2025
  */
 
 #include "shell/shell.hpp"
-#include "utils/color.hpp"
+#include "utils/logger.hpp"
 
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
 #include <iostream>
-#include <string>
+#include <sstream>
+#include <stdexcept>
 
-#define is_end(c) ((c) == ' ' || (c) == '\0')
-
-#define arg_invalid(name, arg)                                            \
-  std::cout << "[" << RED("ERROR") << "]: '" << (name) << "' argumento '" \
-            << (arg) << "' inválido" << "\n"
-
-//===----------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===
 // PRIVATE
-//===----------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===
 
-bool Shell::attr(const path_fs &path)
+std::vector<std::string> Shell::parser(const std::string &cmd) const
 {
-  std::cout << "attr ";
+  std::stringstream stream(cmd);
 
-  for (const auto &str : path) {
-    std::cout << "/" << str;
-  }
-  std::cout << "\n";
-  return true;
-}
+  std::vector<std::string> commands;
+  std::string entry;
 
-bool Shell::cd(const path_fs &path)
-{
-  std::cout << "cd ";
-
-  for (const auto &str : path) {
-    std::cout << "/" << str;
-  }
-  std::cout << "\n";
-  return true;
-}
-
-bool Shell::cluster(uint32_t num)
-{
-  std::cout << "cluster " << num << "\n";
-  return true;
-}
-
-bool Shell::cp(const path_fs &src, const path_fs &dest)
-{
-  std::cout << "cp ";
-
-  for (const auto &str : src) {
-    std::cout << "/" << str;
+  while (getline(stream, entry, ' ')) {
+    commands.push_back(entry);
   }
 
-  std::cout << " ";
-
-  for (const auto &str : dest) {
-    std::cout << "/" << str;
-  }
-
-  std::cout << "\n";
-  return true;
-}
-
-bool Shell::info()
-{
-  std::cout << "info\n";
-  return true;
-}
-
-bool Shell::ls()
-{
-  std::cout << "ls\n";
-  return true;
-}
-
-bool Shell::mkdir(const path_fs &path)
-{
-  std::cout << "mkdir ";
-
-  for (const auto &str : path) {
-    std::cout << "/" << str;
-  }
-  std::cout << "\n";
-  return true;
-}
-
-
-bool Shell::mv(const path_fs &src, const path_fs &dest)
-{
-  std::cout << "mv ";
-
-  for (const auto &str : src) {
-    std::cout << "/" << str;
-  }
-
-  std::cout << " ";
-
-  for (const auto &str : dest) {
-    std::cout << "/" << str;
-  }
-
-  std::cout << "\n";
-  return true;
-}
-
-bool Shell::pwd()
-{
-  std::cout << "pwd\n";
-  return true;
-}
-
-
-bool Shell::rename(const path_fs &src, const path_fs &dest)
-{
-  std::cout << "rename ";
-
-  for (const auto &str : src) {
-    std::cout << "/" << str;
-  }
-
-  std::cout << " ";
-
-  for (const auto &str : dest) {
-    std::cout << "/" << str;
-  }
-
-  std::cout << "\n";
-  return true;
-}
-
-bool Shell::rm(const path_fs &path)
-{
-  std::cout << "rm ";
-
-  for (const auto &str : path) {
-    std::cout << "/" << str;
-  }
-  std::cout << "\n";
-  return true;
-}
-
-bool Shell::rmdir(const path_fs &path)
-{
-  std::cout << "rmdir ";
-
-  for (const auto &str : path) {
-    std::cout << "/" << str;
-  }
-  std::cout << "\n";
-  return true;
-}
-
-bool Shell::touch(const path_fs &path)
-{
-  std::cout << "rmdir ";
-
-  for (const auto &str : path) {
-    std::cout << "/" << str;
-  }
-  std::cout << "\n";
-  return true;
-}
-
-Shell::Command Shell::parse_command(const std::string &input, size_t &pos)
-{
-  switch (input[0]) {
-  case 'a':// attr
-    if (input[1] == 't' && input[2] == 't' && input[3] == 'r'
-        && is_end(input[4])) {
-      pos = 5;
-      return ATTR;
+  std::vector<std::string> results;
+  for (const auto &a : commands) {
+    if (a != "") {
+      results.push_back(a);
     }
-    return UNKNOW;
-  case 'c':// cd, cluster, cp
-    switch (input[1]) {
-    case 'd':// cd
-      if (is_end(input[2])) {
-        pos = 3;
-        return CD;
-      }
-      return UNKNOW;
-    case 'l':// cluster
-      if (input[2] == 'u' && input[3] == 's' && input[4] == 't'
-          && input[5] == 'e' && input[6] == 'r' && is_end(input[7])) {
-        pos = 8;
-        return CLUSTER;
-      }
-      return UNKNOW;
-    case 'p':// cp
-      if (is_end(input[2])) {
-        pos = 3;
-        return CP;
-      }
-      return UNKNOW;
-    default:
-      return UNKNOW;
-    }
-  case 'i':// info
-    if (input[1] == 'n' && input[2] == 'f' && input[3] == 'o'
-        && is_end(input[4])) {
-      pos = 5;
-      return INFO;
-    }
-    return UNKNOW;
-  case 'l':// ls
-    if (input[1] == 's' && is_end(input[2])) {
-      pos = 3;
-      return LS;
-    }
-    return UNKNOW;
-  case 'm':// mkdir, mv
-    switch (input[1]) {
-    case 'k':// mkdir
-      if (input[2] == 'd' && input[3] == 'i' && input[4] == 'r'
-          && is_end(input[5])) {
-        pos = 6;
-        return MKDIR;
-      }
-      return UNKNOW;
-    case 'v':// mv
-      if (is_end(input[2])) {
-        pos = 3;
-        return MV;
-      }
-      return UNKNOW;
-    default:
-      return UNKNOW;
-    }
-  case 'p':// pwd
-    if (input[1] == 'w' && input[2] == 'd' && is_end(input[3])) {
-      pos = 4;
-      return PWD;
-    }
-    return UNKNOW;
-  case 'r':// rename, rm, rmdir
-    switch (input[1]) {
-    case 'e':// rename
-      if (input[2] == 'n' && input[3] == 'a' && input[4] == 'm'
-          && input[5] == 'e' && is_end(input[6])) {
-        pos = 7;
-        return RENAME;
-      }
-      return UNKNOW;
-    case 'm':// rm, rmdir
-      if (is_end(input[2])) {
-        pos = 3;
-        return RM;
-      } else if (input[2] == 'd' && input[3] == 'i' && input[4] == 'r'
-                 && is_end(input[5])) {
-        pos = 6;
-        return RMDIR;
-      }
-      return UNKNOW;
-    default:
-      return UNKNOW;
-    }
-  case 't':// touch
-    if (input[1] == 'o' && input[2] == 'u' && input[3] == 'c' && input[4] == 'h'
-        && is_end(input[5])) {
-      pos = 6;
-      return TOUCH;
-    }
-    return UNKNOW;
-  default:
-    return UNKNOW;
   }
+
+  return results;
 }
 
-path_fs Shell::parse_path(const std::string &input, size_t &pos)
+FSApi Shell::command(const std::string &cmd) const
 {
-  path_fs fullPath;// Armazena todo o caminho
-  std::string curPath;// Gerencia o caminho atual
-
-  bool slash = false;
-  while (true) {
-    // Se a posição for maior do que a string ou for um espaço chegamos no fim
-    if (input.size() < pos || input[pos] == ' ') {
-      if (!curPath.empty()) {
-        fullPath.push_back(curPath);
-      }
-
-      pos++;
-      break;
-    }
-
-    // Se eu encontrar um / seguido de outro / houve um erro.
-    if (slash && input[pos] == '/') {
-      fullPath.clear();
-      break;
-    }
-
-    // Se uma / foi encontrada salva o caminho atual e continua.
-    if (!slash && input[pos] == '/') {
-      slash = true;
-      pos++;
-      if (curPath.length() > 0) {
-        fullPath.push_back(curPath);
-      }
-      curPath.clear();
-      continue;
-    }
-
-    if (input[pos] == '\0') {
-      pos++;
-      continue;
-    }
-
-    curPath += input[pos];
-    pos++;
-    slash = false;
+  if (cmd == "info") {
+    return INFO;
   }
 
-  return fullPath;
+  if (cmd == "cluster") {
+    return CLUSTER;
+  }
+
+  if (cmd == "ls") {
+    return LS;
+  }
+
+  if (cmd == "rm") {
+    return RM;
+  }
+
+  if (cmd == "rmdir") {
+    return RMDIR;
+  }
+
+  if (cmd == "pwd") {
+    return PWD;
+  }
+
+  if (cmd == "cd") {
+    return CD;
+  }
+
+  if (cmd == "attr") {
+    return ATTR;
+  }
+
+  if (cmd == "touch") {
+    return TOUCH;
+  }
+
+  if (cmd == "mkdir") {
+    return MKDIR;
+  }
+
+  if (cmd == "rename") {
+    return RENAME;
+  }
+
+  if (cmd == "mv") {
+    return MV;
+  }
+
+  if (cmd == "cp") {
+    return CP;
+  }
+
+  return FAIL;
 }
 
-bool Shell::execution(const Shell::Command command,
-  const std::string &input,
-  size_t pos)
+void Shell::exec(FSApi cmd, std::vector<std::string> params)
 {
-  size_t posSubstr = 0;
-  std::string arguments;
-  if (pos < input.length()) {
-    arguments = input.substr(pos, input.length());
-  }
-
-  switch (command) {
-  case ATTR: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      arg_invalid("attr", arguments);
-      return false;
-    }
-
-    return Shell::attr(path);
-  }
-  case CD: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      arg_invalid("cd", arguments);
-      return false;
-    }
-
-    return Shell::cd(path);
-  }
+  switch (cmd) {
+  case INFO:
+    fatFS->info();
+    return;
+  case PWD:
+    std::cout << fatFS->pwd() << "\n";
+    return;
   case CLUSTER: {
-    if (arguments.empty()) {
-      arg_invalid("cluster", arguments);
-      return false;
+    if (params.size() < 2) {
+      logger::logError("rm número inválido de parâmetros");
+      return;
     }
 
-    uint32_t num = 0;
-    try {
-      // TODO: Verificar se o tamanho do número no argumento está no tamanho de
-      // um uint32_t
-      num = static_cast<uint32_t>(std::stoi(arguments));
-    } catch (...) {
-      arg_invalid("cluster", arguments);
-      return false;
-    }
-
-    return cluster(num);
+    auto num = static_cast<DWORD>(std::atoi(params[1].c_str()));
+    fatFS->cluster(num);
+    return;
   }
-  case CP: {
-    path_fs src = parse_path(arguments, posSubstr);
-    path_fs dest = parse_path(arguments, posSubstr);
-    if (src.empty() || dest.empty()) {
-      arg_invalid("cp", arguments);
-      return false;
+  case LS: {
+    if (params.size() < 2) {
+      fatFS->ls("");
+    } else {
+      fatFS->ls(params[1]);
     }
-
-    return cp(src, dest);
-  }
-  case INFO: {
-    if (!arguments.empty()) {
-      arg_invalid("info", arguments);
-      return false;
-    }
-
-    return info();
-  }
-  case LS:
-    if (!arguments.empty()) {
-      arg_invalid("ls", arguments);
-      return false;
-    }
-
-    return ls();
-  case MKDIR: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      arg_invalid("mkdir", arguments);
-      return false;
-    }
-
-    return Shell::mkdir(path);
-  }
-  case MV: {
-    path_fs src = parse_path(arguments, posSubstr);
-    path_fs dest = parse_path(arguments, posSubstr);
-    if (src.empty() || dest.empty()) {
-      arg_invalid("mv", arguments);
-      return false;
-    }
-
-    return mv(src, dest);
-  }
-  case PWD: {
-    if (!arguments.empty()) {
-      arg_invalid("pwd", arguments);
-      return false;
-    }
-
-    return pwd();
-  }
-  case RENAME: {
-    path_fs src = parse_path(arguments, posSubstr);
-    path_fs dest = parse_path(arguments, posSubstr);
-    if (src.empty() || dest.empty()) {
-      arg_invalid("rename", arguments);
-      return false;
-    }
-
-    return rename(src, dest);
+    return;
   }
   case RM: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      arg_invalid("rm", arguments);
-      return false;
+    if (params.size() < 2) {
+      logger::logError("rm número inválido de parâmetros");
+      return;
     }
-
-    return Shell::rm(path);
+    fatFS->rm(params[1]);
+    return;
   }
   case RMDIR: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      arg_invalid("rmdir", arguments);
-      return false;
+    if (params.size() < 2) {
+      logger::logError("rmdir número inválido de parâmetros");
+      return;
     }
-
-    return Shell::rmdir(path);
+    fatFS->rmdir(params[1]);
+    return;
+  }
+  case CD: {
+    if (params.size() < 2) {
+      logger::logError("cd número inválido de parâmetros");
+      return;
+    }
+    fatFS->cd(params[1]);
+    return;
+  }
+  case ATTR: {
+    if (params.size() < 2) {
+      logger::logError("attr número inválido de parâmetros");
+      return;
+    }
+    fatFS->attr(params[1]);
+    return;
   }
   case TOUCH: {
-    path_fs path = parse_path(arguments, posSubstr);
-    if (path.empty()) {
-      arg_invalid("touch", arguments);
-      return false;
+    if (params.size() < 2) {
+      logger::logError("touch número inválido de parâmetros");
+      return;
     }
-
-    return Shell::touch(path);
+    fatFS->touch(params[1]);
+    return;
   }
+  case MKDIR: {
+    if (params.size() < 2) {
+      logger::logError("mkdir número inválido de parâmetros");
+      return;
+    }
+    fatFS->mkdir(params[1]);
+    return;
+  }
+  case RENAME: {
+    if (params.size() < 3) {
+      logger::logError("rename número inválido de parâmetros");
+      return;
+    }
+    fatFS->rename(params[1], params[2]);
+    return;
+  }
+  case MV: {
+    if (params.size() < 3) {
+      logger::logError("mv número inválido de parâmetros");
+      return;
+    }
+    fatFS->mv(params[1], params[2]);
+    return;
+  }
+  case CP: {
+    if (params.size() < 3) {
+      logger::logError("cp número inválido de parâmetros");
+      return;
+    }
+    fatFS->cp(params[1], params[2]);
+    return;
+  }
+  case FAIL:
   default:
-  case UNKNOW:
-    std::cout << "[" << YELLOW("UNKNOW") << "] :" << input << "\n";
-    break;
+    logger::logError("Comando não reconhecido");
   }
-  return false;
 }
 
-//===----------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===
 // PUBLIC
-//===----------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===
+
+Shell::Shell(std::unique_ptr<FatFS> fatFS) : fatFS(std::move(fatFS)) {}
 
 void Shell::interpreter()
 {
   std::string input;
 
   while (true) {
-    std::cout << GREEN("fatshell") << ":" << YELLOW("/") << " ";
+    std::cout << "fatshell" << ":" << logger::to_green(fatFS->pwd()) << " ";
     std::getline(std::cin, input);
 
     if (std::cin.eof()) {
@@ -485,8 +220,21 @@ void Shell::interpreter()
       return;
     }
 
-    size_t pos = 0;
-    Shell::Command command = Shell::parse_command(input, pos);
-    Shell::execution(command, input, pos);
+    auto params = parser(input);
+    if (params.empty()) {
+      continue;
+    }
+
+    auto cmd = command(params[0]);
+    if (cmd == FAIL) {
+      logger::logWarning("Comando não reconhecido");
+      continue;
+    }
+
+    try {
+      exec(cmd, params);
+    } catch (std::runtime_error &error) {
+      logger::logError(error.what());
+    }
   }
 }

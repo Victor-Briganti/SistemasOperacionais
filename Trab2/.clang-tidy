@@ -16,6 +16,14 @@ Checks: "*,
         -google-readability-todo,
         -fuchsia-default-arguments-declarations,
         -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+        -cert-err33-c,
+        -hicpp-vararg,
+        -cppcoreguidelines-pro-type-vararg,
+        -hicpp-avoid-c-arrays,
+        -cppcoreguidelines-avoid-c-arrays,
+        -modernize-avoid-c-arrays,
+        -cppcoreguidelines-prefer-member-initializer,
+        -cppcoreguidelines-pro-type-reinterpret-cast,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
