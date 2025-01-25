@@ -290,8 +290,11 @@ O sistema de arquivos organiza o espaço de armazenamento dividindo-o em blocos 
 \section{Materiais}
 \label{sec:materiais}
 
+
+Especificações do computadores utilizados:  
+
 \begin{itemize}
-  \item Especificações do computador utilizado:
+  \item Computador 1:
   \begin{itemize}
     \item Modelo: Lenovo Ideapad S145
     \item CPU: Intel Core i$5$-$12500$H
@@ -299,6 +302,17 @@ O sistema de arquivos organiza o espaço de armazenamento dividindo-o em blocos 
     \item Memória Secundária: SSD $512$GB
     \item Sistema Operacional: Arch
   \item Núcleo: Linux $6.6.70$ 
+  \end{itemize}
+  \item Computador 2:
+  \begin{itemize}
+    \item Modelo: Samsung Expert X41
+    \item CPU: Intel Core i7 7500U
+    \item Memória Principal: $16$GB RAM
+    \item Memória Secundária: SSD $512$GB NVME
+    \item Sistema Operacional: Windowns $10$
+    \item Hipervisor: VirtualBox $7.1.2$
+    \item Sistema Operacional utilizado no Hipervisor: Kali GNU/Linux Rolling
+    \item Núcleo: Linux $6.8.11$
   \end{itemize}
 \end{itemize}
 
@@ -444,8 +458,267 @@ O arquivo \textit{types.hpp} define tipos de dados fundamentais para o sistema, 
     \item \textit{DWORD}: Define um valor de 32 bits (4 bytes), usado para armazenar valores maiores, como \textit{timestamps} completos ou endereços de memória.
 \end{itemize}
 
+% --------------
+
+\graphicspath{ {./figuras/resultados} }
+
 \section{Resultados e Discussões}
-\label{sec:discussao}
+\label{sec:resultados}
+Os resultados foram satifatorios, atravéz do \textit{Shell} foi possivel manipular a imagem FAT com êxito.
+
+% --------------
+
+\subsection{\texttt{info}}
+\label{subsec:info}
+ Utilização: \$ \texttt{info}
+ 
+ O comando \texttt{info} exibe as informações sobre o disco e da FAT, a saída dele pode ser verificada na figura[\ref{fig:info}]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{0-info.PNG}
+    \caption{Saída do comando info}
+    \label{fig:info}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{ls}}
+\label{subsec:ls}
+Utilização: \$ \texttt{ls} (nada ou diretório) 
+
+O comando \texttt{ls} lista os arquivos e diretórios do caminho atual ou do caminho descrito no primeiro parâmetro dele,a sua saída executado no caminho atual pode ser verificada na figura[\ref{fig:ls}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/1-ls.PNG}
+    \caption{Saída do comando ls executando no caminho atual}
+    \label{fig:ls}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{cluster}}
+\label{subsec:cluster}
+Utilização: \$ \texttt{cluster} (número do cluster)
+
+O comando \texttt{cluster} exibe o conteudo de um cluster em específico, exemplo de uso na figura[\ref{fig:cluester}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/2-cluster.PNG}
+    \caption{Saída do comando cluster}
+    \label{fig:cluester}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{cp}}
+\label{subsec:cp}
+Utilização: \$ \texttt{cp} (origin) (destino)
+
+O comando \texttt{cp} realiza a cópia de um arquivo do caminho de origem para o caminho de destino, realizando a cópia entre sistemas de arquivos ou no próprio sistema. A cópia de um arquivo externo para o FAT32 pode ser verificada na figura[\ref{fig:cp-externo-interno-1}] e seu resultado na figura[\ref{fig:cp-externo-interno-2}]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/3.1-cp-externo-interno.PNG}
+    \caption{Execução do comando \texttt{cp} para copiar arquivo externo para o FAT32}
+    \label{fig:cp-externo-interno-1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/3.2-cp-externo-interno.PNG}
+    \caption{Resultado da cópia do arquivo externo}
+    \label{fig:cp-externo-interno-2}
+\end{figure}
+
+A cópia de um arquivo para o próprio FAT32 pode ser verificada na figura[\ref{fig:cp-interno-attr}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/5-cp-interno-attr.PNG}
+    \caption{Executação e resultado do comando \texttt{cp}, utilizado no próprio FAT32}
+    \label{fig:cp-interno-attr}
+\end{figure}
+
+A cópia do arquivo residente no FAT32 para o sistema de arquivos externo pode ser verificada na figura[\ref{fig:cp-interno-externo-1}] e o seu resultado na figura[\ref{fig:cp-interno-externo-2}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/6-cp-interno-externo.PNG}
+    \caption{Execução do comando \texttt{cp} realizando a cópia de um arquivo interno para o sistema de arquivos externo}
+    \label{fig:cp-interno-externo-1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/7-cp-arquivo-externo-resultado.PNG}
+    \caption{Resultado no sistema de arquivos internos após cópia de arquivo resistente no FAT32}
+    \label{fig:cp-interno-externo-2}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{attr}}
+\label{subsec:attr}
+Utilização: \$ \texttt{attr} (diretório ou arquivo)
+
+O comando \texttt{attr} exibe os atributos de um arquivo ou diretório,um exemplo de saída para arquivo pode ser verificado na figura[\ref{fig:attr}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/4-attr.PNG}
+    \caption{Exemplo de saída para o comando \texttt{attr} utilizado em um arquivo}
+    \label{fig:attr}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{touch}}
+\label{subsec:touch}
+Utilização: \$ \texttt{touch} (nome)
+
+O comando \texttt{touch} cria um arquivo sem conteúdo, um exemplo do seu uso pode ser analisado na figura[\ref{fig:touch}].
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/8-touch.PNG}
+    \caption{Exemplo de uso do comando \texttt{touch}}
+    \label{fig:touch}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{mkdir}}
+\label{subsec:mkdir}
+Utilização: \$ \texttt{mkdir} (nome)
+
+O comando \texttt{mkdir} cria um diretório vazio, um exemplo da sua utilização pode ser analisado na figura[\ref{fig:mkdir}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/9-mkdir.PNG}
+    \caption{Exemplo de uso do comando \texttt{mkdir}}
+    \label{fig:mkdir}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{cd}}
+\label{subsec:cd}
+Utilização: \$ \texttt{cd} (destino)
+
+O comando \texttt{cd} possibilita navegar entre os diretórios, um exemplo da sua utilização pode ser analisado na figura[\ref{fig:cd}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/10-cd.PNG}
+    \caption{Exemplo de utilização do comando \texttt{cd}}
+    \label{fig:cd}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{rename}}
+\label{subsec:rename}
+Utilização: \$ \texttt{rename} (arquivo alvo) (arquivo com novo nome)
+
+O comando \texttt{rename} altera o nome de um arquivo específico, um exemplo da sua utilização pode ser analisado na figura[\ref{fig:rename}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/11-rename.PNG}
+    \caption{Exemplo de utilização do comando \texttt{rename}}
+    \label{fig:rename}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{mv}}
+\label{subsec:mv}
+Utilização: \$ \texttt{mv} (origin) (destino)
+
+O comando \texttt{mv} move arquivos para um destino específico, um exemplo da sua utilização movendo um arquivo do sistema de arquivos externo para o FAT32, pode ser analisado na figura[\ref{subsec:mv}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/12-mv-externo-iterno.PNG}
+    \caption{Exemplo do comando \texttt{mv} movendo arquivo externo para o FAT32}
+    \label{fig:mv-externo-interno}
+\end{figure}
+
+O exemplo de mover um arquivo do FAT32 para o sistema de arquivos externo pode ser analisado na figura[\ref{fig:mv-interno-externo}] e sua validação na figura[\ref{fig:mv-externo-validacao}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/13-mv-interno-externo.PNG}
+    \caption{Exemplo do comando \texttt{mv} movendo um arquivo do FAT32 para o sistema de arquivos externo}
+    \label{fig:mv-interno-externo}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/14-mv-externo-validacao.PNG}
+    \caption{Resultado do comando \texttt{mv} movendo um arquivo do FAT32 para o sistema de arquivos externo}
+    \label{fig:mv-externo-validacao}
+\end{figure}
+
+O exemplo de mover um arquivo interno para o próprio FAT32, pode ser verificado na figura[\ref{fig:mv-interno}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/18-mv-interno-interno.PNG}
+    \caption{Exemplo do comando \texttt{mv} movendo arquivo internamente no FAT32}
+    \label{fig:mv-interno}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{rm}}
+\label{subsec:rm}
+Utilização: \$ \texttt{rm} (arquivo)
+
+O comando \texttt{rm} remove um arquivo em especifico do sistema de arquivos, um exemplo para sua utilização pode ser encontrado na figura[\ref{fig:rm}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/16-rm.PNG}
+    \caption{Exemplo da utilização do comando \texttt{rm}}
+    \label{fig:rm}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{rmdir}}
+\label{subsec:rmdir}
+Utilização: \$ \texttt{rmdir} (diretorio)
+
+O comando \texttt{rmdir} remove um diretório especifico caso ele esteja vazio, um exemplo da sua utilização pode ser encontrado na figura[\ref{fig:rmdir}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/17-rmdir.PNG}
+    \caption{Exemplo da utilização do comando \texttt{rmdir}}
+    \label{fig:rmdir}
+\end{figure}
+
+% --------------
+
+\subsection{\texttt{pwd}}
+\label{subsec:pwd}
+Utilização: \$ \texttt{pwd}
+
+O comando \texttt{pwd} exibe o caminho absoluto atual, um exemplo da sua saída pode ser encontrado na figura[\ref{fig:pwd}].
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=450pt]{figuras/resultados/19-pwd.PNG}
+    \caption{Exemplo da saída do comando \texttt{pwd}}
+    \label{fig:pwd}
+\end{figure}
+
+% --------------
 
 \section{Conclusões}
 \label{sec:conclusoes}
