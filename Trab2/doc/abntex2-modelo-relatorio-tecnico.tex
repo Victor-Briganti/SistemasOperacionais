@@ -269,9 +269,9 @@ FAZER
 \section{Introdução}
 \label{sec:introducao}
 
-Um sistema de arquivos é uma parte fundamental dos sistemas operacionais, responsável por organizar, armazenar e gerenciar os dados de forma eficiente e confiável em dispositivos de armazenamento, como discos rígidos e SSDs. Ele desempenha um papel crucial ao permitir que aplicativos e usuários armazenem informações que precisam ser acessadas e preservadas mesmo após o encerramento de um processo ou desligamento do computador~\cite{tanenbaum2016}.
+Um sistema de arquivos é uma parte fundamental de um sistema operacional, responsável por organizar, armazenar e gerenciar os dados de forma eficiente e confiável em dispositivos de armazenamento, como discos rígidos e SSDs. Este sistema  desempenha um papel crucial ao permitir que aplicativos e usuários armazenem informações que precisam ser acessadas e preservadas mesmo após o encerramento de um processo ou desligamento do computador~\cite{tanenbaum2016}.
 
-O sistema de arquivos FAT (File Allocation Table) foi desenvolvido no final da década de 1970. Originalmente utilizado no sistema operacional MS-DOS, o FAT evoluiu ao longo do tempo para suportar mídias maiores, resultando em três variantes principais: FAT12, FAT16 e FAT32. A principal diferença entre essas versões está no tamanho, em bits, das entradas na tabela de alocação, que variam de 12 a 32 bits~\cite{microsoft2000}.
+FAT (File Allocation Table) é um sistema de arquivos desenvolvido no final de 1970. Originalmente utilizado no sistema operacional MS-DOS, o FAT evoluiu ao longo do tempo para suportar mídias maiores, resultando em três variantes principais: FAT12, FAT16 e FAT32. A principal diferença entre essas versões está no tamanho, em bits, das entradas na tabela de alocação, que variam de 12 a 32 bits~\cite{microsoft2000}.
 
 \section{Objetivo}
 \label{sec:objetivos}
@@ -281,17 +281,18 @@ O objetivo deste trabalho é compreender de forma aprofundada o funcionamento do
 \section{Fundamentação}
 \label{sec:fundamentacao}
 
-O sistema de arquivos é um componente essencial de qualquer sistema operacional, sendo responsável pela organização, armazenamento e recuperação de dados em dispositivos de armazenamento. Oferece uma abstração que permite ao usuário interagir com os dados sem se preocupar com os detalhes de baixo nível sobre sua disposição física no dispositivo. O sistema de arquivos define a estrutura e as regras para a criação, organização e manipulação de arquivos, que são as unidades básicas de dados persistentes. Um arquivo é um conjunto de dados armazenados de forma duradoura em dispositivos como discos rígidos e SSDs. Esses dados podem assumir várias formas, como documentos, imagens, vídeos ou bancos de dados, acessados por meio de uma interface fornecida pelo sistema de arquivos, que traduz as operações do usuário em comandos de leitura e escrita no dispositivo.
+O sistema de arquivos é um componente essencial em qualquer sistema operacional, sendo responsável pela organização, armazenamento e recuperação de dados em dispositivos de armazenamento. Este sistema fornece uma abstração que permite ao usuário interagir com os dados de forma intuitiva, sem a necessidade de compreender os detalhes de baixo nível sobre a disposição física dos mesmos.
 
-O sistema de arquivos organiza o espaço de armazenamento dividindo-o em blocos ou setores, mapeados para os arquivos eficientemente. Para facilitar a navegação e o gerenciamento de dados, a estrutura do sistema de arquivos inclui diretórios, que permitem organizar arquivos de maneira hierárquica. Cada arquivo ou diretório possui um nome único, e o sistema de arquivos mantém uma tabela de alocação ou uma estrutura de metadados que indica a localização física de cada arquivo.
+Como camada de abstração, o sistema de arquivos utiliza mecanismos como divisão em blocos/setores, estrutura hierárquica de diretórios, arquivos e metadados para ocultar a complexidade física do usuário. Os arquivos, que representam as unidades básicas de dados, são armazenados de maneira lógica e podem conter desde pequenos trechos de texto até grandes volumes de informações binárias, enquanto os diretórios organizam esses arquivos em uma árvore hierárquica, permitindo uma navegação intuitiva. Essa estrutura hierárquica também possibilita a criação de subdiretórios, facilitando a categorização e o gerenciamento de grandes volumes de dados.
 
- Existem várias estratégias na alocação de arquivos que impactam diretamente o desempenho e a eficiência do sistema. A alocação contígua organiza os blocos de um arquivo sequencialmente, garantindo um acesso rápido e eficiente, principalmente para leituras sequenciais. Contudo, ela sofre com a fragmentação externa, o que pode dificultar a alocação de novos arquivos ou a expansão dos existentes. A alocação encadeada resolve esse problema ao permitir que os blocos de um arquivo sejam armazenados em locais dispersos, com ponteiros em cada bloco indicando a sequência. Essa abordagem aumenta a flexibilidade, mas torna o acesso aleatório mais complexo e menos eficiente. A alocação FAT é uma variação da alocação encadeada, onde os ponteiros são armazenados em uma tabela centralizada, facilitando o acesso e a recuperação dos arquivos, evitando a necessidade de ler bloco a bloco para encontrar suas posições no disco. Em todos os casos, o desafio do sistema de arquivos é balancear eficiência no acesso, segurança e flexibilidade no gerenciamento dos dados, criando uma solução otimizada para as necessidades do usuário e as características do dispositivo de armazenamento~\cite{maziero2019}.
+Além disso, o sistema de arquivos fragmenta o armazenamento em blocos e os mapeia logicamente, criando uma representação unificada dos dados, independentemente de sua dispersão física no dispositivo. Os metadados desempenham um papel crítico nesse processo, armazenando informações como permissões de acesso, tamanho, localização física no disco e datas de modificação. Tabelas de alocação, por exemplo, são utilizadas para rastrear quais blocos pertencem a quais arquivos, garantindo que os dados possam ser localizados e recuperados com eficiência.
+
+Existem diferentes estratégias de alocação que um sistema de arquivos pode utilizar. A alocação contígua é um exemplo desse tipo de estratégia, que organiza os blocos de um arquivo de maneira sequencial, garantindo um acesso rápido e eficiente, contudo é uma estratégia que possui um problema de fragmentação externa, o que pode dificultar a alocação de novos arquivos ou a expansão dos existentes. A alocação encadeada é uma estratégia que surgiu como uma evolução da sequencial, no qual os blocos de dados também atuam como uma lista encadeada no qual um bloco aponta para sua sequência. O FAT é uma variação da alocação encadeada, onde os ponteiros são armazenados em uma tabela centralizada, facilitando o acesso e a recuperação dos arquivos, evitando a necessidade de ler bloco a bloco para encontrar suas posições no disco. Em todo o caso, o desafio do sistema de arquivos é balancear eficiência no acesso, segurança e flexibilidade no gerenciamento dos dados, criando uma solução otimizada para as necessidades do usuário e as características do dispositivo de armazenamento~\cite{maziero2019}.
 
 \section{Materiais}
 \label{sec:materiais}
 
-
-Especificações do computadores utilizados:  
+Especificações dos computadores utilizados durante os desenvolvimentos e testes:
 
 \begin{itemize}
   \item Computador 1:
@@ -324,17 +325,17 @@ O sistema foi implementado na linguagem C++, e sua compilação foi testada util
 \subsection{Estruturas do FAT32}
 \label{subsubsec:estrutura_fat}
 
-O FAT32 é uma evolução dos antigos sistemas e cujo objetivo é permitir a utilização de discos rígidos maiores e melhorar a alocação de clusters. Uma das principais melhorias do FAT32 em relação a versões anteriores é o uso de 32 bits para representar os números de cluster, embora apenas 28 bits sejam utilizados para o endereçamento real. Isso permite que o FAT32 suporte um número significativamente maior de clusters, tornando-o capaz de lidar com volumes muito grandes. Contudo, o sistema apresenta a limitação de tamanho de arquivo poderem ter no máximo de 4 GB~\cite{osdev}.
+O FAT32 é uma evolução do FAT12 e FAT16, projetado para suportar discos rígidos maiores e otimizar a alocação de clusters. Este sistema utiliza 32 bits para números de cluster, com 28 bits para endereçamento real, permitindo um maior número de clusters e compatibilidade com dispositivos de maior capacidade de armazenamento. No entanto, o sistema apresenta uma limitação no tamanho máximo que um arquivo pode ter, não podendo ultrapassar os 4 GB~\cite{osdev}.
 
 \subsubsection{\textit{BIOS Parameter Block}}
 \label{subsubsec:bpb}
 
-O BIOS Parameter Block (BPB) é uma estrutura de dados presente no primeiro setor do volumes FAT, essa estrutura contém informações fundamentais sobre a configuração e organização do sistema de arquivos no volume, os atributos dessa estrutura descrevem:
+O BIOS Parameter Block (BPB) é uma estrutura de dados presente no primeiro setor dodo volume FAT, essa estrutura contém informações fundamentais sobre a configuração e organização do sistema de arquivos no volume, os atributos dessa estrutura descrevem:
 
 \begin{itemize}
     \item Tamanho dos setores: Quantidade de bytes por setor no disco.
     \item Tamanho dos \textit{clusters}: Quantidade de setores por unidade de alocação.
-    \item Número de FATs: Número de tabelas FAT no volume (geralmente 2 para redundância).
+    \item Número de FATs: Número de tabelas FAT no volume, geralmente 2 para redundância.
     \item Número de setores reservados: Setores reservados no início do volume antes das tabelas FAT.
     \item Tamanho total do volume: Definido pelos campos \textit{BPB\_TotSec16} ou \textit{BPB\_TotSec32} dependendo do tamanho do volume.
     \item Outras informações específicas: Como número de cabeças, setores por trilha e setores ocultos.
@@ -357,41 +358,48 @@ Devido ao tamanho dos volumes no FAT32, a estrutura FSInfo foi projetada para fa
 \subsubsection{\textit{FAT}}
 \label{subsubsec:fsinfo}
 
-O FAT é uma estrutura de dados localizada no início do disco que funciona como uma lista encadeada simples para gerenciar a alocação de espaço. Cada entrada na tabela corresponde a um \textit{cluster} e pode apontar para o próximo \textit{cluster} ou indicar o final de um arquivo, que no FAT32 é marcado pelo valor especial \texttt{0x0FFFFFFF}.
+O FAT é uma estrutura de dados localizada no início do disco que funciona como uma lista encadeada simples para gerenciar a alocação de espaço. Cada entrada na tabela corresponde a um \textit{cluster} e pode apontar para o próximo \textit{cluster} ou indicar o final de uma entrada, que no FAT32 é marcado pelo valor especial \texttt{0x0FFFFFFF}.
 
-Para garantir maior robustez e prevenir perda de dados, a FAT é geralmente redundante, mantendo ao menos duas cópias da tabela. Isso reduz o risco de corrupção do sistema em caso de falha ou dano à tabela principal~\cite{microsoft2000}.
+Para garantir maior robustez e prevenir perda de dados, a FAT é geralmente redundante, onde é comum nestes sistemas existirem duas ou mais cópias da tabela. Reduzindo o risco de corrupção do sistema em caso de falha ou dano à tabela principal~\cite{microsoft2000}.
 
 \subsubsection{Entrada do Diretório}
 \label{subsubsec:dentry}
 
-No sistema FAT, as entradas de diretório são estruturas de 32 bytes que representam arquivos e diretórios. Cada entrada é composta por uma série de campos que descrevem as características do arquivo ou diretório, incluindo seu nome, atributos, data e hora de criação, último acesso e \textit{clusters} alocados.
+No sistema FAT, as entradas de diretório são estruturas de 32 bytes que representam arquivos e diretórios. Cada entrada é composta por uma série de campos que descrevem as características do arquivo ou diretório, incluindo seu nome, atributos, data e hora de criação, último acesso e clusters alocados.
 
 A estrutura de uma entrada de diretório é definida da seguinte forma:
 
 \begin{itemize} 
-    \item \textit{DIR\_Name}: Contém o nome do arquivo, com até 8 caracteres para o nome e 3 para a extensão. 
-    \item \textit{DIR\_Attr}: Especifica os atributos do arquivo, como se é de somente leitura, oculto, sistema, diretório, ou arquivo normal.
-    \item \textit{DIR\_FstClusHI} e \textit{DIR\_FstClusLO}: Contêm o número do \textit{cluster} onde o arquivo ou diretório começa no disco. Juntos, formam um valor de 32 bits que aponta para o início do arquivo. 
+    \item \textit{DIR\_Name}: Contém o nome do arquivo, com até 8 caracteres para o nome e 3 para a extensão.
+    \item \textit{DIR\_Attr}: Especifica os atributos do arquivo, Seus valores possíveis são:
+    \begin{itemize} 
+        \item \texttt{ATTR\_READ\_ONLY}: Arquivo somente leitura.
+        \item \texttt{ATTR\_HIDDEN}: Arquivo oculto.
+        \item \texttt{ATTR\_SYSTEM}: Arquivo do sistema.
+        \item \texttt{ATTR\_DIRECTORY}: Indica que a entrada corresponde a um diretório.
+        \item \texttt{ATTR\_ARCHIVE}: Marca arquivos que foram  alterados desde o último backup.
+    \end{itemize}
+    \item \textit{DIR\_FstClusHI} e \textit{DIR\_FstClusLO}: Contêm o número do cluster onde o arquivo ou diretório começa no disco. Juntos, formam um valor de 32 bits que aponta para o início do arquivo. 
     \item \textit{DIR\_FileSize}: Armazena o tamanho do arquivo em bytes, sendo sempre 0 para diretórios. 
-    \item Campos de data e hora: Incluem informações sobre a data e hora de criação, última modificação e último acesso do arquivo. 
+    \item Campos de data e hora: Incluem informações sobre a data e hora de criação, última modificação e último acesso do arquivo.
 \end{itemize}
 
 Além das entradas de diretório padrão, o sistema FAT também permite a utilização de entradas de diretório com nomes longos. Essas entradas são armazenadas imediatamente antes da entrada de diretório curta. Essas entradas são divididas em vários campos que formam partes do nome longo do arquivo, permitindo o uso de nomes mais extensos e que incluem caracteres especiais. A estrutura dessas entradas segue a seguinte organização:
 
 \begin{itemize} 
     \item \textit{LDIR\_Ord}: Indica a ordem da entrada no conjunto de entradas de nome longo associadas à entrada de diretório curta.
-    \item \textit{LDIR\_Name1}, \textit{LDIR\_Name2}, \textit{LDIR\_Name3}: Contêm partes do nome longo do arquivo, armazenadas em subcomponentes de até 13 caracteres no total. 
+    \item \textit{LDIR\_Name1}, \textit{LDIR\_Name2}, \textit{LDIR\_Name3}: Contêm partes do nome longo do arquivo, armazenadas em subcomponentes de até 13 caracteres no total.
     \item \textit{LDIR\_Attr}: Este campo deve ser \texttt{ATTR\_LONG\_NAME}, o que indica que a entrada corresponde a um nome longo.
-    \item \textit{LDIR\_Chksum}: Armazena um valor de verificação de soma do nome, utilizado para validar a correspondência entre as entradas de nome longo e a entrada de nome curto. 
-    \item \textit{LDIR\_FstClusLO}: Este campo deve ser zero. Serve somente para manter a compatibilidade com as entradas de de diretório curtas. 
+    \item \textit{LDIR\_Chksum}: Armazena um valor de verificação de soma do nome, utilizado para validar a correspondência entre as entradas de nome longo e a entrada de nome curto.
+    \item \textit{LDIR\_FstClusLO}: Este campo deve ser zero. Serve somente para manter a compatibilidade com as entradas de diretório curtas.
 \end{itemize}
 
-Cada parte do nome longo é armazenada em uma entrada de diretório distinta, e o conjunto de entradas longas é vinculado à entrada curta correspondente. Assim, o sistema permite a coexistência de nomes curtos (usados por versões antigas do MS-DOS) e nomes longos (permitidos por sistemas modernos), sem causar perda de dados ou interferir na compatibilidade com utilitários antigos. As entradas de diretório longo são identificadas por um atributo especial, \texttt{ATTR\_LONG\_NAME}.
+Cada parte do nome longo é armazenada em uma entrada de diretório distinta, e o conjunto de entradas longas é vinculado à entrada curta correspondente. Assim, o sistema permite a coexistência de nomes curtos, usados por versões antigas do MS-DOS, e nomes longos, permitidos por sistemas modernos, sem causar perda de dados ou interferir na compatibilidade com utilitários antigos. As entradas de diretório longo são identificadas por um atributo especial, \texttt{ATTR\_LONG\_NAME}.
 
 \subsection{Organização do Código}
 \label{subsubsec:code}
 
-Devido à complexidade no desenvolvimento de um sistema de arquivos, a implementação do FAT32 foi estruturada em módulos independentes. Cada módulo é responsável por uma estrutura do sistema. Está sessão é organizada de maneira a explicar cada um desses módulos.
+Devido à complexidade no desenvolvimento de um sistema de arquivos, a implementação do FAT32 foi estruturada em módulos independentes. Cada módulo é responsável por uma estrutura do sistema. Esta sessão é organizada de maneira a explicar cada um desses módulos.
 
 \subsubsection{Entrada e Saída}
 \label{subsubsec:io}
@@ -400,7 +408,7 @@ O módulo de entrada e saída, é uma abstração as chamadas de sistema que lid
 
 O primeiro arquivo é o \textit{fs\_adapter.cpp}, que contém a implementação da classe \texttt{FileSystemAdapter} responsável pela manipulação de arquivos binários no sistema de arquivos do \textit{host}. Essa classe permite a abertura, leitura, escrita, limpeza, remoção e obtenção do tamanho de arquivos.
 
-E o segundo arquivo é o \textit{image.cpp}, que contém a implementação da classe \texttt{Image}, que fornece funcionalidades para ler e escrever dados em imagens, especialmente relacionadas a sistemas de arquivos em FAT32. Assim como o \texttt{FileSystemAdapter}, essa classe utiliza operações de leitura e escrita binária, com a adição de métodos para manipulação da imagem FAT32.
+E o segundo arquivo é o \textit{image.cpp}, que contém a implementação da classe \texttt{Image}, que fornece funcionalidades para ler e escrever dados na imagem onde o sistema de arquivos está gravado. Assim como o \texttt{FileSystemAdapter}, essa classe utiliza operações de leitura e escrita binária, com a adição de alguns métodos para facilitar a manipulação da imagem FAT32.
 
 \subsubsection{Caminhos do Sistema}
 \label{subsubsec:parser}
@@ -410,7 +418,7 @@ Este módulo é referente á manipulação de caminhos no sistema de arquivos. O
 \subsubsection{Sistema de Arquivos}
 \label{subsubsec:fs}
 
-O módulo do sistema de arquivos é responsável por implementar os detalhes e funcionalidades específicas do sistema, dividido em submódulos que abstraem diferentes estruturas. 
+O módulo do sistema de arquivos é responsável por implementar os detalhes e funcionalidades específicas do sistema FAT32, dividido em submódulos que abstraem diferentes estruturas. 
 
 \begin{itemize} 
     \item \textit{structure/}: Submódulo onde se encontram as abstrações das estruturas do sistema de arquivo. São eles:
@@ -422,7 +430,7 @@ O módulo do sistema de arquivos é responsável por implementar os detalhes e f
         \item \textit{fat\_table.cpp}: Implementa a classe \texttt{FatTable}, que traz abstrações para leitura e escrita na tabela FAT, busca por entradas livres e garante a integridade das operações de escrita, replicando-as em ambas as tabelas FAT para aumentar a robustez do sistema.
     \end{itemize}
 
-    \item \textit{entry/}: Submódulo onde se encontram as abstrações, as entradas do sistema. São eles:
+    \item \textit{entry/}: Submódulo onde se encontram as abstrações, das entradas do sistema. São eles:
     \begin{itemize} 
         \item\textit{short\_entry.cpp}: contém a definição da estrutura \texttt{ShortEntry}, que representa uma entrada de nome curto no sistema FAT. Além disso, implementa funções associadas para criar essa estrutura, gerar nomes curtos (incluindo randomização para evitar conflitos), e manipular atributos específicos, como \textit{clusters} associados e tamanhos de arquivos. A estrutura facilita a representação e o gerenciamento eficiente de diretórios ou arquivos de nomes curtos em memória.
 
@@ -437,7 +445,7 @@ A abstração final está localizada na raiz deste módulo, no arquivo \textit{f
 \subsubsection{\textit{Shell}}
 \label{subsubsec:shell}
 
-O módulo do \textit{Shell} implementa a interface em linha de comando que permite que o usuário interaja com o sistema de arquivos. O arquivo principal deste módulo é o \textit{shell.cpp}, que contém a implementação da classe \texttt{Shell}. Essa classe executa em um \textit{loop} contínuo, que interpreta os comandos e utiliza as interfaces públicas de \textit{FatFS} para interagir com o sistema de arquivos.
+O módulo do \textit{Shell} implementa a interface em linha de comando que permite que o usuário interaja com o sistema de arquivos. O arquivo principal deste módulo é o \textit{shell.cpp}, que contém a implementação da classe \texttt{Shell}. Essa classe executa em um \textit{loop} contínuo, que interpreta os comandos e utiliza as interfaces públicas da classe \texttt{FatFS} para interagir com o sistema de arquivos.
 
 \subsubsection{Utilitários}
 \label{subsubsec:utils}
@@ -448,14 +456,14 @@ O arquivo \textit{logger.hpp} define funções de \textit{log} para registrar me
 
 O arquivo \textit{time.hpp} define funções para manipulação e extração de informações de data e hora, essenciais para registrar quando eventos ocorrem, bem como para gerar \textit{timestamps} e \textit{datestamps} usadas pelo submódulo \textit{entry/}.
 
-O arquivo \textit{types.hpp} define tipos de dados fundamentais para o sistema, usados em toda a base de código. Ele assegura consistência na manipulação de dados binários e estruturas de dados de tamanho fixo, com base nos tipos de dados utilizados no sistema. Os tipos são definidos como:
+O arquivo \textit{types.hpp} define tipos de dados fundamentais para o sistema, usados em toda a base de código. Esses tipos asseguram consistência na manipulação de dados binários e estruturas de dados de tamanho fixo, com base nos tipos de dados utilizados no sistema. Os tipos são definidos como:
 
 \begin{itemize}
     \item \texttt{BYTE}: Define um byte (8 bits), utilizado para armazenar dados de pequeno porte ou caracteres.
     
     \item \texttt{WORD}: Define um valor de 16 bits (2 bytes), geralmente utilizado para armazenar valores mais curtos, como datas ou horas.
     
-    \item \textit{DWORD}: Define um valor de 32 bits (4 bytes), usado para armazenar valores maiores, como \textit{timestamps} completos ou endereços de memória.
+    \item \texttt{DWORD}: Define um valor de 32 bits (4 bytes), usado para armazenar valores maiores, como \textit{timestamps} completos ou endereços de memória.
 \end{itemize}
 
 % --------------
@@ -472,12 +480,12 @@ Os resultados foram satifatorios, atravéz do \textit{Shell} foi possivel manipu
 \label{subsec:info}
  Utilização: \$ \texttt{info}
  
- O comando \texttt{info} exibe as informações sobre o disco e da FAT, a saída dele pode ser verificada na figura[\ref{fig:info}]
+ O comando \texttt{info} exibe as informações sobre o disco e da FAT, a saída dele pode ser verificada na Figura~\ref{fig:info}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=450pt]{0-info.PNG}
-    \caption{Saída do comando info}
+    \caption{Saída do comando \texttt{info}}
     \label{fig:info}
 \end{figure}
 
@@ -485,14 +493,14 @@ Os resultados foram satifatorios, atravéz do \textit{Shell} foi possivel manipu
 
 \subsection{\texttt{ls}}
 \label{subsec:ls}
-Utilização: \$ \texttt{ls} (nada ou diretório) 
+Utilização: \$ \texttt{ls [caminho]} 
 
-O comando \texttt{ls} lista os arquivos e diretórios do caminho atual ou do caminho descrito no primeiro parâmetro dele,a sua saída executado no caminho atual pode ser verificada na figura[\ref{fig:ls}].
+O comando \texttt{ls} lista os arquivos e diretórios do caminho atual ou do caminho descrito no primeiro parâmetro dele, a sua saída executada no caminho atual pode ser verificada na Figura~\ref{fig:ls}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=450pt]{figuras/resultados/1-ls.PNG}
-    \caption{Saída do comando ls executando no caminho atual}
+    \caption{Saída do comando \texttt{ls} executado no caminho atual}
     \label{fig:ls}
 \end{figure}
 
@@ -500,14 +508,14 @@ O comando \texttt{ls} lista os arquivos e diretórios do caminho atual ou do cam
 
 \subsection{\texttt{cluster}}
 \label{subsec:cluster}
-Utilização: \$ \texttt{cluster} (número do cluster)
+Utilização: \$ \texttt{cluster <número do cluster>}
 
-O comando \texttt{cluster} exibe o conteudo de um cluster em específico, exemplo de uso na figura[\ref{fig:cluester}].
+O comando \texttt{cluster} exibe o conteúdo de um cluster em específico, exemplo de uso na Figura~\ref{fig:cluester}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=450pt]{figuras/resultados/2-cluster.PNG}
-    \caption{Saída do comando cluster}
+    \caption{Saída do comando \texttt{cluster}}
     \label{fig:cluester}
 \end{figure}
 
@@ -515,9 +523,9 @@ O comando \texttt{cluster} exibe o conteudo de um cluster em específico, exempl
 
 \subsection{\texttt{cp}}
 \label{subsec:cp}
-Utilização: \$ \texttt{cp} (origin) (destino)
+Utilização: \$ \texttt{cp <origem> <destino>}  
 
-O comando \texttt{cp} realiza a cópia de um arquivo do caminho de origem para o caminho de destino, realizando a cópia entre sistemas de arquivos ou no próprio sistema. A cópia de um arquivo externo para o FAT32 pode ser verificada na figura[\ref{fig:cp-externo-interno-1}] e seu resultado na figura[\ref{fig:cp-externo-interno-2}]
+O comando \texttt{cp} realiza a cópia de um arquivo do caminho de origem para o caminho de destino, podendo efetuar a cópia entre o sistema da imagem e o sistema de arquivo do host sistemas de arquivos ou dentro do próprio sistema da imagem. A cópia de um arquivo externo para o FAT32 pode ser verificada na Figura~\ref{fig:cp-externo-interno-1} e seu resultado na Figura~\ref{fig:cp-externo-interno-2}.
 
 \begin{figure}[H]
     \centering
@@ -533,7 +541,7 @@ O comando \texttt{cp} realiza a cópia de um arquivo do caminho de origem para o
     \label{fig:cp-externo-interno-2}
 \end{figure}
 
-A cópia de um arquivo para o próprio FAT32 pode ser verificada na figura[\ref{fig:cp-interno-attr}].
+A cópia de um arquivo para o próprio FAT32 pode ser verificada na Figura~\ref{fig:cp-interno-attr}.
 
 \begin{figure}[H]
     \centering
@@ -542,7 +550,7 @@ A cópia de um arquivo para o próprio FAT32 pode ser verificada na figura[\ref{
     \label{fig:cp-interno-attr}
 \end{figure}
 
-A cópia do arquivo residente no FAT32 para o sistema de arquivos externo pode ser verificada na figura[\ref{fig:cp-interno-externo-1}] e o seu resultado na figura[\ref{fig:cp-interno-externo-2}].
+A cópia do arquivo residente no FAT32 para o sistema de arquivos externo pode ser verificada na Figura~\ref{fig:cp-interno-externo-1} e o seu resultado na Figura~\ref{fig:cp-interno-externo-2}.
 
 \begin{figure}[H]
     \centering
@@ -562,9 +570,9 @@ A cópia do arquivo residente no FAT32 para o sistema de arquivos externo pode s
 
 \subsection{\texttt{attr}}
 \label{subsec:attr}
-Utilização: \$ \texttt{attr} (diretório ou arquivo)
+Utilização: \$ \texttt{attr <diretório | arquivo> }
 
-O comando \texttt{attr} exibe os atributos de um arquivo ou diretório,um exemplo de saída para arquivo pode ser verificado na figura[\ref{fig:attr}].
+O comando \texttt{attr} exibe os atributos de um arquivo ou diretório, a Figura~\ref{fig:attr} mostra a saída deste comando.
 
 \begin{figure}[H]
     \centering
@@ -579,7 +587,7 @@ O comando \texttt{attr} exibe os atributos de um arquivo ou diretório,um exempl
 \label{subsec:touch}
 Utilização: \$ \texttt{touch} (nome)
 
-O comando \texttt{touch} cria um arquivo sem conteúdo, um exemplo do seu uso pode ser analisado na figura[\ref{fig:touch}].
+O comando \texttt{touch} cria um arquivo sem conteúdo, a Figura~\ref{fig:touch} mostra a execução deste comando.
 
 \begin{figure}[h!]
     \centering
@@ -592,9 +600,9 @@ O comando \texttt{touch} cria um arquivo sem conteúdo, um exemplo do seu uso po
 
 \subsection{\texttt{mkdir}}
 \label{subsec:mkdir}
-Utilização: \$ \texttt{mkdir} (nome)
+Utilização: \$ \texttt{mkdir <nome>}
 
-O comando \texttt{mkdir} cria um diretório vazio, um exemplo da sua utilização pode ser analisado na figura[\ref{fig:mkdir}].
+O comando \texttt{mkdir} cria um diretório vazio, um exemplo da sua utilização pode ser analisado na Figura~\ref{fig:mkdir}.
 
 \begin{figure}[H]
     \centering
@@ -607,10 +615,10 @@ O comando \texttt{mkdir} cria um diretório vazio, um exemplo da sua utilizaçã
 
 \subsection{\texttt{cd}}
 \label{subsec:cd}
-Utilização: \$ \texttt{cd} (destino)
+Utilização: \$ \texttt{cd <destino>}
 
-O comando \texttt{cd} possibilita navegar entre os diretórios, um exemplo da sua utilização pode ser analisado na figura[\ref{fig:cd}].
-
+O comando \texttt{cd} possibilita navegar entre os diretórios, um exemplo da sua utilização pode ser analisado na Figura~\ref{fig:cd}.
+ 
 \begin{figure}[H]
     \centering
     \includegraphics[width=450pt]{figuras/resultados/10-cd.PNG}
@@ -622,9 +630,9 @@ O comando \texttt{cd} possibilita navegar entre os diretórios, um exemplo da su
 
 \subsection{\texttt{rename}}
 \label{subsec:rename}
-Utilização: \$ \texttt{rename} (arquivo alvo) (arquivo com novo nome)
+Utilização: \$ \texttt{rename <arquivo alvo> <arquivo com novo nome>}
 
-O comando \texttt{rename} altera o nome de um arquivo específico, um exemplo da sua utilização pode ser analisado na figura[\ref{fig:rename}].
+O comando \texttt{rename} altera o nome de um arquivo específico, um exemplo da sua utilização pode ser analisado na Figura~\ref{fig:rename}.
 
 \begin{figure}[H]
     \centering
@@ -637,9 +645,9 @@ O comando \texttt{rename} altera o nome de um arquivo específico, um exemplo da
 
 \subsection{\texttt{mv}}
 \label{subsec:mv}
-Utilização: \$ \texttt{mv} (origin) (destino)
+Utilização: \$ \texttt{mv <origem> <destino>}
 
-O comando \texttt{mv} move arquivos para um destino específico, um exemplo da sua utilização movendo um arquivo do sistema de arquivos externo para o FAT32, pode ser analisado na figura[\ref{subsec:mv}].
+O comando \texttt{mv} move arquivos para um destino específico, assim como o comando \texttt{cp} também pode ser usado para interagir com o sistema de arquivo original do sistema operacional, um exemplo da sua utilização movendo um arquivo do sistema de arquivos externo para o FAT32, pode ser analisado na Figura~\ref{subsec:mv}.
 
 \begin{figure}[H]
     \centering
@@ -648,7 +656,7 @@ O comando \texttt{mv} move arquivos para um destino específico, um exemplo da s
     \label{fig:mv-externo-interno}
 \end{figure}
 
-O exemplo de mover um arquivo do FAT32 para o sistema de arquivos externo pode ser analisado na figura[\ref{fig:mv-interno-externo}] e sua validação na figura[\ref{fig:mv-externo-validacao}].
+O exemplo de mover um arquivo do FAT32 para o sistema de arquivos externo pode ser analisado na Figura~\ref{fig:mv-interno-externo} e sua validação na Figura~\ref{fig:mv-externo-validacao}.
 
 \begin{figure}[H]
     \centering
@@ -664,7 +672,7 @@ O exemplo de mover um arquivo do FAT32 para o sistema de arquivos externo pode s
     \label{fig:mv-externo-validacao}
 \end{figure}
 
-O exemplo de mover um arquivo interno para o próprio FAT32, pode ser verificado na figura[\ref{fig:mv-interno}].
+O exemplo de mover um arquivo interno para o próprio FAT32, pode ser verificado na Figura~\ref{fig:mv-interno}.
 
 \begin{figure}[H]
     \centering
@@ -677,9 +685,9 @@ O exemplo de mover um arquivo interno para o próprio FAT32, pode ser verificado
 
 \subsection{\texttt{rm}}
 \label{subsec:rm}
-Utilização: \$ \texttt{rm} (arquivo)
+Utilização: \$ \texttt{rm <arquivo>}
 
-O comando \texttt{rm} remove um arquivo em especifico do sistema de arquivos, um exemplo para sua utilização pode ser encontrado na figura[\ref{fig:rm}].
+O comando \texttt{rm} remove um arquivo em especifico do sistema de arquivos, um exemplo para sua utilização pode ser encontrado na Figura~\ref{fig:rm}.
 
 \begin{figure}[H]
     \centering
@@ -692,9 +700,9 @@ O comando \texttt{rm} remove um arquivo em especifico do sistema de arquivos, um
 
 \subsection{\texttt{rmdir}}
 \label{subsec:rmdir}
-Utilização: \$ \texttt{rmdir} (diretorio)
+Utilização: \$ \texttt{rmdir <diretorio>}
 
-O comando \texttt{rmdir} remove um diretório especifico caso ele esteja vazio, um exemplo da sua utilização pode ser encontrado na figura[\ref{fig:rmdir}].
+O comando \texttt{rmdir} remove um diretório específico caso ele esteja vazio, um exemplo da sua utilização pode ser encontrado na Figura~\ref{fig:rmdir}.
 
 \begin{figure}[H]
     \centering
@@ -709,7 +717,7 @@ O comando \texttt{rmdir} remove um diretório especifico caso ele esteja vazio, 
 \label{subsec:pwd}
 Utilização: \$ \texttt{pwd}
 
-O comando \texttt{pwd} exibe o caminho absoluto atual, um exemplo da sua saída pode ser encontrado na figura[\ref{fig:pwd}].
+O comando \texttt{pwd} exibe o caminho absoluto atual, um exemplo da sua saída pode ser encontrado na Figura~\ref{fig:pwd}.
 
 \begin{figure}[H]
     \centering
@@ -742,3 +750,4 @@ O comando \texttt{pwd} exibe o caminho absoluto atual, um exemplo da sua saída 
 \bibliography{abntex2-modelo-references}
 
 \end{document}
+
