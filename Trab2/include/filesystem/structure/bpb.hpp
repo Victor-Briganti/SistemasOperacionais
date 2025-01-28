@@ -1,7 +1,7 @@
 /*
  * Descrição: Definição da estrutura BPB (BIOS Parameter Block)
  *
- * Autores: João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Gustavo Takeda, Matheus Floriano Saito
  * Licença: BSD 2
  *
  * Data: 26/12/2024

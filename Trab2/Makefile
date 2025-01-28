@@ -1,4 +1,4 @@
-CXX:=clang++
+CXX:=g++
 CXXFLAGS:=-Wextra -Wno-unused-parameter -Wno-unused-function -Wno-sign-conversion -Wconversion
 DEBFLAGS:=-g3 -fstandalone-debug
 INCLUDE:=-Iinclude/

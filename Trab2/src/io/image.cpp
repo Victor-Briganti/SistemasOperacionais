@@ -1,7 +1,7 @@
 /*
  * Descrição: Implementação da classe para a leitura da imagem do FAT 32
  *
- * Autores: João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Gustavo Takeda, Matheus Floriano Saito
  * Licença: BSD 2
  *
  * Data: 26/12/2024

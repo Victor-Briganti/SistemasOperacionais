@@ -1,7 +1,7 @@
 /**
  * Descrição: Implementações da entrada com nome curto
  *
- * Autores: João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Gustavo Takeda, Matheus Floriano Saito
  * Licença: BSD 2
  *
  * Data: 05/01/2025
