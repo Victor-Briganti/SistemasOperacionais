@@ -213,15 +213,15 @@
 
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
-FAZER
-% Este trabalho teve como objetivo compreender e aplicar conceitos e recursos de segurança em Sistemas Operacionais GNU/Linux. Para isso, foi utilizado um sistema operacional GNU/Linux em uma máquina virtual executada no hipervisor VirtualBox. As atividades incluíram a configuração de mecanismos fundamentais de segurança no sistema operacional, a análise de arquivos essenciais para o gerenciamento desses recursos e a proteção de dados sensíveis. O trabalho foi concluído com êxito, resultando em uma compreensão prática e teórica sólida sobre segurança básica em um sistema GNU/Linux. Os resultados destacam a relevância da aplicação de medidas de segurança para proteger informações e recursos do sistema operacional, especialmente dados sensíveis, reforçando a importância de uma abordagem estruturada e prática.
+
+Este estudo teve como objetivo investigar e implementar um sistema de arquivos FAT32 operando em uma imagem de disco em um sistema GNU/Linux. A implementação foi realizada em C++, utilizando uma abordagem modular que facilitou a organização e a manutenção do código. O estudo incluiu uma análise detalhada das estruturas do FAT32, com ênfase na manipulação de tabelas de alocação, entradas de diretório e clusters. Como resultado, o trabalho proporcionou uma compreensão aprofundada, tanto teórica quanto prática, sobre a implementação e o funcionamento do sistema de arquivos FAT32.
 
  \vspace{\onelineskip}
     
  \noindent
- \textbf{Palavras-chave}: palavra1; palavra2; palavra3.
-\end{resumo}
-% ---
+ \textbf{Palavras-chave}: C++; GNU/Linux; Imagem de Disco.
+ 
+\end{resumo}% ---
 
 % ---
 % inserir lista de ilustrações
@@ -470,7 +470,7 @@ O arquivo \textit{types.hpp} define tipos de dados fundamentais para o sistema, 
 
 \graphicspath{ {./figuras/resultados} }
 
-\section{Resultados e Discussões}
+\section{Resultados}
 \label{sec:resultados}
 Os resultados foram satifatorios, atravéz do \textit{Shell} foi possivel manipular a imagem FAT com êxito.
 
@@ -730,6 +730,7 @@ O comando \texttt{pwd} exibe o caminho absoluto atual, um exemplo da sua saída 
 
 \section{Conclusões}
 \label{sec:conclusoes}
+A implementação do sistema de arquivos FAT32 permitiu consolidar conceitos teóricos sobre a organização e implementação de um sistema de arquivos, em especial o FAT32, destacando a sua organização de dados em disco, gerenciamento de metadados e alocação de clusters. A estrutura modular do código, dividida em componentes como tabela FAT, entradas de diretório e manipulação de imagens de disco, facilitou a manutenção e o teste individual de cada funcionalidade. O shell desenvolvido provou ser eficaz na interação com o sistema, executando comandos complexos como cópia entre sistemas de arquivos externos e internos, movimentação de arquivos e renomeação. Os principais desafios durante a implementação do sistema foi a manipulação de nomes longos e a garantia de integridade do sistema todo. Ainda assim, acreditamos que o resultado foi positivo, tanto para o nosso aprendizado quanto para o êxito do projeto em si.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
