@@ -1,7 +1,7 @@
 /**
  * Descrição: Implementação para lidar com sistema de arquivos do OS
  *
- * Autores: João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Gustavo Takeda, Matheus Floriano Saito
  * Licença: BSD 2
  *
  * Data: 09/02/2025

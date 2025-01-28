@@ -1,7 +1,7 @@
 /**
  * Descrição: Definição para funções de log
  *
- * Autores: João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Gustavo Takeda, Matheus Floriano Saito
  * Licença: BSD 2
  *
  * Data: 05/12/2024

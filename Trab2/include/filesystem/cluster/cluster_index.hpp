@@ -1,7 +1,7 @@
 /**
  * Descrição: Definição da estrutura que indexa o cluster
  *
- * Autores: João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Gustavo Takeda, Matheus Floriano Saito
  * Licença: BSD 2
  *
  * Data: 06/01/2025

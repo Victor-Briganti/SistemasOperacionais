@@ -1,7 +1,7 @@
 /**
  * Descrição: Implementação da classe do Shell iterativo.
  *
- * Autores: João Victor Briganti, Luiz Takeda
+ * Autores: João Victor Briganti, Luiz Gustavo Takeda, Matheus Floriano Saito
  * Licença: BSD 2
  *
  * Data: 10/01/2025
