@@ -8,12 +8,40 @@
  */
 
 #include "filesystem/entry/dentry.hpp"
+#include "filesystem/default.hpp"
 #include "filesystem/entry/long_entry.hpp"
 #include "filesystem/entry/short_entry.hpp"
 #include "utils/logger.hpp"
 
 #include <cctype>
 #include <cstring>
+
+//===------------------------------------------------------------------------===
+// PRIVATE
+//===------------------------------------------------------------------------===
+
+void Dentry::mountLongName() {
+  int i = 0;
+  for (int i = 0; i < NAME_MAIN_SIZE; i++) {
+    if (shortName[i] != ' ') {
+      longName += shortName[i];
+    }
+  }
+
+  if (shortName[NAME_MAIN_SIZE + 1] != ' ') {
+    longName += '.';
+  }
+
+  for (int i = NAME_MAIN_SIZE; i < NAME_FULL_SIZE; i++) {
+    if (shortName[i] != ' ') {
+      longName += shortName[i];
+    }
+  }
+}
+
+//===------------------------------------------------------------------------===
+// PUBLIC
+//===------------------------------------------------------------------------===
 
 Dentry::Dentry(const ShortEntry &entry,
   const std::vector<LongEntry> &lentry,
@@ -29,8 +57,8 @@ Dentry::Dentry(const ShortEntry &entry,
   int isDot = strncmp(shortName.data(), DOT, NAME_FULL_SIZE);
   int isDotDot = strncmp(shortName.data(), DOTDOT, NAME_FULL_SIZE);
 
-  if ((!isDot || !isDotDot) && !lentry.empty()) {
-    logger::logWarning("Entrada sem nome longo");
+  if ((isDot || isDotDot) && lentry.empty()) {
+    this->mountLongName();
   }
 
   if (isDirectory()) {

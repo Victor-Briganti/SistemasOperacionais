@@ -52,6 +52,11 @@ class Dentry
   /* Lista de clusters e posições que está entrada pode estar */
   std::vector<ClusterIndex> clusterIndexes;
 
+  /** 
+   * @brief Cria um nome longo a partir da entrada curta 
+   */
+  void mountLongName();
+
 public:
   /**
    * @brief Inicializa a entrada
