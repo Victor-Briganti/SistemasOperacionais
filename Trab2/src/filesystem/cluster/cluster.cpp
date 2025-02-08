@@ -115,6 +115,7 @@ int ClusterIO::searchEmptyEntries(DWORD cluster,
 
       // Se o espaço encontrado até agora não satisfaz reseta o index
       if (index.clusterNum != 0) {
+        emptyEntries = 0;
         index.clusterNum = 0;
         index.initPos = 0;
         clusterIndexes.clear();
