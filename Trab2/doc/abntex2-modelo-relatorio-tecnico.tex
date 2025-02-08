@@ -502,207 +502,867 @@ O arquivo \texttt{types.hpp} define tipos de dados fundamentais para o sistema, 
 \subsection{Classes e Estruturas}
 \label{subsec:classes_estruturas}
 
-\subsubsection{\texttt{ClusterIndex}}
-\label{subsubsec:cluster_index}
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:cluster_io}.
 
-\begin{lstlisting}[caption={Estrutura de indexação que referência o cluster da entrada}, label={lst:cluster_index}]
-struct ClusterIndex
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{Placeholders}:
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{Placeholders}:
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{Placeholders}:
+        \end{itemize}
+\end{itemize}
+
+
+\subsubsection{\texttt{Shell}}
+\label{subsubsec:shell}
+
+\begin{lstlisting}[caption={Classe que implementa o \textit{shell}}, label={lst:shell}]
+class Shell
 {
-  /// Número do cluster 
-  DWORD clusterNum;
+  // Ponteiro para a interface do sistema de arquivos
+  std::unique_ptr<FatFS> fatFS;
 
-  /// Posição inicial no cluster. (Relativa ao tamanho das entradas)
-  DWORD initPos;
+  /// @brief Dividi o comando passado em diferentes partes
+  ///
+  /// @param command Comando inserido pelo usuário
+  ///
+  /// @return Uma lista com todas as partes do comando
+  std::vector<std::string> parser(const std::string &cmd) const;
 
-  /// Posição final no cluster. (Relativa ao tamanho das entradas) 
-  DWORD endPos;
+  /// @brief Analisa a string e retorna o comando
+  ///
+  /// @param command Comando inserido pelo usuário
+  ///
+  /// @return O FSApi referente ao comando
+  FSApi command(const std::string &cmd) const;
+
+  /// @brief Executa o loop do shell iterativo
+  void exec(FSApi cmd, std::vector<std::string> params);
+
+public:
+  /// @brief Inicia a estrutura do shell
+  ///
+  /// @param fatFS Interface do sistema de arquivos.
+  explicit Shell(std::unique_ptr<FatFS> fatFS);
+
+  /// @brief Executa o loop do shell iterativo
+  void interpreter();
 };
 \end{lstlisting}
 
-\subsubsection{\texttt{ClusterIO}}
-\label{subsubsec:cluster_io}
+\subsubsection{\texttt{Image}}
+\label{subsubsec:image}
 
-\begin{lstlisting}[caption={Classe de abstração dos clusters do sistema}, label={lst:cluster_io}]
-class ClusterIO
+\begin{lstlisting}[caption={Classe para interação do arquivo \texttt{.img} que contém o FAT32 gravado}, label={lst:image}]
+class Image
 {
-  /// Interface usada para ler e escrever a imagem 
+  std::fstream image;
+
+public:
+  /// @brief Construtor para a imagem
+  ///
+  /// Abre a imagem especificada pelo caminho.
+  ///
+  /// @param path Caminho para a imagem
+  ///
+  /// @exception Argumento inválido, quando o caminho não é válido
+  /// @exception Runtime error, quando não é possível abrir o arquivo
+  explicit Image(const std::string &path);
+
+  ~Image();
+
+  /// @brief Fecha o arquivo aberto
+  void close();
+
+  /// @brief Lê a imagem
+  ///
+  /// @param offset Posição onde a leitura será iniciada
+  /// @param buffer Posição de memória que irá receber o dado lido
+  /// @param size Tamanho do dado a ser lido
+  ///
+  /// @return true se foi possível ler, false caso contrário
+  bool read(DWORD offset, void *buffer, size_t size);
+
+  /// @brief Escreve na imagem
+  ///
+  /// @param offset Posição onde a escrita será iniciada
+  /// @param buffer Posição de memória que tem os dados a serem escritos
+  /// @param size Tamanho do dado a ser escrito
+  ///
+  /// @return true se foi possível escrever, false caso contrário
+  bool write(DWORD offset, const void *const buffer, size_t size);
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{FileSystemAdapter}}
+\label{subsubsec:file_system_adapter}
+
+\begin{lstlisting}[caption={Classe que realiza interface com sistema de arquivos do \textit{host}}, label={lst:fsadapter}]
+class FileSystemAdapter
+{
+  /// Caminho para o arquivo sendo manipulado
+  std::string filePath;
+
+  /// Ponteiro para o arquivo que vai ser manipulado
+  std::fstream file;
+
+  /// Define o como o arquivo está aberto
+  FileOption fileOption;
+
+  /// Flag para dizer se o arquivo foi ou não excluído
+  bool isDeleted;
+
+  /// @brief Limpa o arquivo
+  ///
+  /// Está opção só deve ser usada quando o arquivo for aberto em maneira de
+  /// leitura.
+  ///
+  /// @param path Caminho para o arquivo que será limpo
+  ///
+  /// @return true se foi possível limpar o arquivo, false caso contrário
+  bool clean(const std::string &path) const;
+
+  /// @brief Abre o arquivo conforme a opção passada
+  ///
+  /// @param path Caminho para o arquivo que será aberto
+  ///
+  /// @return true se foi possível abrir o arquivo, false caso contrário
+  bool open(const std::string &path);
+
+public:
+  /// @brief Construtor para a manipulação do arquivo
+  ///
+  /// Abre o arquivo para manipulação especificada pelo caminho.
+  ///
+  /// @param path Caminho para o arquivo
+  /// @param option Opção usada ao abrir o arquivo
+  ///
+  /// @exception Argumento inválido, quando o caminho não é válido
+  /// @exception Runtime error, quando não é possível abrir o arquivo
+  explicit FileSystemAdapter(const std::string &path, FileOption option);
+
+  ~FileSystemAdapter();
+
+  /// @brief Escreve no arquivo
+  ///
+  /// @param offset Posição onde a escrita será iniciada
+  /// @param buffer Posição de memória que tem os dados a serem escritos
+  /// @param size Tamanho do dado a ser escrito
+  ///
+  /// @return true se foi possível escrever, false caso contrário
+  bool write(DWORD offset, const void *const buffer, size_t size);
+
+  /// @brief Lê o arquivo
+  ///
+  /// @param offset Posição onde a leitura será iniciada
+  /// @param buffer Posição de memória que irá receber o dado lido
+  /// @param size Tamanho do dado a ser lido
+  ///
+  /// @return true se foi possível ler, false caso contrário
+  bool read(DWORD offset, void *buffer, size_t size);
+
+  /// @brief Exclui o arquivo
+  ///
+  /// @return true se foi possível remover, false caso contrário
+  bool remove();
+
+  /// @brief Retorna o tamanho do arquivo
+  ///
+  /// @param fileSize Referência que recebe o tamanho do arquivo
+  ///
+  /// @return true se foi possível ler o tamanho do arquivo, false caso contrário
+  bool getFileSize(size_t &fileSize);
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{PathName}}
+\label{subsubsec:path_name}
+
+\begin{lstlisting}[caption={Classe que implementa o \textit{parser} de caminhos e nomes de entradas no sistema}, label={lst:pathname}]
+class PathName
+{
+  /// Define o diretório raiz do sistema
+  const std::string ROOT_DIR = "img/";
+
+  /// Define o diretório raiz do sistema
+  const char EXTERNAL_PATH = '/';
+
+  /// Define o caminho atual do sistema
+  std::string curPath;
+
+public:
+  PathName();
+
+  /// @brief Retorna o caminho atual do sistema
+  [[nodiscard]] std::string getCurPath() const;
+
+  /// @brief Atualiza o caminho atual do sistema
+  ///
+  /// @param path Novo caminho para o sistema
+  void setCurPath(const std::string &path);
+
+  /// @brief Retorna o diretório raiz atual
+  [[nodiscard]] std::string getRootDir() const;
+
+  /// @brief Dividi um caminho em suas partes
+  ///
+  /// @param path Caminho a ser dividido em partes
+  /// @param delim Caracter que delimita a divisão do caminho
+  ///
+  /// @return Um vetor contendo o nome de cada parte do caminho
+  [[nodiscard]] std::vector<std::string> split(const std::string &path,
+    char delim) const;
+
+  /// @brief Junta todas as partes de um caminho
+  ///
+  /// @param path Vetor com cada parte do caminho a ser unido
+  ///
+  /// @return Uma string com o caminho
+  [[nodiscard]] std::string merge(const std::vector<std::string> &path) const;
+
+  /// @brief Gera o caminho completo a partir de um caminho qualquer
+  ///
+  /// @param path Caminho a ser tratado
+  ///
+  /// @return Uma lista com o caminho completo
+  [[nodiscard]] std::vector<std::string> generateFullPath(
+    const std::string &path) const;
+
+  /// @brief Verifica se a lista de caminho é referente ao root
+  ///
+  /// @param listPath Lista com caminhos a ser verificada
+  ///
+  /// @return true se for o diretório raiz, false caso contrário
+  bool isRootDir(const std::vector<std::string> &listPath);
+
+  /// @brief Dividi o caminho do arquivo
+  ///
+  /// @param path Referência o caminho que precisa ser divido em duas partes.
+  /// Durante a divisão este caminho e alterado.
+  ///
+  /// @exception Gera uma exceção se o caminho não for válido.
+  ///
+  /// @return O último nome dentro do caminho
+  std::string getLastNameFromPath(std::string &path);
+
+  /// @brief Verifica se é um caminho externo
+  ///
+  /// @param path Caminho a ser verificado
+  ///
+  /// @return true se for um caminho externo, false caso contrário
+  bool isExternalPath(const std::string &path) const;
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{FatFS}}
+\label{subsubsec:fatfs}
+
+\begin{lstlisting}[caption={Classe que expõe as interfaces de interação com o sistema de arquivos}, label={lst:fatfs}]
+class FatFS
+{
+private:
+  /// Interface usada para ler e escrever a imagem
   std::shared_ptr<Image> image;
 
-  /// Interface usada lidar com a estrutura BPB 
+  /// Interface usada lidar com a estrutura BPB
   std::shared_ptr<BiosBlock> bios;
-
-  /// Estrutura que armazena informações sobre os clusters
-  std::shared_ptr<FileSysInfo> fsInfo;
 
   /// Interface para lidar com a tabela FAT
   std::shared_ptr<FatTable> fatTable;
 
+  /// Interface para lidar com a estrutura FSInfo
+  std::shared_ptr<FileSysInfo> fsInfo;
+
   /// Caminho atual no sistema de arquivos
   std::shared_ptr<PathName> pathName;
 
-  /// Define a quantidade de entradas por cluster
-  size_t NUM_ENTRIES;
+  /// Classe para acesso aos clusters
+  std::shared_ptr<ClusterIO> clusterIO;
 
-  /// @brief Gera as entradas relacionadas ao nome especificado
+  /// @brief Helper para a listagem de diretórios
   ///
-  /// @param num Número do cluster onde a entrada será criada
-  /// @param name Nome da entrada a ser criada
-  /// @param sentry Referência a entrada curta a ser criada
-  /// @param lentry Referência a entrada longa a ser criada
-  /// @param attrs Atributos da entrada a ser criada
+  /// @param num Número do cluster onde ocorrerá a listagem
   ///
   /// @exception Gera um exceção se houver algum problema durante a busca do
   /// cluster.
-  /// @return true se foi possível criar, false caso contrário
-  bool generateEntries(DWORD num,
-    const std::string &name,
-    ShortEntry &sentry,
-    std::vector<LongEntry> &lentry,
-    BYTE attrs);
+  void listClusterDir(DWORD num);
 
-  /// @brief Busca entradas vazias e continuas
+  /// @brief Atualiza as timestamps do diretório pai
   ///
-  /// @param cluster Número do cluster onde ocorrerá a busca
-  /// @param numEntries Quantidade de entradas a serem alocadas
-  /// @param clusterIndexes Lista com as posições para escrever a entrada
+  /// @param path Caminho para o diretório que precisa ter o seu tempo atualizado
   ///
   /// @exception Gera um exceção se houver algum problema durante a busca do
   /// cluster.
-  /// @return 0 se o espaço vazio suporta todas as entradas, 0< se o espaço não é
-  /// suficiente.
-  int searchEmptyEntries(DWORD cluster,
-    DWORD numEntries,
-    std::vector<ClusterIndex> &clusterIndexes);
+  /// @return 0 se foi possível atualizar, 1 se foi tentado atualizar o pai e -1 caso tenha algum erro.
+  int updateParentTimestamp(std::string path);
 
-  /// @brief Inicializa e insere as entradas DOT e DOTDOT nod diretório criado
+  /// @brief Cópia dados internos para uma localização externa
   ///
-  /// @param parentClt Número do cluster onde a entrada será criada
-  /// @param dentry Entrada que representa o diretório alocado
+  /// @param from Caminho do arquivo interno
+  /// @param to Caminho para o arquivo externo
   ///
-  /// @return true se foi possível alocar, false caso contrário.
-  bool insertDotEntries(DWORD parentClt, Dentry &dentry);
+  /// @exception Gera um exceção se houver algum problema durante a busca do
+  /// cluster.
+  /// @return true se foi possível copiar, false caso contrário
+  bool copyInternalData(const std::string &from, const std::string &to);
 
-  /// @brief Cria uma entrada do tipo diretório e insere no buffer de entrada
+  /// @brief Cópia dados externos para uma localização interna
   ///
-  /// Além da criação da entrada, no diretório também se faz necessário alocar um
-  /// buffer para receber as demais entradas.
+  /// @param from Caminho do arquivo externo
+  /// @param to Caminho para o arquivo interno
   ///
-  /// @param num Número do cluster onde a entrada será criada
-  /// @param name Nome do arquivo a ser criado
-  ///
-  /// @return true se foi possível criar, false caso contrário.
-  bool createDirectoryEntry(DWORD num, const std::string &name);
+  /// @exception Gera um exceção se houver algum problema durante a busca do
+  /// cluster.
+  /// @return true se foi possível copiar, false caso contrário
+  bool copyExternalData(const std::string &from, const std::string &to);
 
-  /// @brief Cria uma entrada do tipo arquivo e insere no buffer de entrada
+  /// @brief Cópia dados de um caminho interno para outro interno
   ///
-  /// @param num Número do cluster onde a entrada será criada
-  /// @param name Nome do arquivo a ser criado
+  /// @param from Caminho do arquivo interno
+  /// @param to Caminho para o arquivo interno
   ///
-  /// @return true se foi possível criar, false caso contrário.
-  bool createArchiveEntry(DWORD num, const std::string &name);
+  /// @exception Gera um exceção se houver algum problema durante a busca do
+  /// cluster.
+  /// @return true se foi possível copiar, false caso contrário
+  bool copyInSystemData(const std::string &from, const std::string &to);
 
 public:
-  explicit ClusterIO(std::shared_ptr<Image> image,
-    std::shared_ptr<BiosBlock> bios,
-    std::shared_ptr<FatTable> fatTable,
-    std::shared_ptr<FileSysInfo> fsInfo,
-    std::shared_ptr<PathName> pathName);
-
-  /// @brief Lê um cluster da memória em um buffer
-  /// 
-  /// @param buffer Ponteiro que irá receber as informações a serem lidas
-  /// @param num Número do cluster que será lido
-  /// 
-  /// @return true se foi possível ler, false caso contrário
-  bool readCluster(void *buffer, DWORD num);
-
-  /// @brief Escreve um cluster na imagem
+  /// @brief Inicia a estrutura do sistema de arquivo
   ///
-  /// @param buffer Ponteiro com as informações que serão escritas
-  /// @param num Número do cluster que será escrito
+  /// Aloca cada uma das estruturas e as inicializa.
+  ///
+  /// @param path Caminho para a imagem FAT.
+  ///
+  /// @exception Gera uma exceção se não for possível alocar ou inicializar as
+  /// estruturas.
+  explicit FatFS(const std::string &path);
+
+  /// @brief Mostra as informações sobre o sistema de arquivos
+  void info();
+
+  /// @brief Mostra as informações de um cluster no formato texto
+  ///
+  /// @param num Número do cluster no qual as informações serão mostradas
+  ///
+  /// @return true se foi possível ler, false caso contrário
+  bool cluster(DWORD num);
+
+  /// @brief Lista todos os diretórios/arquivos de um caminho especificado
+  ///
+  /// @param path Caminho a ser listado
+  ///
+  /// @return true se foi possível listar diretório, false caso contrário
+  bool ls(const std::string &path);
+
+  /// @brief Remove um arquivo do sistema
+  ///
+  /// @param path Caminho do arquivo a ser removido
+  ///
+  /// @return true se foi possível remover arquivo, false caso contrário
+  bool rm(const std::string &path);
+
+  /// @brief Remove um diretório vazio do sistema
+  ///
+  /// @param path Caminho do diretório vazio a ser removido
+  ///
+  /// @return true se foi possível remover diretório, false caso contrário
+  bool rmdir(const std::string &path);
+
+  /// @brief Retorna o caminho atual do sistema
+  std::string pwd();
+
+  /// @brief Altera o caminho atual
+  ///
+  /// @param path Novo caminho base do sistema
+  ///
+  /// @return true se foi possível alterar caminho atual, false caso contrário
+  bool cd(const std::string &path);
+
+  /// @brief Imprime os atributos de uma entrada
+  ///
+  /// @param path Caminho para a entrada a ser apresentada
+  ///
+  /// @return true se foi possível listar atributos, false caso contrário
+  bool attr(const std::string &path);
+
+  /// @brief Cria um arquivo vazio
+  ///
+  /// @param path Caminho para a entrada a ser criada
+  ///
+  /// @return true se foi possível criar arquivo, false caso contrário
+  bool touch(const std::string &path);
+
+  /// @brief Cria um diretório
+  ///
+  /// @param path Caminho para o diretório a ser criado
+  ///
+  /// @return true se foi possível criar diretório, false caso contrário
+  bool mkdir(const std::string &path);
+
+  /// @brief Renomeia um arquivo
+  ///
+  /// @param from Caminho do arquivo original
+  /// @param to Caminho do destino
+  ///
+  /// @return true se foi possível renomear, false caso contrário
+  bool rename(const std::string &from, const std::string &to);
+
+  /// @brief Move um arquivo de um caminho a outro
+  ///
+  /// @param from Caminho do arquivo original
+  /// @param to Caminho do destino
+  ///
+  /// @return true se foi possível mover, false caso contrário
+  bool mv(const std::string &from, const std::string &to);
+
+  /// @brief Copia um arquivo de um caminho a outro
+  ///
+  /// @param from Caminho do arquivo original
+  /// @param to Caminho do destino
+  ///
+  /// @return true se foi possível copiar, false caso contrário
+  bool cp(const std::string &from, const std::string &to);
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{BPB}}
+\label{subsubsec:bpb}
+
+\begin{lstlisting}[caption={Estrutura que representa o BPB encontrado no volume FAT}, label={lst:bpb}]
+  struct __attribute__((packed)) BPB
+  {
+    // BPB comum para todos os FATs
+    BYTE jmpBoot[3]; // Instrução para código de boot
+    BYTE OEMName[8]; // Indica o sistema que realizou a formatação do disco
+    WORD BytsPerSec; // Quantidade de bytes por sector
+    BYTE SecPerClus; // Número de setores por cluster
+    WORD RsvdSecCnt; // Número de setores reservados no inicio do volume
+    BYTE NumFATs; // Quantidade de estruturas FAT
+    WORD RootEntCnt; // Quantidade de entradas no dir raiz
+    WORD TotSec16; // Total de setores no volume. Usado em FAT12/FAT16
+    BYTE Media; // Tipo de mídia
+    WORD FATSz16; // Tamanho da estrutura FAT. Usado em FAT12/FAT16
+    WORD SecPerTrk; // Setores por cilindro
+    WORD NumHeads; // Quantidade de cabeças do dispositivo
+    DWORD HiddSec; // Quantidade de setores escondidos
+    DWORD TotSec32; // Total de setores no volume. Usado em FAT32
+
+    // BPB para FAT32
+    DWORD FATSz32; // Tamanho da estrutura FAT. Usado em FAT32
+    WORD ExtFlags; // Informações adicionais para a estrutura FAT
+    WORD FSVer; // Define a versão do FAT32
+    DWORD RootClus; // Número do cluster raiz.
+    WORD FSInfo; // Geralmente tem valor 1
+    WORD BkBootSec; // Deve ser 6
+    BYTE Reserved[12]; // Reservado
+    BYTE DrvNum; // Define o driver para o tipo do dispositivo
+    BYTE Reserved1; // Reservado
+    BYTE BootSig; // Assinatura do boot
+    DWORD VolID; // Determina um ID para o volume
+    BYTE VolLab[11]; // Nome do volume
+    BYTE FilSysType[8]; // String com o tipo do sistema
+  };
+\end{lstlisting}
+
+\subsubsection{\texttt{BiosBlock}}
+\label{subsubsec:bios_block}
+
+\begin{lstlisting}[caption={Classe que abstrai a extração de informações da estrutura BPB}, label={lst:biosblock}]
+// Classe para lidar com a estrutura BPB do FAT filesystem
+class BiosBlock
+{
+private:
+  /// Estrutura do BPB
+  BPB bpb;
+
+  /// Primeiro setor de dados
+  DWORD firstDataSector;
+
+  /// Total de setores no diretório raiz
+  DWORD rootDirSectors;
+
+  /// Total de setores no sistema de arquivos
+  DWORD totSec;
+
+  /// Tamanho da FAT
+  DWORD fatSz;
+
+  /// Total de setores de dados
+  DWORD dataSecTotal;
+
+  /// Total de clusters no sistema
+  DWORD countOfClusters;
+
+  /// @brief Inicializa a estrutura do BPB e demais estruturas.
+  ///
+  /// @return 0 se foi possível inicializar a estrutura, -1 caso contrário.
+  int bpbInit();
+
+  /// @brief Determinar o tipo de FAT do sistema.
+  ///
+  /// @return 12 se for FAT12, 16 se for FAT16 e 32 se for FAT32.
+  [[nodiscard]] inline int fatType() const;
+
+public:
+  /// @brief Inicia a estrutura BPB
+  ///
+  /// Lê a estrutura BPB em memória e inicializa informações necessárias para o
+  /// funcionamento dos sistema de arquivos.
+  ///
+  /// @param image Interface para fazer a leitura do sistema.
+  ///
+  /// @exception Gera uma exceção se não for possível ler a estrutura BPB, ou o
+  /// sistema de arquivos não ser do tipo FAT32.
+  explicit BiosBlock(const std::shared_ptr<Image> &image);
+  ~BiosBlock() = default;
+
+  /// @brief Imprime as informações do BPB
+  ///
+  /// @return 0 se foi possível imprimir, -1 se algo deu errado.
+  void bpbPrint() const;
+
+  /// @brief Retorna o endereço do FAT especificado
+  ///
+  /// @param num Número do FAT. Não pode ser maior do que o valor salvo em
+  /// NumFATs
+  ///
+  /// @exception Gera uma exceção no caso do número especificado não ser válido.
+  /// @return O setor do FAT especificado.
+  [[nodiscard]] DWORD fatSector(int num) const;
+
+  /// @brief Quantidade de FATs do sistema
+  ///
+  /// @return Retorna o valor de numFATs
+  [[nodiscard]] inline BYTE getNumFATs() const { return bpb.NumFATs; }
+
+  /// @brief Tamanho da FAT do sistema em setores
+  ///
+  /// @return Retorna o valor de fatSz
+  [[nodiscard]] inline DWORD getFATSz() const { return fatSz; }
+
+  /// @brief Quantidades de bytes por setor
+  ///
+  /// @return Retorna o valor de bpb.BytsPerSec
+  [[nodiscard]] inline WORD getBytesPerSec() const { return bpb.BytsPerSec; }
+
+  /// @brief Quantidades de setores por cluster
+  ///
+  /// @return Retorna o valor de bpb.SecPerCluster
+  [[nodiscard]] inline BYTE getSecPerCluster() const { return bpb.SecPerClus; }
+
+  /// @brief Total de setores na região de dados
+  ///
+  /// @return Retorna o valor de dataSecTotal
+  [[nodiscard]] inline DWORD getDataSecTotal() const { return dataSecTotal; }
+
+  /// @brief Total de cluster no sistema de arquivos
+  ///
+  /// @return Retorna o valor de countOfClusters
+  [[nodiscard]] inline DWORD getCountOfClusters() const
+  {
+    return countOfClusters;
+  }
+
+  /// @brief Total de setores reservados
+  ///
+  /// @return Retorna o valor de bpb.RsvdSecCnt
+  [[nodiscard]] inline WORD getRsvdSecCnt() const { return bpb.RsvdSecCnt; }
+
+  /// @brief Total de setores reservados
+  ///
+  /// @return Retorna o valor de bpb.RsvdSecCnt
+  [[nodiscard]] inline DWORD firstSectorOfCluster(DWORD num) const
+  {
+    return (num - 2) * bpb.SecPerClus + firstDataSector;
+  }
+
+  /// @brief Valor do cluster raiz
+  ///
+  /// @return Retorna o valor de bpb.RootClus
+  [[nodiscard]] inline DWORD getRootClus() const { return bpb.RootClus; }
+
+  /// @brief Tamanho do cluster em bytes
+  ///
+  /// @return A quantidade de bytes por setor do clsuter
+  [[nodiscard]] inline size_t totClusByts() const
+  {
+    return static_cast<size_t>(getSecPerCluster()) * getBytesPerSec();
+  }
+
+  /// @brief Setor em que o FSInfo se encontra
+  ///
+  /// @return Retorna o valor de bpb.FSInfo
+  [[nodiscard]] inline DWORD getFSInfo() const { return bpb.FSInfo; }
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{FSInfo}}
+\label{subsubsec:fsinfo}
+
+\begin{lstlisting}[caption={Estrutura que representa o FSInfo encontrado no volume FAT}, label={lst:fsinfo}]
+struct __attribute__((packed)) FSInfo
+{
+  DWORD LeadSig; // Assinatura para validar o FSInfo
+  BYTE Reserved1[480]; // Estrutura que não deve ser usada
+  DWORD StrucSig; // Outra assinatura para validar o FSInfo
+  DWORD FreeCount; // Contém a quantidade de clusters livre do volume
+  DWORD NextFree; // Próximo cluster livre
+  BYTE Reserved2[12]; // Estrutura que não deve ser usada
+  DWORD TrailSig; // Mais uma assinatura para validar a estrutura
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{FileSysInfo}}
+\label{subsubsec:file_sys_info}
+
+\begin{lstlisting}[caption={Classe que abstrai a extração de informações da estrutura FSInfo}, label={lst:fileinfo}]
+// Classe para lidar com a estrutura FSInfo do FAT filesystem
+class FileSysInfo
+{
+  /// Definição de valor quando não se sabe a quantidade de clusters livres
+  static constexpr DWORD UNKNOWN_FREECLUS = 0xFFFFFFFF;
+
+  /// Valor da assinatura do LeadSig
+  static constexpr DWORD LEADISG = 0x41615252;
+
+  /// Valor da assinatura do StrucSig
+  static constexpr DWORD STRUCSIG = 0x61417272;
+
+  /// Valor da assinatura do TrailSig
+  static constexpr DWORD TRAILSIG = 0xAA550000;
+
+  /// Estrutura do FSInfo
+  FSInfo fsinfo;
+
+  /// Interface usada para ler e escrever a imagem
+  std::shared_ptr<Image> image;
+
+  /// Offset da estrutra no sistema de arquivos
+  const DWORD offset;
+
+  /// Flag para definir se a estrutura foi ou não alterada
+  bool dirty = false;
+
+  /// Total de clusters no sistema
+  DWORD totalClus;
+
+public:
+  /// @brief Inicia a estrutura FSInfo
+  ///
+  /// Lê a estrutura FSInfo em memória e inicializa informações necessárias para
+  /// o funcionamento dos sistema de arquivos.
+  ///
+  /// @param image Interface para fazer a leitura do sistema.
+  /// @param offset Offset do FSInfo no sistema de arquivos.
+  /// @param fatTable Tabela FAT usada para realizar algumas verificações.
+  ///
+  /// @exception Gera uma exceção se não for possível ler a estrutura FSInfo ou
+  /// houve algum erro durante sua verificação.
+  explicit FileSysInfo(std::shared_ptr<Image> image,
+    DWORD offset,
+    const std::shared_ptr<FatTable> &fatTable);
+
+  /// @brief Finaliza a estrutura
+  ///
+  /// Verifica se a flag dirty está setada, e se estiver escreve o FSInfo na
+  /// imagem original.
+  ~FileSysInfo();
+
+  /// @brief Quantidade de clusters livres no sistema
+  ///
+  /// @return Retorna o valor de fsinfo.FreeCount
+  [[nodiscard]] inline DWORD getFreeCount() const { return fsinfo.FreeCount; }
+
+  /// @brief Último cluste livre conhecido
+  ///
+  /// @return Retorna o valor de fsinfo.NextFree
+  [[nodiscard]] inline DWORD getNextFree() const { return fsinfo.NextFree; }
+
+  /// @brief Coloca um novo valor na quantidade de clusters livres
+  ///
+  /// @return true se foi possível alterar, false caso contrário
+  bool setFreeCount(DWORD freeCount);
+
+  /// @brief Coloca um novo valor no último cluster livre conhecido
+  ///
+  /// @return true se foi possível alterar, false caso contrário
+  bool setNextFree(DWORD nextFree);
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{FatTable}}
+\label{subsubsec:fat_table}
+
+\begin{lstlisting}[caption={Classe a estrutura FAT}, label={lst:fat_table}]
+class FatTable
+{
+  /// Máscaras para leitura e escrita na tabela
+  static constexpr DWORD LSB_MASK = 0x0FFFFFFF;
+  static constexpr DWORD MSB_MASK = 0xF0000000;
+
+  /// Define que o cluster está livre
+  static constexpr DWORD FREE_CLUSTER = 0x00000000;
+
+  /// Define o final da cadeia de clusters
+  static constexpr DWORD EOC = 0x0FFFFFF8;
+
+  /// Interface usada para ler e escrever a FAT
+  std::shared_ptr<Image> image;
+
+  /// Interface para lidar com o BPB
+  std::shared_ptr<BiosBlock> bios;
+
+  /// Tabela FAT em memória
+  std::unique_ptr<BYTE[]> table;
+
+  /// @brief Lê uma das tabelas FAT em memória
+  ///
+  /// @return true se foi possível ler, false caso contrário
+  bool readFatTable(int num);
+
+  /// @brief Escreve uma das tabelas FAT na imagem
   ///
   /// @return true se foi possível escrever, false caso contrário
-  bool writeCluster(const void *buffer, DWORD num);
+  bool writeFatTable(int num);
 
-  /// @brief Aloca um novo cluster
+  /// @brief Escreve em uma das entradas da tabela FAT em memória
   ///
-  /// @param cluster Número do cluster que será estendido. Se o valor for 0, uma
-  /// nova cadeia será criada
+  /// @param offset Posição a ser escrita na tabela
+  /// @param value Variável armazena o valor a ser escrito na tabela
   ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível alocar o cluster, false caso contrário.
-  bool allocNewCluster(DWORD &cluster);
+  /// @return true se foi possível escrever, false caso contrário
+  void writeInTable(DWORD num, DWORD value);
 
-  /// @brief Retorna o cluster da entrada corrente
+  /// @brief Lê uma entrada da tabela FAT em memória
   ///
-  /// No caso da entrada que é um "..", ao tentar retornar seu cluster o valor 0
-  /// será retornado. Para evitar problemas aqui retornamos o valor do
-  /// RootClus.
+  /// @param offset Posição a ser lida da tabela
+  /// @param value Variável que recebe valor a ser lido da tabela
   ///
-  /// @param entry Entrada que terá seu cluster extraído.
-  ///
-  /// @return O valor do cluster da entrada
-  DWORD getEntryClus(const Dentry &entry);
+  /// @return true se foi possível ler, false caso contrário
+  [[nodiscard]] DWORD readFromTable(DWORD offset) const;
 
-  /// @brief Retorna uma lista com todas as entradas de um diretório
+public:
+  /// @brief Inicializa a FAT em memória
   ///
-  /// @param num Número do cluster do diretório que será listado
+  /// Carrega a primeira FAT em memória e inicializa demais informações
   ///
-  /// @exception Exceções podem ocorrer durante a leitura das informações das
-  /// entradas.
+  /// @param image Interface para leitura da imagem
+  /// @param bios Interface para obter informações da BPB
   ///
-  /// @return Um vetor com todos as entradas se foi possível ler.
-  std::vector<Dentry> getListEntries(DWORD num);
+  /// @exception Gera uma exceção se houver algum erro durante a leitura ou
+  /// inicialização.
+  explicit FatTable(std::shared_ptr<Image> image,
+    std::shared_ptr<BiosBlock> bios);
 
-  /// @brief Busca uma entrada por meio do caminho passado
-  ///
-  /// @param path Caminho que está sendo buscado
-  /// @param listPath Referência a lista com todas as partes do caminho. Este
-  /// caminho é alterado ao longo da busca.
-  /// @param searchType Especifica o tipo de entrada sendo buscado.
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a verificação
-  /// do caminho.
-  /// @return Um vetor com o caminho propriamente dividido e o cluster no qual o
-  /// último arquivo se encontra
-  std::optional<Dentry> searchEntryByPath(const std::string &path,
-    std::vector<std::string> &listPath,
-    EntryType searchType);
+  /// @brief Imprime a tabela atual
+  void printTable() const;
 
-  /// @brief Atualiza uma entrada dentro do cluster
-  ///
-  /// Reescreve a entrada passada nos clusters em que suas entradas são
-  /// localizadas.
-  ///
-  /// @param entry Entrada a ser atualizada
-  ///
-  /// @return true se foi possível atualizar, false caso contrário.
-  bool updateEntry(Dentry &entry);
+  /// @brief Mostra informações de espaço da tabela atual
+  void printInfo() const;
 
-  /// @brief Remove uma entrada do cluster
+  /// @brief Cadeia de clusters
   ///
-  /// @param entry Entrada a ser removida
+  /// @param start Inicio da cadeia a ser listada
   ///
-  /// @return true se foi possível remover, false caso contrário.
-  bool removeEntry(Dentry &entry);
+  /// @return Retorna uma lista com todos os clusters da cadeia
+  std::vector<DWORD> listChain(DWORD start);
 
-  /// @brief Deleta a entrada do sistema de arquivo
+  /// @brief Remove uma cadeia de clusters alocada
   ///
-  /// A entrada é removida tanto do cluster quanto do FAT.
+  /// @param start Inicio da cadeia a ser removida
   ///
-  /// @param entry Entrada a ser removida
-  ///
-  /// @return true se foi possível deletar, false caso contrário.
-  bool deleteEntry(Dentry &entry);
+  /// @return Retorna a quantidade de cadeias removidas
+  int removeChain(DWORD start);
 
-  /// @brief Aloca a entrada e insere no buffer
-  /// 
-  /// @param name Nome do arquivo a ser criado
-  /// @param num Número do cluster onde a entrada será criada
-  /// 
-  /// @return true se foi possível criar, false caso contrário.
-  bool createEntry(DWORD num, const std::string &name, EntryType type);
+  /// @brief Quantidade de clusters em uso
+  ///
+  /// Lê a tabela atual e retorn a quantidade de clusters que estão em uso.
+  ///
+  /// @return Valor da quantidade de clusters em uso
+  [[nodiscard]] DWORD usedClusters() const;
+
+  /// @brief Quantidade de clusters livres
+  ///
+  /// Lê a tabela atual e retorna a quantidade de clusters que estão livres.
+  ///
+  /// @return Valor da quantidade de clusters livres
+  [[nodiscard]] DWORD freeClusters() const;
+
+  /// @brief Busca por uma entrada livre na tabela fat
+  ///
+  /// @param num Posição inicial para realizar a busca. A posição do cluster
+  /// encontrado é salvo aqui.
+  ///
+  /// @return true se foi encontrado, false caso contrário
+  bool searchFreeEntry(DWORD &num);
+
+  /// @brief Busca por uma cadeia de entradas livres na tabela fat
+  ///
+  /// @param initPos Posição inicial para realizar a busca. A posição do cluster
+  /// encontrado é salvo aqui.
+  /// @param num Número de entradas sendo buscadas
+  ///
+  /// @return Uma lista com todas as cadeias livres
+  std::vector<DWORD> searchListFreeEntry(DWORD initPos, DWORD num);
+
+  /// @brief Aloca os clusters
+  ///
+  /// @param tail Último cluster da antiga cadeia. Está função considera que seu
+  /// valor é EOC
+  /// @param clusters lista de clusters que serão alocados para formar uma cadeia
+  ///
+  /// @return true se foi possível escrever na tabela, false caso contrário
+  bool allocClusters(DWORD tail, const std::vector<DWORD> &clusters);
+
+  /// @brief Tamanho máximo em bytes dos clusters livres
+  size_t maxFreeClusByts();
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{ShortEntry}}
+\label{subsubsec:short_entry}
+
+\begin{lstlisting}[caption={Estrutura que representa uma entrada curta no sistema de arquivos}, label={lst:shortentry}] 
+// Estrutura de diretórios/arquivos
+struct __attribute__((packed)) ShortEntry
+{
+  BYTE name[NAME_FULL_SIZE]; // Nome curto 
+  BYTE attr; // Atributos que o arquivo pode ter
+  BYTE ntres; // Reservado
+  BYTE crtTimeTenth; // Tempo que o arquivo foi criado em ms
+  WORD crtTime; // Tempo em que o arquivo foi criado
+  WORD crtDate; // Data em que o arquivo foi criado
+  WORD lstAccDate; // Última data de acesso
+  WORD fstClusHI; // Bits mais significativos do cluster
+  WORD wrtTime; // Tempo em que o arquivo foi escrito
+  WORD wrtDate; // Data em que o arquivo foi escrito
+  WORD fstClusLO; // Bits menos significativos do cluster
+  DWORD fileSize; // Tamanho do arquivo. 0 no caso de diretórios
+};
+\end{lstlisting}
+
+\subsubsection{\texttt{LongEntry}}
+\label{subsubsec:long_entry}
+
+\begin{lstlisting}[caption={Estrutura que representa uma entrada longa no sistema de arquivos}, label={lst:longentry}] 
+// Estrutura de diretórios/arquivos para nomes longos
+struct __attribute__((packed)) LongEntry
+{
+  BYTE ord; // A ordem dessa entrada na sequência de nomes longos 
+  BYTE name1[10]; // Caracteres de 1-5 do nome longo
+  BYTE attr; // Deve ser igual a ATTR\_LONG\_NAME
+  BYTE type; // 0 é um diretório, outros valores rementem a arquivos
+  BYTE chckSum; // Checksum usado para verificar esta entrada
+  BYTE name2[12]; // Caracteres 6-11 do nome longo
+  WORD fstClusLO; // Deve ser 0. Está aqui só por compatibilidade
+  BYTE name3[4]; // Caracteres 12-13 do nome longo
 };
 \end{lstlisting}
 
@@ -982,849 +1642,190 @@ public:
 };
 \end{lstlisting}
 
-\subsubsection{\texttt{LongEntry}}
-\label{subsubsec:long_entry}
+\subsubsection{\texttt{ClusterIO}}
+\label{subsubsec:cluster_io}
 
-\begin{lstlisting}[caption={Estrutura que representa uma entrada longa no sistema de arquivos}, label={lst:longentry}] 
-// Estrutura de diretórios/arquivos para nomes longos
-struct __attribute__((packed)) LongEntry
+\begin{lstlisting}[caption={Classe de abstração dos clusters do sistema}, label={lst:cluster_io}]
+class ClusterIO
 {
-  BYTE ord; // A ordem dessa entrada na sequência de nomes longos 
-  BYTE name1[10]; // Caracteres de 1-5 do nome longo
-  BYTE attr; // Deve ser igual a ATTR\_LONG\_NAME
-  BYTE type; // 0 é um diretório, outros valores rementem a arquivos
-  BYTE chckSum; // Checksum usado para verificar esta entrada
-  BYTE name2[12]; // Caracteres 6-11 do nome longo
-  WORD fstClusLO; // Deve ser 0. Está aqui só por compatibilidade
-  BYTE name3[4]; // Caracteres 12-13 do nome longo
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{ShortEntry}}
-\label{subsubsec:short_entry}
-
-\begin{lstlisting}[caption={Estrutura que representa uma entrada curta no sistema de arquivos}, label={lst:shortentry}] 
-// Estrutura de diretórios/arquivos
-struct __attribute__((packed)) ShortEntry
-{
-  BYTE name[NAME_FULL_SIZE]; // Nome curto 
-  BYTE attr; // Atributos que o arquivo pode ter
-  BYTE ntres; // Reservado
-  BYTE crtTimeTenth; // Tempo que o arquivo foi criado em ms
-  WORD crtTime; // Tempo em que o arquivo foi criado
-  WORD crtDate; // Data em que o arquivo foi criado
-  WORD lstAccDate; // Última data de acesso
-  WORD fstClusHI; // Bits mais significativos do cluster
-  WORD wrtTime; // Tempo em que o arquivo foi escrito
-  WORD wrtDate; // Data em que o arquivo foi escrito
-  WORD fstClusLO; // Bits menos significativos do cluster
-  DWORD fileSize; // Tamanho do arquivo. 0 no caso de diretórios
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{BPB}}
-\label{subsubsec:bpb}
-
-\begin{lstlisting}[caption={Estrutura que representa o BPB encontrado no volume FAT}, label={lst:bpb}]
-  struct __attribute__((packed)) BPB
-  {
-    // BPB comum para todos os FATs
-    BYTE jmpBoot[3]; // Instrução para código de boot
-    BYTE OEMName[8]; // Indica o sistema que realizou a formatação do disco
-    WORD BytsPerSec; // Quantidade de bytes por sector
-    BYTE SecPerClus; // Número de setores por cluster
-    WORD RsvdSecCnt; // Número de setores reservados no inicio do volume
-    BYTE NumFATs; // Quantidade de estruturas FAT
-    WORD RootEntCnt; // Quantidade de entradas no dir raiz
-    WORD TotSec16; // Total de setores no volume. Usado em FAT12/FAT16
-    BYTE Media; // Tipo de mídia
-    WORD FATSz16; // Tamanho da estrutura FAT. Usado em FAT12/FAT16
-    WORD SecPerTrk; // Setores por cilindro
-    WORD NumHeads; // Quantidade de cabeças do dispositivo
-    DWORD HiddSec; // Quantidade de setores escondidos
-    DWORD TotSec32; // Total de setores no volume. Usado em FAT32
-
-    // BPB para FAT32
-    DWORD FATSz32; // Tamanho da estrutura FAT. Usado em FAT32
-    WORD ExtFlags; // Informações adicionais para a estrutura FAT
-    WORD FSVer; // Define a versão do FAT32
-    DWORD RootClus; // Número do cluster raiz.
-    WORD FSInfo; // Geralmente tem valor 1
-    WORD BkBootSec; // Deve ser 6
-    BYTE Reserved[12]; // Reservado
-    BYTE DrvNum; // Define o driver para o tipo do dispositivo
-    BYTE Reserved1; // Reservado
-    BYTE BootSig; // Assinatura do boot
-    DWORD VolID; // Determina um ID para o volume
-    BYTE VolLab[11]; // Nome do volume
-    BYTE FilSysType[8]; // String com o tipo do sistema
-  };
-\end{lstlisting}
-
-\subsubsection{\texttt{BiosBlock}}
-\label{subsubsec:bios_block}
-
-\begin{lstlisting}[caption={Classe que abstrai a extração de informações da estrutura BPB}, label={lst:biosblock}]
-// Classe para lidar com a estrutura BPB do FAT filesystem
-class BiosBlock
-{
-private:
-  /// Estrutura do BPB
-  BPB bpb;
-
-  /// Primeiro setor de dados
-  DWORD firstDataSector;
-
-  /// Total de setores no diretório raiz
-  DWORD rootDirSectors;
-
-  /// Total de setores no sistema de arquivos
-  DWORD totSec;
-
-  /// Tamanho da FAT
-  DWORD fatSz;
-
-  /// Total de setores de dados
-  DWORD dataSecTotal;
-
-  /// Total de clusters no sistema
-  DWORD countOfClusters;
-
-  /// @brief Inicializa a estrutura do BPB e demais estruturas.
-  ///
-  /// @return 0 se foi possível inicializar a estrutura, -1 caso contrário.
-  int bpbInit();
-
-  /// @brief Determinar o tipo de FAT do sistema.
-  ///
-  /// @return 12 se for FAT12, 16 se for FAT16 e 32 se for FAT32.
-  [[nodiscard]] inline int fatType() const;
-
-public:
-  /// @brief Inicia a estrutura BPB
-  ///
-  /// Lê a estrutura BPB em memória e inicializa informações necessárias para o
-  /// funcionamento dos sistema de arquivos.
-  ///
-  /// @param image Interface para fazer a leitura do sistema.
-  ///
-  /// @exception Gera uma exceção se não for possível ler a estrutura BPB, ou o
-  /// sistema de arquivos não ser do tipo FAT32.
-  explicit BiosBlock(const std::shared_ptr<Image> &image);
-  ~BiosBlock() = default;
-
-  /// @brief Imprime as informações do BPB
-  ///
-  /// @return 0 se foi possível imprimir, -1 se algo deu errado.
-  void bpbPrint() const;
-
-  /// @brief Retorna o endereço do FAT especificado
-  ///
-  /// @param num Número do FAT. Não pode ser maior do que o valor salvo em
-  /// NumFATs
-  ///
-  /// @exception Gera uma exceção no caso do número especificado não ser válido.
-  /// @return O setor do FAT especificado.
-  [[nodiscard]] DWORD fatSector(int num) const;
-
-  /// @brief Quantidade de FATs do sistema
-  ///
-  /// @return Retorna o valor de numFATs
-  [[nodiscard]] inline BYTE getNumFATs() const { return bpb.NumFATs; }
-
-  /// @brief Tamanho da FAT do sistema em setores
-  ///
-  /// @return Retorna o valor de fatSz
-  [[nodiscard]] inline DWORD getFATSz() const { return fatSz; }
-
-  /// @brief Quantidades de bytes por setor
-  ///
-  /// @return Retorna o valor de bpb.BytsPerSec
-  [[nodiscard]] inline WORD getBytesPerSec() const { return bpb.BytsPerSec; }
-
-  /// @brief Quantidades de setores por cluster
-  ///
-  /// @return Retorna o valor de bpb.SecPerCluster
-  [[nodiscard]] inline BYTE getSecPerCluster() const { return bpb.SecPerClus; }
-
-  /// @brief Total de setores na região de dados
-  ///
-  /// @return Retorna o valor de dataSecTotal
-  [[nodiscard]] inline DWORD getDataSecTotal() const { return dataSecTotal; }
-
-  /// @brief Total de cluster no sistema de arquivos
-  ///
-  /// @return Retorna o valor de countOfClusters
-  [[nodiscard]] inline DWORD getCountOfClusters() const
-  {
-    return countOfClusters;
-  }
-
-  /// @brief Total de setores reservados
-  ///
-  /// @return Retorna o valor de bpb.RsvdSecCnt
-  [[nodiscard]] inline WORD getRsvdSecCnt() const { return bpb.RsvdSecCnt; }
-
-  /// @brief Total de setores reservados
-  ///
-  /// @return Retorna o valor de bpb.RsvdSecCnt
-  [[nodiscard]] inline DWORD firstSectorOfCluster(DWORD num) const
-  {
-    return (num - 2) * bpb.SecPerClus + firstDataSector;
-  }
-
-  /// @brief Valor do cluster raiz
-  ///
-  /// @return Retorna o valor de bpb.RootClus
-  [[nodiscard]] inline DWORD getRootClus() const { return bpb.RootClus; }
-
-  /// @brief Tamanho do cluster em bytes
-  ///
-  /// @return A quantidade de bytes por setor do clsuter
-  [[nodiscard]] inline size_t totClusByts() const
-  {
-    return static_cast<size_t>(getSecPerCluster()) * getBytesPerSec();
-  }
-
-  /// @brief Setor em que o FSInfo se encontra
-  ///
-  /// @return Retorna o valor de bpb.FSInfo
-  [[nodiscard]] inline DWORD getFSInfo() const { return bpb.FSInfo; }
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{FatTable}}
-\label{subsubsec:fat_table}
-
-\begin{lstlisting}[caption={Classe a estrutura FAT}, label={lst:fat_table}]
-class FatTable
-{
-  /// Máscaras para leitura e escrita na tabela
-  static constexpr DWORD LSB_MASK = 0x0FFFFFFF;
-  static constexpr DWORD MSB_MASK = 0xF0000000;
-
-  /// Define que o cluster está livre
-  static constexpr DWORD FREE_CLUSTER = 0x00000000;
-
-  /// Define o final da cadeia de clusters
-  static constexpr DWORD EOC = 0x0FFFFFF8;
-
-  /// Interface usada para ler e escrever a FAT
+  /// Interface usada para ler e escrever a imagem 
   std::shared_ptr<Image> image;
 
-  /// Interface para lidar com o BPB
+  /// Interface usada lidar com a estrutura BPB 
   std::shared_ptr<BiosBlock> bios;
 
-  /// Tabela FAT em memória
-  std::unique_ptr<BYTE[]> table;
-
-  /// @brief Lê uma das tabelas FAT em memória
-  ///
-  /// @return true se foi possível ler, false caso contrário
-  bool readFatTable(int num);
-
-  /// @brief Escreve uma das tabelas FAT na imagem
-  ///
-  /// @return true se foi possível escrever, false caso contrário
-  bool writeFatTable(int num);
-
-  /// @brief Escreve em uma das entradas da tabela FAT em memória
-  ///
-  /// @param offset Posição a ser escrita na tabela
-  /// @param value Variável armazena o valor a ser escrito na tabela
-  ///
-  /// @return true se foi possível escrever, false caso contrário
-  void writeInTable(DWORD num, DWORD value);
-
-  /// @brief Lê uma entrada da tabela FAT em memória
-  ///
-  /// @param offset Posição a ser lida da tabela
-  /// @param value Variável que recebe valor a ser lido da tabela
-  ///
-  /// @return true se foi possível ler, false caso contrário
-  [[nodiscard]] DWORD readFromTable(DWORD offset) const;
-
-public:
-  /// @brief Inicializa a FAT em memória
-  ///
-  /// Carrega a primeira FAT em memória e inicializa demais informações
-  ///
-  /// @param image Interface para leitura da imagem
-  /// @param bios Interface para obter informações da BPB
-  ///
-  /// @exception Gera uma exceção se houver algum erro durante a leitura ou
-  /// inicialização.
-  explicit FatTable(std::shared_ptr<Image> image,
-    std::shared_ptr<BiosBlock> bios);
-
-  /// @brief Imprime a tabela atual
-  void printTable() const;
-
-  /// @brief Mostra informações de espaço da tabela atual
-  void printInfo() const;
-
-  /// @brief Cadeia de clusters
-  ///
-  /// @param start Inicio da cadeia a ser listada
-  ///
-  /// @return Retorna uma lista com todos os clusters da cadeia
-  std::vector<DWORD> listChain(DWORD start);
-
-  /// @brief Remove uma cadeia de clusters alocada
-  ///
-  /// @param start Inicio da cadeia a ser removida
-  ///
-  /// @return Retorna a quantidade de cadeias removidas
-  int removeChain(DWORD start);
-
-  /// @brief Quantidade de clusters em uso
-  ///
-  /// Lê a tabela atual e retorn a quantidade de clusters que estão em uso.
-  ///
-  /// @return Valor da quantidade de clusters em uso
-  [[nodiscard]] DWORD usedClusters() const;
-
-  /// @brief Quantidade de clusters livres
-  ///
-  /// Lê a tabela atual e retorna a quantidade de clusters que estão livres.
-  ///
-  /// @return Valor da quantidade de clusters livres
-  [[nodiscard]] DWORD freeClusters() const;
-
-  /// @brief Busca por uma entrada livre na tabela fat
-  ///
-  /// @param num Posição inicial para realizar a busca. A posição do cluster
-  /// encontrado é salvo aqui.
-  ///
-  /// @return true se foi encontrado, false caso contrário
-  bool searchFreeEntry(DWORD &num);
-
-  /// @brief Busca por uma cadeia de entradas livres na tabela fat
-  ///
-  /// @param initPos Posição inicial para realizar a busca. A posição do cluster
-  /// encontrado é salvo aqui.
-  /// @param num Número de entradas sendo buscadas
-  ///
-  /// @return Uma lista com todas as cadeias livres
-  std::vector<DWORD> searchListFreeEntry(DWORD initPos, DWORD num);
-
-  /// @brief Aloca os clusters
-  ///
-  /// @param tail Último cluster da antiga cadeia. Está função considera que seu
-  /// valor é EOC
-  /// @param clusters lista de clusters que serão alocados para formar uma cadeia
-  ///
-  /// @return true se foi possível escrever na tabela, false caso contrário
-  bool allocClusters(DWORD tail, const std::vector<DWORD> &clusters);
-
-  /// @brief Tamanho máximo em bytes dos clusters livres
-  size_t maxFreeClusByts();
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{FSInfo}}
-\label{subsubsec:fsinfo}
-
-\begin{lstlisting}[caption={Estrutura que representa o FSInfo encontrado no volume FAT}, label={lst:fsinfo}]
-struct __attribute__((packed)) FSInfo
-{
-  DWORD LeadSig; // Assinatura para validar o FSInfo
-  BYTE Reserved1[480]; // Estrutura que não deve ser usada
-  DWORD StrucSig; // Outra assinatura para validar o FSInfo
-  DWORD FreeCount; // Contém a quantidade de clusters livre do volume
-  DWORD NextFree; // Próximo cluster livre
-  BYTE Reserved2[12]; // Estrutura que não deve ser usada
-  DWORD TrailSig; // Mais uma assinatura para validar a estrutura
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{FileSysInfo}}
-\label{subsubsec:file_sys_info}
-
-\begin{lstlisting}[caption={Classe que abstrai a extração de informações da estrutura FSInfo}, label={lst:fileinfo}]
-// Classe para lidar com a estrutura FSInfo do FAT filesystem
-class FileSysInfo
-{
-  /// Definição de valor quando não se sabe a quantidade de clusters livres
-  static constexpr DWORD UNKNOWN_FREECLUS = 0xFFFFFFFF;
-
-  /// Valor da assinatura do LeadSig
-  static constexpr DWORD LEADISG = 0x41615252;
-
-  /// Valor da assinatura do StrucSig
-  static constexpr DWORD STRUCSIG = 0x61417272;
-
-  /// Valor da assinatura do TrailSig
-  static constexpr DWORD TRAILSIG = 0xAA550000;
-
-  /// Estrutura do FSInfo
-  FSInfo fsinfo;
-
-  /// Interface usada para ler e escrever a imagem
-  std::shared_ptr<Image> image;
-
-  /// Offset da estrutra no sistema de arquivos
-  const DWORD offset;
-
-  /// Flag para definir se a estrutura foi ou não alterada
-  bool dirty = false;
-
-  /// Total de clusters no sistema
-  DWORD totalClus;
-
-public:
-  /// @brief Inicia a estrutura FSInfo
-  ///
-  /// Lê a estrutura FSInfo em memória e inicializa informações necessárias para
-  /// o funcionamento dos sistema de arquivos.
-  ///
-  /// @param image Interface para fazer a leitura do sistema.
-  /// @param offset Offset do FSInfo no sistema de arquivos.
-  /// @param fatTable Tabela FAT usada para realizar algumas verificações.
-  ///
-  /// @exception Gera uma exceção se não for possível ler a estrutura FSInfo ou
-  /// houve algum erro durante sua verificação.
-  explicit FileSysInfo(std::shared_ptr<Image> image,
-    DWORD offset,
-    const std::shared_ptr<FatTable> &fatTable);
-
-  /// @brief Finaliza a estrutura
-  ///
-  /// Verifica se a flag dirty está setada, e se estiver escreve o FSInfo na
-  /// imagem original.
-  ~FileSysInfo();
-
-  /// @brief Quantidade de clusters livres no sistema
-  ///
-  /// @return Retorna o valor de fsinfo.FreeCount
-  [[nodiscard]] inline DWORD getFreeCount() const { return fsinfo.FreeCount; }
-
-  /// @brief Último cluste livre conhecido
-  ///
-  /// @return Retorna o valor de fsinfo.NextFree
-  [[nodiscard]] inline DWORD getNextFree() const { return fsinfo.NextFree; }
-
-  /// @brief Coloca um novo valor na quantidade de clusters livres
-  ///
-  /// @return true se foi possível alterar, false caso contrário
-  bool setFreeCount(DWORD freeCount);
-
-  /// @brief Coloca um novo valor no último cluster livre conhecido
-  ///
-  /// @return true se foi possível alterar, false caso contrário
-  bool setNextFree(DWORD nextFree);
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{FatFS}}
-\label{subsubsec:file_sys_info}
-
-\begin{lstlisting}[caption={Classe que expõe as interfaces de interação com o sistema de arquivos}, label={lst:fatfs}]
-class FatFS
-{
-private:
-  /// Interface usada para ler e escrever a imagem
-  std::shared_ptr<Image> image;
-
-  /// Interface usada lidar com a estrutura BPB
-  std::shared_ptr<BiosBlock> bios;
+  /// Estrutura que armazena informações sobre os clusters
+  std::shared_ptr<FileSysInfo> fsInfo;
 
   /// Interface para lidar com a tabela FAT
   std::shared_ptr<FatTable> fatTable;
 
-  /// Interface para lidar com a estrutura FSInfo
-  std::shared_ptr<FileSysInfo> fsInfo;
-
   /// Caminho atual no sistema de arquivos
   std::shared_ptr<PathName> pathName;
 
-  /// Classe para acesso aos clusters
-  std::shared_ptr<ClusterIO> clusterIO;
+  /// Define a quantidade de entradas por cluster
+  size_t NUM_ENTRIES;
 
-  /// @brief Helper para a listagem de diretórios
+  /// @brief Gera as entradas relacionadas ao nome especificado
   ///
-  /// @param num Número do cluster onde ocorrerá a listagem
+  /// @param num Número do cluster onde a entrada será criada
+  /// @param name Nome da entrada a ser criada
+  /// @param sentry Referência a entrada curta a ser criada
+  /// @param lentry Referência a entrada longa a ser criada
+  /// @param attrs Atributos da entrada a ser criada
   ///
   /// @exception Gera um exceção se houver algum problema durante a busca do
   /// cluster.
-  void listClusterDir(DWORD num);
+  /// @return true se foi possível criar, false caso contrário
+  bool generateEntries(DWORD num,
+    const std::string &name,
+    ShortEntry &sentry,
+    std::vector<LongEntry> &lentry,
+    BYTE attrs);
 
-  /// @brief Atualiza as timestamps do diretório pai
+  /// @brief Busca entradas vazias e continuas
   ///
-  /// @param path Caminho para o diretório que precisa ter o seu tempo atualizado
+  /// @param cluster Número do cluster onde ocorrerá a busca
+  /// @param numEntries Quantidade de entradas a serem alocadas
+  /// @param clusterIndexes Lista com as posições para escrever a entrada
   ///
   /// @exception Gera um exceção se houver algum problema durante a busca do
   /// cluster.
-  /// @return 0 se foi possível atualizar, 1 se foi tentado atualizar o pai e -1 caso tenha algum erro.
-  int updateParentTimestamp(std::string path);
+  /// @return 0 se o espaço vazio suporta todas as entradas, 0< se o espaço não é
+  /// suficiente.
+  int searchEmptyEntries(DWORD cluster,
+    DWORD numEntries,
+    std::vector<ClusterIndex> &clusterIndexes);
 
-  /// @brief Cópia dados internos para uma localização externa
+  /// @brief Inicializa e insere as entradas DOT e DOTDOT nod diretório criado
   ///
-  /// @param from Caminho do arquivo interno
-  /// @param to Caminho para o arquivo externo
+  /// @param parentClt Número do cluster onde a entrada será criada
+  /// @param dentry Entrada que representa o diretório alocado
   ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível copiar, false caso contrário
-  bool copyInternalData(const std::string &from, const std::string &to);
+  /// @return true se foi possível alocar, false caso contrário.
+  bool insertDotEntries(DWORD parentClt, Dentry &dentry);
 
-  /// @brief Cópia dados externos para uma localização interna
+  /// @brief Cria uma entrada do tipo diretório e insere no buffer de entrada
   ///
-  /// @param from Caminho do arquivo externo
-  /// @param to Caminho para o arquivo interno
+  /// Além da criação da entrada, no diretório também se faz necessário alocar um
+  /// buffer para receber as demais entradas.
   ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível copiar, false caso contrário
-  bool copyExternalData(const std::string &from, const std::string &to);
+  /// @param num Número do cluster onde a entrada será criada
+  /// @param name Nome do arquivo a ser criado
+  ///
+  /// @return true se foi possível criar, false caso contrário.
+  bool createDirectoryEntry(DWORD num, const std::string &name);
 
-  /// @brief Cópia dados de um caminho interno para outro interno
+  /// @brief Cria uma entrada do tipo arquivo e insere no buffer de entrada
   ///
-  /// @param from Caminho do arquivo interno
-  /// @param to Caminho para o arquivo interno
+  /// @param num Número do cluster onde a entrada será criada
+  /// @param name Nome do arquivo a ser criado
   ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível copiar, false caso contrário
-  bool copyInSystemData(const std::string &from, const std::string &to);
+  /// @return true se foi possível criar, false caso contrário.
+  bool createArchiveEntry(DWORD num, const std::string &name);
 
 public:
-  /// @brief Inicia a estrutura do sistema de arquivo
-  ///
-  /// Aloca cada uma das estruturas e as inicializa.
-  ///
-  /// @param path Caminho para a imagem FAT.
-  ///
-  /// @exception Gera uma exceção se não for possível alocar ou inicializar as
-  /// estruturas.
-  explicit FatFS(const std::string &path);
+  explicit ClusterIO(std::shared_ptr<Image> image,
+    std::shared_ptr<BiosBlock> bios,
+    std::shared_ptr<FatTable> fatTable,
+    std::shared_ptr<FileSysInfo> fsInfo,
+    std::shared_ptr<PathName> pathName);
 
-  /// @brief Mostra as informações sobre o sistema de arquivos
-  void info();
-
-  /// @brief Mostra as informações de um cluster no formato texto
-  ///
-  /// @param num Número do cluster no qual as informações serão mostradas
-  ///
+  /// @brief Lê um cluster da memória em um buffer
+  /// 
+  /// @param buffer Ponteiro que irá receber as informações a serem lidas
+  /// @param num Número do cluster que será lido
+  /// 
   /// @return true se foi possível ler, false caso contrário
-  bool cluster(DWORD num);
+  bool readCluster(void *buffer, DWORD num);
 
-  /// @brief Lista todos os diretórios/arquivos de um caminho especificado
+  /// @brief Escreve um cluster na imagem
   ///
-  /// @param path Caminho a ser listado
-  ///
-  /// @return true se foi possível listar diretório, false caso contrário
-  bool ls(const std::string &path);
-
-  /// @brief Remove um arquivo do sistema
-  ///
-  /// @param path Caminho do arquivo a ser removido
-  ///
-  /// @return true se foi possível remover arquivo, false caso contrário
-  bool rm(const std::string &path);
-
-  /// @brief Remove um diretório vazio do sistema
-  ///
-  /// @param path Caminho do diretório vazio a ser removido
-  ///
-  /// @return true se foi possível remover diretório, false caso contrário
-  bool rmdir(const std::string &path);
-
-  /// @brief Retorna o caminho atual do sistema
-  std::string pwd();
-
-  /// @brief Altera o caminho atual
-  ///
-  /// @param path Novo caminho base do sistema
-  ///
-  /// @return true se foi possível alterar caminho atual, false caso contrário
-  bool cd(const std::string &path);
-
-  /// @brief Imprime os atributos de uma entrada
-  ///
-  /// @param path Caminho para a entrada a ser apresentada
-  ///
-  /// @return true se foi possível listar atributos, false caso contrário
-  bool attr(const std::string &path);
-
-  /// @brief Cria um arquivo vazio
-  ///
-  /// @param path Caminho para a entrada a ser criada
-  ///
-  /// @return true se foi possível criar arquivo, false caso contrário
-  bool touch(const std::string &path);
-
-  /// @brief Cria um diretório
-  ///
-  /// @param path Caminho para o diretório a ser criado
-  ///
-  /// @return true se foi possível criar diretório, false caso contrário
-  bool mkdir(const std::string &path);
-
-  /// @brief Renomeia um arquivo
-  ///
-  /// @param from Caminho do arquivo original
-  /// @param to Caminho do destino
-  ///
-  /// @return true se foi possível renomear, false caso contrário
-  bool rename(const std::string &from, const std::string &to);
-
-  /// @brief Move um arquivo de um caminho a outro
-  ///
-  /// @param from Caminho do arquivo original
-  /// @param to Caminho do destino
-  ///
-  /// @return true se foi possível mover, false caso contrário
-  bool mv(const std::string &from, const std::string &to);
-
-  /// @brief Copia um arquivo de um caminho a outro
-  ///
-  /// @param from Caminho do arquivo original
-  /// @param to Caminho do destino
-  ///
-  /// @return true se foi possível copiar, false caso contrário
-  bool cp(const std::string &from, const std::string &to);
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{FileSystemAdapter}}
-\label{subsubsec:file_system_adapter}
-
-\begin{lstlisting}[caption={Classe que realiza interface com sistema de arquivos do \textit{host}}, label={lst:fsadapter}]
-class FileSystemAdapter
-{
-  /// Caminho para o arquivo sendo manipulado
-  std::string filePath;
-
-  /// Ponteiro para o arquivo que vai ser manipulado
-  std::fstream file;
-
-  /// Define o como o arquivo está aberto
-  FileOption fileOption;
-
-  /// Flag para dizer se o arquivo foi ou não excluído
-  bool isDeleted;
-
-  /// @brief Limpa o arquivo
-  ///
-  /// Está opção só deve ser usada quando o arquivo for aberto em maneira de
-  /// leitura.
-  ///
-  /// @param path Caminho para o arquivo que será limpo
-  ///
-  /// @return true se foi possível limpar o arquivo, false caso contrário
-  bool clean(const std::string &path) const;
-
-  /// @brief Abre o arquivo conforme a opção passada
-  ///
-  /// @param path Caminho para o arquivo que será aberto
-  ///
-  /// @return true se foi possível abrir o arquivo, false caso contrário
-  bool open(const std::string &path);
-
-public:
-  /// @brief Construtor para a manipulação do arquivo
-  ///
-  /// Abre o arquivo para manipulação especificada pelo caminho.
-  ///
-  /// @param path Caminho para o arquivo
-  /// @param option Opção usada ao abrir o arquivo
-  ///
-  /// @exception Argumento inválido, quando o caminho não é válido
-  /// @exception Runtime error, quando não é possível abrir o arquivo
-  explicit FileSystemAdapter(const std::string &path, FileOption option);
-
-  ~FileSystemAdapter();
-
-  /// @brief Escreve no arquivo
-  ///
-  /// @param offset Posição onde a escrita será iniciada
-  /// @param buffer Posição de memória que tem os dados a serem escritos
-  /// @param size Tamanho do dado a ser escrito
+  /// @param buffer Ponteiro com as informações que serão escritas
+  /// @param num Número do cluster que será escrito
   ///
   /// @return true se foi possível escrever, false caso contrário
-  bool write(DWORD offset, const void *const buffer, size_t size);
+  bool writeCluster(const void *buffer, DWORD num);
 
-  /// @brief Lê o arquivo
+  /// @brief Aloca um novo cluster
   ///
-  /// @param offset Posição onde a leitura será iniciada
-  /// @param buffer Posição de memória que irá receber o dado lido
-  /// @param size Tamanho do dado a ser lido
+  /// @param cluster Número do cluster que será estendido. Se o valor for 0, uma
+  /// nova cadeia será criada
   ///
-  /// @return true se foi possível ler, false caso contrário
-  bool read(DWORD offset, void *buffer, size_t size);
+  /// @exception Gera um exceção se houver algum problema durante a busca do
+  /// cluster.
+  /// @return true se foi possível alocar o cluster, false caso contrário.
+  bool allocNewCluster(DWORD &cluster);
 
-  /// @brief Exclui o arquivo
+  /// @brief Retorna o cluster da entrada corrente
   ///
-  /// @return true se foi possível remover, false caso contrário
-  bool remove();
-
-  /// @brief Retorna o tamanho do arquivo
+  /// No caso da entrada que é um "..", ao tentar retornar seu cluster o valor 0
+  /// será retornado. Para evitar problemas aqui retornamos o valor do
+  /// RootClus.
   ///
-  /// @param fileSize Referência que recebe o tamanho do arquivo
+  /// @param entry Entrada que terá seu cluster extraído.
   ///
-  /// @return true se foi possível ler o tamanho do arquivo, false caso contrário
-  bool getFileSize(size_t &fileSize);
-};
-\end{lstlisting}
+  /// @return O valor do cluster da entrada
+  DWORD getEntryClus(const Dentry &entry);
 
-\subsubsection{\texttt{Image}}
-\label{subsubsec:image}
-
-\begin{lstlisting}[caption={Classe para interação do arquivo \texttt{.img} que contém o FAT32 gravado}, label={lst:image}]
-class Image
-{
-  std::fstream image;
-
-public:
-  /// @brief Construtor para a imagem
+  /// @brief Retorna uma lista com todas as entradas de um diretório
   ///
-  /// Abre a imagem especificada pelo caminho.
+  /// @param num Número do cluster do diretório que será listado
   ///
-  /// @param path Caminho para a imagem
+  /// @exception Exceções podem ocorrer durante a leitura das informações das
+  /// entradas.
   ///
-  /// @exception Argumento inválido, quando o caminho não é válido
-  /// @exception Runtime error, quando não é possível abrir o arquivo
-  explicit Image(const std::string &path);
+  /// @return Um vetor com todos as entradas se foi possível ler.
+  std::vector<Dentry> getListEntries(DWORD num);
 
-  ~Image();
-
-  /// @brief Fecha o arquivo aberto
-  void close();
-
-  /// @brief Lê a imagem
+  /// @brief Busca uma entrada por meio do caminho passado
   ///
-  /// @param offset Posição onde a leitura será iniciada
-  /// @param buffer Posição de memória que irá receber o dado lido
-  /// @param size Tamanho do dado a ser lido
+  /// @param path Caminho que está sendo buscado
+  /// @param listPath Referência a lista com todas as partes do caminho. Este
+  /// caminho é alterado ao longo da busca.
+  /// @param searchType Especifica o tipo de entrada sendo buscado.
   ///
-  /// @return true se foi possível ler, false caso contrário
-  bool read(DWORD offset, void *buffer, size_t size);
+  /// @exception Gera um exceção se houver algum problema durante a verificação
+  /// do caminho.
+  /// @return Um vetor com o caminho propriamente dividido e o cluster no qual o
+  /// último arquivo se encontra
+  std::optional<Dentry> searchEntryByPath(const std::string &path,
+    std::vector<std::string> &listPath,
+    EntryType searchType);
 
-  /// @brief Escreve na imagem
+  /// @brief Atualiza uma entrada dentro do cluster
   ///
-  /// @param offset Posição onde a escrita será iniciada
-  /// @param buffer Posição de memória que tem os dados a serem escritos
-  /// @param size Tamanho do dado a ser escrito
+  /// Reescreve a entrada passada nos clusters em que suas entradas são
+  /// localizadas.
   ///
-  /// @return true se foi possível escrever, false caso contrário
-  bool write(DWORD offset, const void *const buffer, size_t size);
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{PathName}}
-\label{subsubsec:path_name}
-
-\begin{lstlisting}[caption={Classe que implementa o \textit{parser} de caminhos e nomes de entradas no sistema}, label={lst:pathname}]
-class PathName
-{
-  /// Define o diretório raiz do sistema
-  const std::string ROOT_DIR = "img/";
-
-  /// Define o diretório raiz do sistema
-  const char EXTERNAL_PATH = '/';
-
-  /// Define o caminho atual do sistema
-  std::string curPath;
-
-public:
-  PathName();
-
-  /// @brief Retorna o caminho atual do sistema
-  [[nodiscard]] std::string getCurPath() const;
-
-  /// @brief Atualiza o caminho atual do sistema
+  /// @param entry Entrada a ser atualizada
   ///
-  /// @param path Novo caminho para o sistema
-  void setCurPath(const std::string &path);
+  /// @return true se foi possível atualizar, false caso contrário.
+  bool updateEntry(Dentry &entry);
 
-  /// @brief Retorna o diretório raiz atual
-  [[nodiscard]] std::string getRootDir() const;
+  /// @brief Remove uma entrada do cluster
+  ///
+  /// @param entry Entrada a ser removida
+  ///
+  /// @return true se foi possível remover, false caso contrário.
+  bool removeEntry(Dentry &entry);
 
-  /// @brief Dividi um caminho em suas partes
+  /// @brief Deleta a entrada do sistema de arquivo
   ///
-  /// @param path Caminho a ser dividido em partes
-  /// @param delim Caracter que delimita a divisão do caminho
+  /// A entrada é removida tanto do cluster quanto do FAT.
   ///
-  /// @return Um vetor contendo o nome de cada parte do caminho
-  [[nodiscard]] std::vector<std::string> split(const std::string &path,
-    char delim) const;
+  /// @param entry Entrada a ser removida
+  ///
+  /// @return true se foi possível deletar, false caso contrário.
+  bool deleteEntry(Dentry &entry);
 
-  /// @brief Junta todas as partes de um caminho
-  ///
-  /// @param path Vetor com cada parte do caminho a ser unido
-  ///
-  /// @return Uma string com o caminho
-  [[nodiscard]] std::string merge(const std::vector<std::string> &path) const;
-
-  /// @brief Gera o caminho completo a partir de um caminho qualquer
-  ///
-  /// @param path Caminho a ser tratado
-  ///
-  /// @return Uma lista com o caminho completo
-  [[nodiscard]] std::vector<std::string> generateFullPath(
-    const std::string &path) const;
-
-  /// @brief Verifica se a lista de caminho é referente ao root
-  ///
-  /// @param listPath Lista com caminhos a ser verificada
-  ///
-  /// @return true se for o diretório raiz, false caso contrário
-  bool isRootDir(const std::vector<std::string> &listPath);
-
-  /// @brief Dividi o caminho do arquivo
-  ///
-  /// @param path Referência o caminho que precisa ser divido em duas partes.
-  /// Durante a divisão este caminho e alterado.
-  ///
-  /// @exception Gera uma exceção se o caminho não for válido.
-  ///
-  /// @return O último nome dentro do caminho
-  std::string getLastNameFromPath(std::string &path);
-
-  /// @brief Verifica se é um caminho externo
-  ///
-  /// @param path Caminho a ser verificado
-  ///
-  /// @return true se for um caminho externo, false caso contrário
-  bool isExternalPath(const std::string &path) const;
-};
-\end{lstlisting}
-
-\subsubsection{\texttt{Shell}}
-\label{subsubsec:shell}
-
-\begin{lstlisting}[caption={Classe que implementa o \textit{shell}}, label={lst:shell}]
-class Shell
-{
-  // Ponteiro para a interface do sistema de arquivos
-  std::unique_ptr<FatFS> fatFS;
-
-  /// @brief Dividi o comando passado em diferentes partes
-  ///
-  /// @param command Comando inserido pelo usuário
-  ///
-  /// @return Uma lista com todas as partes do comando
-  std::vector<std::string> parser(const std::string &cmd) const;
-
-  /// @brief Analisa a string e retorna o comando
-  ///
-  /// @param command Comando inserido pelo usuário
-  ///
-  /// @return O FSApi referente ao comando
-  FSApi command(const std::string &cmd) const;
-
-  /// @brief Executa o loop do shell iterativo
-  void exec(FSApi cmd, std::vector<std::string> params);
-
-public:
-  /// @brief Inicia a estrutura do shell
-  ///
-  /// @param fatFS Interface do sistema de arquivos.
-  explicit Shell(std::unique_ptr<FatFS> fatFS);
-
-  /// @brief Executa o loop do shell iterativo
-  void interpreter();
+  /// @brief Aloca a entrada e insere no buffer
+  /// 
+  /// @param name Nome do arquivo a ser criado
+  /// @param num Número do cluster onde a entrada será criada
+  /// 
+  /// @return true se foi possível criar, false caso contrário.
+  bool createEntry(DWORD num, const std::string &name, EntryType type);
 };
 \end{lstlisting}
 
@@ -2134,3 +2135,4 @@ A implementação do sistema de arquivos FAT32 permitiu consolidar conceitos te�
 \bibliography{abntex2-modelo-references}
 
 \end{document}
+
