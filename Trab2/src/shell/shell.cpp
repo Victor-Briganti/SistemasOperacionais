@@ -20,23 +20,40 @@
 
 std::vector<std::string> Shell::parser(const std::string &cmd) const
 {
-  std::stringstream stream(cmd);
-
   std::vector<std::string> commands;
   std::string entry;
 
-  while (getline(stream, entry, ' ')) {
+  for (size_t i = 0; i < cmd.size(); i++) {
+    if (cmd[i] == '\\' && i + 1 < cmd.size()) {
+      if (cmd[i + 1] == ' ') {
+        entry += ' ';
+      } else if (cmd[i + 1] == '\\') {
+        entry += '\\';
+      } else {
+        std::string invalidChar;
+        invalidChar += cmd[i + 1];
+        throw std::runtime_error("Caracter '\\" + invalidChar + "' é inválido");
+      }
+      i++;
+      continue;
+    }
+
+    if (cmd[i] == ' ') {
+      if (entry != "") {
+        commands.push_back(entry);
+      }
+      entry.clear();
+      continue;
+    }
+
+    entry += cmd[i];
+  }
+
+  if (entry != "") {
     commands.push_back(entry);
   }
 
-  std::vector<std::string> results;
-  for (const auto &a : commands) {
-    if (a != "") {
-      results.push_back(a);
-    }
-  }
-
-  return results;
+  return commands;
 }
 
 FSApi Shell::command(const std::string &cmd) const
@@ -220,18 +237,18 @@ void Shell::interpreter()
       return;
     }
 
-    auto params = parser(input);
-    if (params.empty()) {
-      continue;
-    }
-
-    auto cmd = command(params[0]);
-    if (cmd == FAIL) {
-      logger::logWarning("Comando não reconhecido");
-      continue;
-    }
-
     try {
+      auto params = parser(input);
+      if (params.empty()) {
+        continue;
+      }
+
+      auto cmd = command(params[0]);
+      if (cmd == FAIL) {
+        logger::logWarning("Comando não reconhecido");
+        continue;
+      }
+
       exec(cmd, params);
     } catch (std::runtime_error &error) {
       logger::logError(error.what());
