@@ -94,30 +94,57 @@
 \usepackage{listings}
 \usepackage{color}
 
-\definecolor{dkgreen}{rgb}{0,0.6,0}
-\definecolor{gray}{rgb}{0.5,0.5,0.5}
-\definecolor{mauve}{rgb}{0.58,0,0.82}
+% \definecolor{dkgreen}{rgb}{0,0.6,0}
+% \definecolor{gray}{rgb}{0.5,0.5,0.5}
+% \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\lstset{frame=tb,
-  language=C++,
-  aboveskip=3mm,
-  belowskip=3mm,
-  showstringspaces=false,
-  columns=flexible,
-  basicstyle={\small\ttfamily},
-  numbers=none,
-  numberstyle=\tiny\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
-  breaklines=true,
-  breakatwhitespace=true,
-  tabsize=3,
-  extendedchars=true,
-  inputencoding=utf8x,
-  texcl=true
-}
+% \lstset{frame=tb,
+%   language=C++,
+%   aboveskip=3mm,
+%   belowskip=3mm,
+%   showstringspaces=false,
+%   columns=flexible,
+%   basicstyle={\small\ttfamily},
+%   numbers=none,
+%   numberstyle=\tiny\color{gray},
+%   keywordstyle=\color{blue},
+%   commentstyle=\color{dkgreen},
+%   stringstyle=\color{mauve},
+%   breaklines=true,
+%   breakatwhitespace=true,
+%   tabsize=3,
+%   extendedchars=true,
+%   inputencoding=utf8x,
+%   texcl=true
+% }
 % ---
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    language=C++,
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
 
 % --- 
 % CONFIGURAÇÕES DE PACOTES
@@ -1106,93 +1133,91 @@ public:
 \subsubsection{\texttt{FSInfo}}
 \label{subsubsec:fsinfo}
 
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fsinfo}.
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{LeadSig}: Assinatura utilizada para validar a estrutura FSInfo
+            \item \texttt{Reserved1}: Campo reservado que não deve ser utilizado
+            \item \texttt{StrucSig}: Segunda assinatura utilizada para validar a estrutura FSInfo
+            \item \texttt{FreeCount}: Número de clusters livres no volume
+            \item \texttt{NextFree}: Próximo cluster livre disponível
+            \item \texttt{Reserved2}: Campo reservado que não deve ser utilizado
+            \item \texttt{TrailSig}: Terceira assinatura utilizada para validar a estrutura
+        \end{itemize}
+\end{itemize}
+
+
 \begin{lstlisting}[caption={Estrutura que representa o FSInfo encontrado no volume FAT}, label={lst:fsinfo}]
 struct __attribute__((packed)) FSInfo
 {
-  DWORD LeadSig; // Assinatura para validar o FSInfo
-  BYTE Reserved1[480]; // Estrutura que não deve ser usada
-  DWORD StrucSig; // Outra assinatura para validar o FSInfo
-  DWORD FreeCount; // Contém a quantidade de clusters livre do volume
-  DWORD NextFree; // Próximo cluster livre
-  BYTE Reserved2[12]; // Estrutura que não deve ser usada
-  DWORD TrailSig; // Mais uma assinatura para validar a estrutura
+  DWORD LeadSig;
+  BYTE Reserved1[480]; 
+  DWORD StrucSig; 
+  DWORD FreeCount; 
+  DWORD NextFree; 
+  BYTE Reserved2[12]; 
+  DWORD TrailSig; 
 };
 \end{lstlisting}
 
 \subsubsection{\texttt{FileSysInfo}}
 \label{subsubsec:file_sys_info}
 
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fileinfo}.
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{UNKNOWN\_FREECLUS}: Valor utilizado quando a quantidade de clusters livres é desconhecida
+            \item \texttt{LEADISG}: Valor da assinatura do LeadSig
+            \item \texttt{STRUCSIG}: Valor da assinatura do StrucSig
+            \item \texttt{TRAILSIG}: Valor da assinatura do TrailSig
+            \item \texttt{fsinfo}: Estrutura do FSInfo
+            \item \texttt{image}: Interface usada para leitura e escrita da imagem
+            \item \texttt{offset}: Offset da estrutura no sistema de arquivos
+            \item \texttt{dirty}: Flag que indica se a estrutura foi alterada
+            \item \texttt{totalClus}: Total de clusters no sistema
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{FileSysInfo}: Inicializa a estrutura FSInfo, lê seus dados em memória e configura as informações necessárias para o funcionamento do sistema de arquivos
+            \item \texttt{\~FileSysInfo}: Verifica se a flag \texttt{dirty} está setada e, se estiver, escreve o FSInfo na imagem original
+            \item \texttt{getFreeCount}: Retorna a quantidade de clusters livres no sistema
+            \item \texttt{getNextFree}: Retorna o último cluster livre conhecido
+            \item \texttt{setFreeCount}: Atualiza o valor da quantidade de clusters livres
+            \item \texttt{setNextFree}: Atualiza o valor do último cluster livre conhecido
+        \end{itemize}
+\end{itemize}
+
+
 \begin{lstlisting}[caption={Classe que abstrai a extração de informações da estrutura FSInfo}, label={lst:fileinfo}]
-// Classe para lidar com a estrutura FSInfo do FAT filesystem
 class FileSysInfo
 {
-  /// Definição de valor quando não se sabe a quantidade de clusters livres
   static constexpr DWORD UNKNOWN_FREECLUS = 0xFFFFFFFF;
-
-  /// Valor da assinatura do LeadSig
   static constexpr DWORD LEADISG = 0x41615252;
-
-  /// Valor da assinatura do StrucSig
   static constexpr DWORD STRUCSIG = 0x61417272;
-
-  /// Valor da assinatura do TrailSig
   static constexpr DWORD TRAILSIG = 0xAA550000;
-
-  /// Estrutura do FSInfo
   FSInfo fsinfo;
-
-  /// Interface usada para ler e escrever a imagem
   std::shared_ptr<Image> image;
-
-  /// Offset da estrutra no sistema de arquivos
   const DWORD offset;
-
-  /// Flag para definir se a estrutura foi ou não alterada
   bool dirty = false;
-
-  /// Total de clusters no sistema
   DWORD totalClus;
 
 public:
-  /// @brief Inicia a estrutura FSInfo
-  ///
-  /// Lê a estrutura FSInfo em memória e inicializa informações necessárias para
-  /// o funcionamento dos sistema de arquivos.
-  ///
-  /// @param image Interface para fazer a leitura do sistema.
-  /// @param offset Offset do FSInfo no sistema de arquivos.
-  /// @param fatTable Tabela FAT usada para realizar algumas verificações.
-  ///
-  /// @exception Gera uma exceção se não for possível ler a estrutura FSInfo ou
-  /// houve algum erro durante sua verificação.
   explicit FileSysInfo(std::shared_ptr<Image> image,
     DWORD offset,
     const std::shared_ptr<FatTable> &fatTable);
 
-  /// @brief Finaliza a estrutura
-  ///
-  /// Verifica se a flag dirty está setada, e se estiver escreve o FSInfo na
-  /// imagem original.
   ~FileSysInfo();
+  
+  [[nodiscard]] inline DWORD getFreeCount() const;
 
-  /// @brief Quantidade de clusters livres no sistema
-  ///
-  /// @return Retorna o valor de fsinfo.FreeCount
-  [[nodiscard]] inline DWORD getFreeCount() const { return fsinfo.FreeCount; }
+  [[nodiscard]] inline DWORD getNextFree() const;
 
-  /// @brief Último cluste livre conhecido
-  ///
-  /// @return Retorna o valor de fsinfo.NextFree
-  [[nodiscard]] inline DWORD getNextFree() const { return fsinfo.NextFree; }
-
-  /// @brief Coloca um novo valor na quantidade de clusters livres
-  ///
-  /// @return true se foi possível alterar, false caso contrário
   bool setFreeCount(DWORD freeCount);
 
-  /// @brief Coloca um novo valor no último cluster livre conhecido
-  ///
-  /// @return true se foi possível alterar, false caso contrário
   bool setNextFree(DWORD nextFree);
 };
 \end{lstlisting}
@@ -1200,128 +1225,84 @@ public:
 \subsubsection{\texttt{FatTable}}
 \label{subsubsec:fat_table}
 
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fat_table}.
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{LSB\_MASK e MSB\_MASK}: Máscaras para leitura e escrita na tabela FAT
+            \item \texttt{FREE\_CLUSTER}: Indica que o cluster está livre
+            \item \texttt{EOC}: Indica o final da cadeia de clusters
+            \item \texttt{image}: Interface usada para ler e escrever na FAT
+            \item \texttt{bios}: Interface para manipulação do BPB
+            \item \texttt{table}: Tabela FAT armazenada em memória
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{readFatTable}: Lê uma das tabelas FAT para a memória
+            \item \texttt{writeFatTable}: Escreve uma das tabelas FAT na imagem
+            \item \texttt{writeInTable}: Escreve em uma das entradas da tabela FAT na memória
+            \item \texttt{readFromTable}: Lê uma entrada da tabela FAT na memória
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{FatTable}: Inicializa a FAT em memória
+            \item \texttt{printTable}: Exibe a tabela FAT atual
+            \item \texttt{printInfo}: Mostra informações sobre o espaço da tabela atual
+            \item \texttt{listChain}: Retorna a cadeia de clusters alocados
+            \item \texttt{removeChain}: Remove uma cadeia de clusters alocados
+            \item \texttt{usedClusters}: Retorna a quantidade de clusters em uso na tabela FAT atual
+            \item \texttt{freeClusters}: Retorna a quantidade de clusters livres na tabela FAT atual
+            \item \texttt{searchFreeEntry}: Busca por uma entrada livre na tabela FAT
+            \item \texttt{searchListFreeEntry}: Busca por uma sequência de entradas livres na tabela FAT
+            \item \texttt{allocClusters}: Aloca novos clusters na FAT
+            \item \texttt{maxFreeClusByts}: Retorna o tamanho máximo, em bytes, dos clusters livres
+        \end{itemize}
+\end{itemize}
+
+
 \begin{lstlisting}[caption={Classe a estrutura FAT}, label={lst:fat_table}]
 class FatTable
 {
-  /// Máscaras para leitura e escrita na tabela
   static constexpr DWORD LSB_MASK = 0x0FFFFFFF;
   static constexpr DWORD MSB_MASK = 0xF0000000;
-
-  /// Define que o cluster está livre
   static constexpr DWORD FREE_CLUSTER = 0x00000000;
-
-  /// Define o final da cadeia de clusters
   static constexpr DWORD EOC = 0x0FFFFFF8;
-
-  /// Interface usada para ler e escrever a FAT
+  
   std::shared_ptr<Image> image;
-
-  /// Interface para lidar com o BPB
   std::shared_ptr<BiosBlock> bios;
-
-  /// Tabela FAT em memória
   std::unique_ptr<BYTE[]> table;
 
-  /// @brief Lê uma das tabelas FAT em memória
-  ///
-  /// @return true se foi possível ler, false caso contrário
   bool readFatTable(int num);
 
-  /// @brief Escreve uma das tabelas FAT na imagem
-  ///
-  /// @return true se foi possível escrever, false caso contrário
   bool writeFatTable(int num);
 
-  /// @brief Escreve em uma das entradas da tabela FAT em memória
-  ///
-  /// @param offset Posição a ser escrita na tabela
-  /// @param value Variável armazena o valor a ser escrito na tabela
-  ///
-  /// @return true se foi possível escrever, false caso contrário
   void writeInTable(DWORD num, DWORD value);
 
-  /// @brief Lê uma entrada da tabela FAT em memória
-  ///
-  /// @param offset Posição a ser lida da tabela
-  /// @param value Variável que recebe valor a ser lido da tabela
-  ///
-  /// @return true se foi possível ler, false caso contrário
   [[nodiscard]] DWORD readFromTable(DWORD offset) const;
 
 public:
-  /// @brief Inicializa a FAT em memória
-  ///
-  /// Carrega a primeira FAT em memória e inicializa demais informações
-  ///
-  /// @param image Interface para leitura da imagem
-  /// @param bios Interface para obter informações da BPB
-  ///
-  /// @exception Gera uma exceção se houver algum erro durante a leitura ou
-  /// inicialização.
   explicit FatTable(std::shared_ptr<Image> image,
     std::shared_ptr<BiosBlock> bios);
 
-  /// @brief Imprime a tabela atual
   void printTable() const;
 
-  /// @brief Mostra informações de espaço da tabela atual
   void printInfo() const;
 
-  /// @brief Cadeia de clusters
-  ///
-  /// @param start Inicio da cadeia a ser listada
-  ///
-  /// @return Retorna uma lista com todos os clusters da cadeia
   std::vector<DWORD> listChain(DWORD start);
 
-  /// @brief Remove uma cadeia de clusters alocada
-  ///
-  /// @param start Inicio da cadeia a ser removida
-  ///
-  /// @return Retorna a quantidade de cadeias removidas
   int removeChain(DWORD start);
 
-  /// @brief Quantidade de clusters em uso
-  ///
-  /// Lê a tabela atual e retorn a quantidade de clusters que estão em uso.
-  ///
-  /// @return Valor da quantidade de clusters em uso
   [[nodiscard]] DWORD usedClusters() const;
 
-  /// @brief Quantidade de clusters livres
-  ///
-  /// Lê a tabela atual e retorna a quantidade de clusters que estão livres.
-  ///
-  /// @return Valor da quantidade de clusters livres
   [[nodiscard]] DWORD freeClusters() const;
 
-  /// @brief Busca por uma entrada livre na tabela fat
-  ///
-  /// @param num Posição inicial para realizar a busca. A posição do cluster
-  /// encontrado é salvo aqui.
-  ///
-  /// @return true se foi encontrado, false caso contrário
   bool searchFreeEntry(DWORD &num);
 
-  /// @brief Busca por uma cadeia de entradas livres na tabela fat
-  ///
-  /// @param initPos Posição inicial para realizar a busca. A posição do cluster
-  /// encontrado é salvo aqui.
-  /// @param num Número de entradas sendo buscadas
-  ///
-  /// @return Uma lista com todas as cadeias livres
   std::vector<DWORD> searchListFreeEntry(DWORD initPos, DWORD num);
 
-  /// @brief Aloca os clusters
-  ///
-  /// @param tail Último cluster da antiga cadeia. Está função considera que seu
-  /// valor é EOC
-  /// @param clusters lista de clusters que serão alocados para formar uma cadeia
-  ///
-  /// @return true se foi possível escrever na tabela, false caso contrário
   bool allocClusters(DWORD tail, const std::vector<DWORD> &clusters);
 
-  /// @brief Tamanho máximo em bytes dos clusters livres
   size_t maxFreeClusByts();
 };
 \end{lstlisting}
@@ -1329,399 +1310,284 @@ public:
 \subsubsection{\texttt{ShortEntry}}
 \label{subsubsec:short_entry}
 
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:shortentry}.
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{name}: Nome curto da entrada
+            \item \texttt{attr}: Atributos associados ao arquivo
+            \item \texttt{ntres}: Campo reservado
+            \item \texttt{crtTimeTenth}: Milissegundos da criação do arquivo
+            \item \texttt{crtTime}: Hora e minutos da criação do arquivo
+            \item \texttt{crtDate}: Data de criação do arquivo
+            \item \texttt{lstAccDate}: Data do último acesso
+            \item \texttt{fstClusHI}: Parte alta do número do cluster inicial
+            \item \texttt{wrtTime}: Hora e minutos da última modificação
+            \item \texttt{wrtDate}: Data da última modificação
+            \item \texttt{fstClusLO}: Parte baixa do número do cluster inicial
+            \item \texttt{fileSize}: Tamanho do arquivo (0 para diretórios)
+        \end{itemize}
+\end{itemize}
+
 \begin{lstlisting}[caption={Estrutura que representa uma entrada curta no sistema de arquivos}, label={lst:shortentry}] 
-// Estrutura de diretórios/arquivos
 struct __attribute__((packed)) ShortEntry
 {
-  BYTE name[NAME_FULL_SIZE]; // Nome curto 
-  BYTE attr; // Atributos que o arquivo pode ter
-  BYTE ntres; // Reservado
-  BYTE crtTimeTenth; // Tempo que o arquivo foi criado em ms
-  WORD crtTime; // Tempo em que o arquivo foi criado
-  WORD crtDate; // Data em que o arquivo foi criado
-  WORD lstAccDate; // Última data de acesso
-  WORD fstClusHI; // Bits mais significativos do cluster
-  WORD wrtTime; // Tempo em que o arquivo foi escrito
-  WORD wrtDate; // Data em que o arquivo foi escrito
-  WORD fstClusLO; // Bits menos significativos do cluster
-  DWORD fileSize; // Tamanho do arquivo. 0 no caso de diretórios
+  BYTE name[NAME_FULL_SIZE];
+  BYTE attr; 
+  BYTE ntres;
+  BYTE crtTimeTenth;
+  WORD crtTime; 
+  WORD crtDate; 
+  WORD lstAccDate;
+  WORD fstClusHI; 
+  WORD wrtTime;
+  WORD wrtDate;
+  WORD fstClusLO;
+  DWORD fileSize;
 };
 \end{lstlisting}
 
 \subsubsection{\texttt{LongEntry}}
 \label{subsubsec:long_entry}
 
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:longentry}.
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{ord}: A ordem dessa entrada na sequência de nomes longos
+            \item \texttt{name1}: Caracteres de 1-5 do nome longo
+            \item \texttt{attr}: Deve ser igual a \texttt{ATTR\_LONG\_NAME}
+            \item \texttt{type}: 0 é um diretório, outros valores remetem a arquivos
+            \item \texttt{chckSum}: Checksum usado para verificar esta entrada
+            \item \texttt{name2}: Caracteres 6-11 do nome longo
+            \item \texttt{fstClusLO}: Deve ser 0. Está aqui só por compatibilidade
+            \item \texttt{name3}: Caracteres 12-13 do nome longo
+        \end{itemize}
+\end{itemize}
+
+
 \begin{lstlisting}[caption={Estrutura que representa uma entrada longa no sistema de arquivos}, label={lst:longentry}] 
-// Estrutura de diretórios/arquivos para nomes longos
 struct __attribute__((packed)) LongEntry
 {
-  BYTE ord; // A ordem dessa entrada na sequência de nomes longos 
-  BYTE name1[10]; // Caracteres de 1-5 do nome longo
-  BYTE attr; // Deve ser igual a ATTR\_LONG\_NAME
-  BYTE type; // 0 é um diretório, outros valores rementem a arquivos
-  BYTE chckSum; // Checksum usado para verificar esta entrada
-  BYTE name2[12]; // Caracteres 6-11 do nome longo
-  WORD fstClusLO; // Deve ser 0. Está aqui só por compatibilidade
-  BYTE name3[4]; // Caracteres 12-13 do nome longo
+  BYTE ord;
+  BYTE name1[10];
+  BYTE attr; 
+  BYTE type; 
+  BYTE chckSum; 
+  BYTE name2[12];
+  WORD fstClusLO; 
+  BYTE name3[4]; 
 };
 \end{lstlisting}
 
 \subsubsection{\texttt{Dentry}}
 \label{subsubsec:dentry}
 
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:dentry}.
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{entry}: Estrutura que armazena os metadados da entrada.
+            \item \texttt{longEntries}: Lista contendo os nomes longos associados à entrada.
+            \item \texttt{shortName}: Nome curto da entrada.
+            \item \texttt{longName}: Nome longo da entrada.
+            \item \texttt{nameType}: Tipo de nome da entrada (curto ou longo).
+            \item \texttt{type}: Tipo da entrada (arquivo ou diretório).
+            \item \texttt{clusterIndexes}: Lista de clusters e posições onde esta entrada pode estar armazenada.
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{mountLongName}: Gera um nome longo a partir do nome curto da entrada.
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{Dentry}: Inicializa a entrada.
+            \item \texttt{getLongName}: Retorna o nome longo da entrada.
+            \item \texttt{getShortName}: Retorna o nome curto da entrada.
+            \item \texttt{getDataCluster}: Retorna o cluster onde os dados da entrada estão armazenados.
+            \item \texttt{setDataCluster}: Define o cluster onde esta entrada está armazenada.
+            \item \texttt{setFileSize}: Define o tamanho do arquivo.
+            \item \texttt{getFileSize}: Retorna o tamanho do arquivo.
+            \item \texttt{isDirectory}: Retorna verdadeiro se a entrada for um diretório.
+            \item \texttt{isHidden}: Retorna verdadeiro se a entrada estiver oculta.
+            \item \texttt{isReadOnly}: Retorna verdadeiro se a entrada for somente leitura.
+            \item \texttt{getCreationDay}: Retorna o dia de criação do arquivo.
+            \item \texttt{getCreationMonth}: Retorna o mês de criação do arquivo.
+            \item \texttt{getCreationYear}: Retorna o ano de criação do arquivo.
+            \item \texttt{getCreationHour}: Retorna a hora de criação do arquivo.
+            \item \texttt{getCreationMinute}: Retorna o minuto de criação do arquivo.
+            \item \texttt{getCreationSecond}: Retorna os segundos da criação do arquivo.
+            \item \texttt{getWriteDay}: Retorna o dia da última modificação do arquivo.
+            \item \texttt{getWriteMonth}: Retorna o mês da última modificação do arquivo.
+            \item \texttt{getWriteYear}: Retorna o ano da última modificação do arquivo.
+            \item \texttt{getWriteHour}: Retorna a hora da última modificação do arquivo.
+            \item \texttt{getWriteMinute}: Retorna o minuto da última modificação do arquivo.
+            \item \texttt{getWriteSecond}: Retorna os segundos da última modificação do arquivo.
+            \item \texttt{getLstAccDay}: Retorna o dia do último acesso ao arquivo.
+            \item \texttt{getLstAccMonth}: Retorna o mês do último acesso ao arquivo.
+            \item \texttt{getLstAccYear}: Retorna o ano do último acesso ao arquivo.
+            \item \texttt{getShortEntry}: Retorna a entrada curta associada a esta entrada.
+            \item \texttt{getLongEntries}: Retorna todas as entradas longas associadas a esta entrada.
+            \item \texttt{getClusterIndexes}: Retorna a lista de índices desta entrada nos clusters.
+            \item \texttt{getEntryType}: Retorna o tipo da entrada (arquivo ou diretório).
+            \item \texttt{getNameType}: Retorna o tipo de nome da entrada (curto ou longo).
+        \end{itemize}
+\end{itemize}
+
 \begin{lstlisting}[caption={Classe que abstrai entradas longas e curtas em uma única interface}, label={lst:dentry}]
 class Dentry
 {
-  /// Estrutura de metadados
   ShortEntry entry;
-
-  /// Lista de nomes longos
+  
   std::vector<LongEntry> longEntries;
 
-  /// Nome curto da entrada
   std::array<char, NAME_FULL_SIZE + 1> shortName;
 
-  /// Nome longo da entrada
   std::string longName;
 
-  /// Define qual o tipo de nome que a entrada possui
   DentryNameType nameType;
 
-  /// Define qual o tipo da entrada
   EntryType type;
 
-  /// Lista de clusters e posições que esta entrada pode estar
   std::vector<ClusterIndex> clusterIndexes;
 
-  /// @brief Cria um nome longo a partir da entrada curta 
   void mountLongName();
 
 public:
-  /// @brief Inicializa a entrada
-  ///
-  /// @param entry Entrada curta, que possui os atributos do arquivo em si
-  /// @param lentry Vetor que contém todas as partes do nome longo
-  /// @param initPost Posição inicial na entrada do buffer
-  /// @param endPos Posição final na entrada do buffer
-  ///
-  /// @exception Gera uma exceção no caso de haver algum erro no entry ou lentry.
   explicit Dentry(const ShortEntry &entry,
     const std::vector<LongEntry> &lentry,
     const std::vector<ClusterIndex> &clusterIndexes);
 
-  /// @brief Nome longo da entrada
-  ///
-  /// @return retorna o nome longo da entrada
-  [[nodiscard]] inline std::string getLongName() const
-  {
-    switch (nameType) {
-    case DOT_NAME:
-      return ".";
-    case DOTDOT_NAME:
-      return "..";
-    case SHORT_NAME:
-      return shortName.data();
-    default:
-      return longName;
-    }
-  }
+  [[nodiscard]] inline std::string getLongName() const;
 
-  /// @brief Nome curto da entrada
-  ///
-  /// @return retorna o nome curto da entrada
-  [[nodiscard]] inline const char *getShortName() const
-  {
-    return shortName.data();
-  }
+  [[nodiscard]] inline const char *getShortName() const;
 
-  /// @brief Cluster onde os dados da entrada estão armazenados
-  ///
-  /// @return retorna o cluster referente aos dados dessa entrada
-  [[nodiscard]] inline DWORD getDataCluster() const
-  {
-    return static_cast<DWORD>(entry.fstClusHI << 16) | entry.fstClusLO;
-  }
+  [[nodiscard]] inline DWORD getDataCluster() const;
 
-  /// @brief Define o cluster dessa entrada
-  ///
-  /// @param cluster Número do cluster que esta entrada está relacionada
   void setDataCluster(DWORD cluster);
 
-  /// @brief Define o tamanho do arquivo
-  ///
-  /// @param size Tamanho dessa entrada dentro do sistema
   void setFileSize(DWORD fileSize);
 
-  /// @brief Cluster onde esta entrada está armazenada
-  ///
-  /// @return retorna o cluster referente ao cluster que armazena esta entrada
-  [[nodiscard]] inline DWORD getEntryCluster() const
-  {
-    return clusterIndexes[0].clusterNum;
-  }
+  [[nodiscard]] inline DWORD getEntryCluster() const;
 
-  /// @brief Tamanho do arquivo
-  ///
-  /// @return retorna o tamanho do arquivo
-  [[nodiscard]] inline DWORD getFileSize() const { return entry.fileSize; }
+  [[nodiscard]] inline DWORD getFileSize() const;
 
-  /// @brief Retorna verdadeiro se é um diretório
-  ///
-  /// @return retorna o valor de directory
-  [[nodiscard]] inline bool isDirectory() const
-  {
-    return ((entry.attr & ATTR_DIRECTORY) != 0);
-  }
+  [[nodiscard]] inline bool isDirectory() const;
 
-  /// @brief Retorna verdadeiro se é uma entrada escondida
-  ///
-  /// @return retorna o valor de hidden
-  [[nodiscard]] inline bool isHidden() const
-  {
-    return ((entry.attr & ATTR_HIDDEN) != 0);
-  }
+  [[nodiscard]] inline bool isHidden() const;
 
-  /// @brief Retorna verdadeiro se é somente leitura
-  ///
-  /// @return retorna o valor de readOnly
-  [[nodiscard]] inline bool isReadOnly() const
-  {
-    return ((entry.attr & ATTR_READ_ONLY) != 0);
-  }
+  [[nodiscard]] inline bool isReadOnly() const;
 
-  /// @brief Retorna o dia de criação do arquivo
-  ///
-  /// @return retorna o dia do datestamp crtDate
-  [[nodiscard]] inline WORD getCreationDay() const
-  {
-    return timefs::day(entry.crtDate);
-  }
+  [[nodiscard]] inline WORD getCreationDay() const;
 
-  /// @brief Retorna o mês de criação do arquivo
-  ///
-  /// @return retorna o mês do datestamp crtDate
-  [[nodiscard]] inline WORD getCreationMonth() const
-  {
-    return timefs::month(entry.crtDate);
-  }
+  [[nodiscard]] inline WORD getCreationMonth() const;
 
-  /// @brief Retorna o ano de criação do arquivo
-  ///
-  /// @return retorna o ano do datestamp crtDate
-  [[nodiscard]] inline WORD getCreationYear() const
-  {
-    return timefs::year(entry.crtDate);
-  }
+  [[nodiscard]] inline WORD getCreationYear() const;
 
-  /// @brief Retorna a hora de criação do arquivo
-  ///
-  /// @return retorna a hora do timestamp crtTime
-  [[nodiscard]] inline WORD getCreationHour() const
-  {
-    return timefs::hour(entry.crtTime);
-  }
+  [[nodiscard]] inline WORD getCreationHour() const;
 
-  /// @brief Retorna o mês de criação do arquivo
-  ///
-  /// @return retorna o mês do timestamp crtTime
-  [[nodiscard]] inline WORD getCreationMinute() const
-  {
-    return timefs::minutes(entry.crtTime);
-  }
+  [[nodiscard]] inline WORD getCreationMinute() const;
 
-  /// @brief Retorna o ano de criação do arquivo
-  ///
-  /// @return retorna o ano do timestamp crtTime
-  [[nodiscard]] inline WORD getCreationSeconds() const
-  {
-    return timefs::seconds(entry.crtTime);
-  }
+  [[nodiscard]] inline WORD getCreationSeconds() const;
 
-  /// @brief Retorna o dia de criação do arquivo
-  ///
-  /// @return retorna o dia do datestamp wrtDate
-  [[nodiscard]] inline WORD getWriteDay() const
-  {
-    return timefs::day(entry.wrtDate);
-  }
+  [[nodiscard]] inline WORD getWriteDay() const;
 
-  /// @brief Retorna o mês de criação do arquivo
-  ///
-  /// @return retorna o mês do datestamp wrtDate
-  [[nodiscard]] inline WORD getWriteMonth() const
-  {
-    return timefs::month(entry.wrtDate);
-  }
+  [[nodiscard]] inline WORD getWriteMonth() const;
 
-  /// @brief Retorna o ano de criação do arquivo
-  ///
-  /// @return retorna o ano do datestamp wrtDate
-  [[nodiscard]] inline WORD getWriteYear() const
-  {
-    return timefs::year(entry.wrtDate);
-  }
+  [[nodiscard]] inline WORD getWriteYear() const;
 
-  /// @brief Retorna o dia de criação do arquivo
-  ///
-  /// @return retorna o dia do datestamp lstAccDate
-  [[nodiscard]] inline WORD getLstAccDay() const
-  {
-    return timefs::day(entry.lstAccDate);
-  }
+  [[nodiscard]] inline WORD getLstAccDay() const;
 
-  /// @brief Retorna o mês de criação do arquivo
-  ///
-  /// @return retorna o mês do datestamp lstAccDate
-  [[nodiscard]] inline WORD getLstAccMonth() const
-  {
-    return timefs::month(entry.lstAccDate);
-  }
+  [[nodiscard]] inline WORD getLstAccMonth() const;
 
-  /// @brief Retorna o ano de criação do arquivo
-  ///
-  /// @return retorna o ano do datestamp lstAccDate
-  [[nodiscard]] inline WORD getLstAccYear() const
-  {
-    return timefs::year(entry.lstAccDate);
-  }
+  [[nodiscard]] inline WORD getLstAccYear() const;
 
-  /// @brief Retorna a hora de criação do arquivo
-  ///
-  /// @return retorna a hora do timestamp wrtTime
-  [[nodiscard]] inline WORD getWriteHour() const
-  {
-    return timefs::hour(entry.wrtTime);
-  }
+  [[nodiscard]] inline WORD getWriteHour() const;
 
-  /// @brief Retorna o mês de criação do arquivo
-  ///
-  /// @return retorna o mês do timestamp wrtTime
-  [[nodiscard]] inline WORD getWriteMinute() const
-  {
-    return timefs::minutes(entry.wrtTime);
-  }
+  [[nodiscard]] inline WORD getWriteMinute() const;
 
-  /// @brief Retorna o ano de criação do arquivo
-  ///
-  /// @return retorna o ano do timestamp wrtTime
-  [[nodiscard]] inline WORD getWriteSeconds() const
-  {
-    return timefs::seconds(entry.wrtTime);
-  }
+  [[nodiscard]] inline WORD getWriteSeconds() const;
 
-  /// @brief Retorna a entrada curta relacionada a esta entrada
-  ///
-  /// @return retorna uma cópia de dir
-  [[nodiscard]] inline ShortEntry getShortEntry() const { return entry; }
+  [[nodiscard]] inline ShortEntry getShortEntry() const;
 
-  /// @brief Retorna todas entradas longas relacionadas a esta entrada
-  ///
-  /// @return retorna uma cópia da lista de entradas longas
-  [[nodiscard]] inline std::vector<LongEntry> getLongEntries() const
-  {
-    return longEntries;
-  }
+  [[nodiscard]] inline std::vector<LongEntry> getLongEntries() const;
 
-  /// @brief Retorna a lista de indexação desta entrada nos clusters
-  ///
-  /// @return retorna a lista de indexação
-  [[nodiscard]] inline std::vector<ClusterIndex> getClusterIndexes() const
-  {
-    return clusterIndexes;
-  }
+  [[nodiscard]] inline std::vector<ClusterIndex> getClusterIndexes() const;
 
-  /// @brief Tipo do arquivo
-  ///
-  /// @return Tipo de arquivo
   [[nodiscard]] inline EntryType getEntryType() const { return type; }
 
-  /// @brief Tipo de nome do arquivo
-  ///
-  /// @return Tipo de nome
-  [[nodiscard]] inline DentryNameType getNameType() const { return nameType; }
+  [[nodiscard]] inline DentryNameType getNameType() const;
 };
 \end{lstlisting}
 
 \subsubsection{\texttt{ClusterIO}}
 \label{subsubsec:cluster_io}
 
+Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:cluster_io}.
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{image}: Interface para leitura e escrita da imagem.
+            \item \texttt{bios}: Interface para manipulação da estrutura BPB.
+            \item \texttt{fsInfo}: Estrutura que armazena informações sobre os clusters.
+            \item \texttt{fatTable}: Interface para manipulação da tabela FAT.
+            \item \texttt{pathName}: Caminho atual no sistema de arquivos.
+            \item \texttt{NUM\_ENTRIES}: Número de entradas por cluster.
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{generateEntries}: Gera as entradas correspondentes a um nome especificado.
+            \item \texttt{searchEmptyEntries}: Busca entradas vazias e continuas.
+            \item \texttt{insertDotEntries}: Inicializa e insere as entradas \texttt{.} (DOT) e \texttt{..} (DOTDOT) no diretório criado.
+            \item \texttt{createDirectoryEntry}: Cria uma entrada do tipo diretório e a insere no buffer de entrada.
+            \item \texttt{createArchiveEntry}: Cria uma entrada do tipo arquivo e a insere no buffer de entrada.
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{ClusterIO}: Inicializa a classe.
+            \item \texttt{readCluster}: Lê um cluster da memória para um buffer.
+            \item \texttt{writeCluster}: Escreve um cluster na imagem.
+            \item \texttt{allocNewCluster}: Aloca um novo cluster.
+            \item \texttt{getEntryClus}: Retorna o cluster da entrada atual.
+            \item \texttt{getListEntries}: Retorna uma lista com todas as entradas de um diretório.
+            \item \texttt{searchEntryByPath}: Busca uma entrada pelo caminho especificado.
+            \item \texttt{updateEntry}: Atualiza uma entrada dentro do cluster.
+            \item \texttt{removeEntry}: Remove uma entrada do cluster.
+            \item \texttt{deleteEntry}: Exclui uma entrada do sistema de arquivos.
+            \item \texttt{createEntry}: Aloca uma nova entrada e a insere no buffer.
+        \end{itemize}
+\end{itemize}
+
+
 \begin{lstlisting}[caption={Classe de abstração dos clusters do sistema}, label={lst:cluster_io}]
 class ClusterIO
 {
-  /// Interface usada para ler e escrever a imagem 
   std::shared_ptr<Image> image;
-
-  /// Interface usada lidar com a estrutura BPB 
   std::shared_ptr<BiosBlock> bios;
-
-  /// Estrutura que armazena informações sobre os clusters
   std::shared_ptr<FileSysInfo> fsInfo;
-
-  /// Interface para lidar com a tabela FAT
   std::shared_ptr<FatTable> fatTable;
-
-  /// Caminho atual no sistema de arquivos
   std::shared_ptr<PathName> pathName;
-
-  /// Define a quantidade de entradas por cluster
+  
   size_t NUM_ENTRIES;
 
-  /// @brief Gera as entradas relacionadas ao nome especificado
-  ///
-  /// @param num Número do cluster onde a entrada será criada
-  /// @param name Nome da entrada a ser criada
-  /// @param sentry Referência a entrada curta a ser criada
-  /// @param lentry Referência a entrada longa a ser criada
-  /// @param attrs Atributos da entrada a ser criada
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível criar, false caso contrário
   bool generateEntries(DWORD num,
     const std::string &name,
     ShortEntry &sentry,
     std::vector<LongEntry> &lentry,
     BYTE attrs);
 
-  /// @brief Busca entradas vazias e continuas
-  ///
-  /// @param cluster Número do cluster onde ocorrerá a busca
-  /// @param numEntries Quantidade de entradas a serem alocadas
-  /// @param clusterIndexes Lista com as posições para escrever a entrada
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return 0 se o espaço vazio suporta todas as entradas, 0< se o espaço não é
-  /// suficiente.
   int searchEmptyEntries(DWORD cluster,
     DWORD numEntries,
     std::vector<ClusterIndex> &clusterIndexes);
 
-  /// @brief Inicializa e insere as entradas DOT e DOTDOT nod diretório criado
-  ///
-  /// @param parentClt Número do cluster onde a entrada será criada
-  /// @param dentry Entrada que representa o diretório alocado
-  ///
-  /// @return true se foi possível alocar, false caso contrário.
   bool insertDotEntries(DWORD parentClt, Dentry &dentry);
 
-  /// @brief Cria uma entrada do tipo diretório e insere no buffer de entrada
-  ///
-  /// Além da criação da entrada, no diretório também se faz necessário alocar um
-  /// buffer para receber as demais entradas.
-  ///
-  /// @param num Número do cluster onde a entrada será criada
-  /// @param name Nome do arquivo a ser criado
-  ///
-  /// @return true se foi possível criar, false caso contrário.
   bool createDirectoryEntry(DWORD num, const std::string &name);
 
-  /// @brief Cria uma entrada do tipo arquivo e insere no buffer de entrada
-  ///
-  /// @param num Número do cluster onde a entrada será criada
-  /// @param name Nome do arquivo a ser criado
-  ///
-  /// @return true se foi possível criar, false caso contrário.
   bool createArchiveEntry(DWORD num, const std::string &name);
 
 public:
@@ -1730,101 +1596,27 @@ public:
     std::shared_ptr<FatTable> fatTable,
     std::shared_ptr<FileSysInfo> fsInfo,
     std::shared_ptr<PathName> pathName);
-
-  /// @brief Lê um cluster da memória em um buffer
-  /// 
-  /// @param buffer Ponteiro que irá receber as informações a serem lidas
-  /// @param num Número do cluster que será lido
-  /// 
-  /// @return true se foi possível ler, false caso contrário
+    
   bool readCluster(void *buffer, DWORD num);
 
-  /// @brief Escreve um cluster na imagem
-  ///
-  /// @param buffer Ponteiro com as informações que serão escritas
-  /// @param num Número do cluster que será escrito
-  ///
-  /// @return true se foi possível escrever, false caso contrário
   bool writeCluster(const void *buffer, DWORD num);
 
-  /// @brief Aloca um novo cluster
-  ///
-  /// @param cluster Número do cluster que será estendido. Se o valor for 0, uma
-  /// nova cadeia será criada
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível alocar o cluster, false caso contrário.
   bool allocNewCluster(DWORD &cluster);
 
-  /// @brief Retorna o cluster da entrada corrente
-  ///
-  /// No caso da entrada que é um "..", ao tentar retornar seu cluster o valor 0
-  /// será retornado. Para evitar problemas aqui retornamos o valor do
-  /// RootClus.
-  ///
-  /// @param entry Entrada que terá seu cluster extraído.
-  ///
-  /// @return O valor do cluster da entrada
   DWORD getEntryClus(const Dentry &entry);
 
-  /// @brief Retorna uma lista com todas as entradas de um diretório
-  ///
-  /// @param num Número do cluster do diretório que será listado
-  ///
-  /// @exception Exceções podem ocorrer durante a leitura das informações das
-  /// entradas.
-  ///
-  /// @return Um vetor com todos as entradas se foi possível ler.
   std::vector<Dentry> getListEntries(DWORD num);
 
-  /// @brief Busca uma entrada por meio do caminho passado
-  ///
-  /// @param path Caminho que está sendo buscado
-  /// @param listPath Referência a lista com todas as partes do caminho. Este
-  /// caminho é alterado ao longo da busca.
-  /// @param searchType Especifica o tipo de entrada sendo buscado.
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a verificação
-  /// do caminho.
-  /// @return Um vetor com o caminho propriamente dividido e o cluster no qual o
-  /// último arquivo se encontra
   std::optional<Dentry> searchEntryByPath(const std::string &path,
     std::vector<std::string> &listPath,
     EntryType searchType);
 
-  /// @brief Atualiza uma entrada dentro do cluster
-  ///
-  /// Reescreve a entrada passada nos clusters em que suas entradas são
-  /// localizadas.
-  ///
-  /// @param entry Entrada a ser atualizada
-  ///
-  /// @return true se foi possível atualizar, false caso contrário.
   bool updateEntry(Dentry &entry);
 
-  /// @brief Remove uma entrada do cluster
-  ///
-  /// @param entry Entrada a ser removida
-  ///
-  /// @return true se foi possível remover, false caso contrário.
   bool removeEntry(Dentry &entry);
 
-  /// @brief Deleta a entrada do sistema de arquivo
-  ///
-  /// A entrada é removida tanto do cluster quanto do FAT.
-  ///
-  /// @param entry Entrada a ser removida
-  ///
-  /// @return true se foi possível deletar, false caso contrário.
   bool deleteEntry(Dentry &entry);
 
-  /// @brief Aloca a entrada e insere no buffer
-  /// 
-  /// @param name Nome do arquivo a ser criado
-  /// @param num Número do cluster onde a entrada será criada
-  /// 
-  /// @return true se foi possível criar, false caso contrário.
   bool createEntry(DWORD num, const std::string &name, EntryType type);
 };
 \end{lstlisting}
@@ -1844,6 +1636,8 @@ Responsável pela implementação das classes relacionadas aos \textit{clusters}
 
 \subsection{Luiz Gustavo Takeda}
 \label{subsec:luizinho}
+
+Responsável pela implementação das classes relacionadas a manipulção das entradas do sistema e leitura das informações sobre a imagem FAT. Também participou nas implementações das classes \texttt{FatTable} e \texttt{FatFS}.  
 
 \subsection{Matheus Floriano Saito}
 \label{subsec:peixoto}

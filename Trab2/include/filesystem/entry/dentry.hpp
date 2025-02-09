@@ -233,7 +233,7 @@ public:
   }
 
   /**
-   * @brief Retorna o dia de criação do arquivo
+   * @brief Retorna o dia de escrita do arquivo
    *
    * @return retorna o dia do datestamp wrtDate
    */
@@ -243,7 +243,7 @@ public:
   }
 
   /**
-   * @brief Retorna o mês de criação do arquivo
+   * @brief Retorna o mês de escrita do arquivo
    *
    * @return retorna o mês do datestamp wrtDate
    */
@@ -253,7 +253,7 @@ public:
   }
 
   /**
-   * @brief Retorna o ano de criação do arquivo
+   * @brief Retorna o ano de escrita do arquivo
    *
    * @return retorna o ano do datestamp wrtDate
    */
@@ -263,7 +263,7 @@ public:
   }
 
   /**
-   * @brief Retorna o dia de criação do arquivo
+   * @brief Retorna o dia de escrita do arquivo
    *
    * @return retorna o dia do datestamp lstAccDate
    */
@@ -273,7 +273,7 @@ public:
   }
 
   /**
-   * @brief Retorna o mês de criação do arquivo
+   * @brief Retorna o mês de escrita do arquivo
    *
    * @return retorna o mês do datestamp lstAccDate
    */
@@ -283,7 +283,7 @@ public:
   }
 
   /**
-   * @brief Retorna o ano de criação do arquivo
+   * @brief Retorna o ano de escrita do arquivo
    *
    * @return retorna o ano do datestamp lstAccDate
    */
@@ -293,7 +293,7 @@ public:
   }
 
   /**
-   * @brief Retorna a hora de criação do arquivo
+   * @brief Retorna a hora de escrita do arquivo
    *
    * @return retorna a hora do timestamp wrtTime
    */
@@ -303,7 +303,7 @@ public:
   }
 
   /**
-   * @brief Retorna o mês de criação do arquivo
+   * @brief Retorna o mês de escrita do arquivo
    *
    * @return retorna o mês do timestamp wrtTime
    */
@@ -313,7 +313,7 @@ public:
   }
 
   /**
-   * @brief Retorna o ano de criação do arquivo
+   * @brief Retorna o ano de escrita do arquivo
    *
    * @return retorna o ano do timestamp wrtTime
    */
