@@ -1390,50 +1390,50 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:dentry}.
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{entry}: Estrutura que armazena os metadados da entrada.
-            \item \texttt{longEntries}: Lista contendo os nomes longos associados à entrada.
-            \item \texttt{shortName}: Nome curto da entrada.
-            \item \texttt{longName}: Nome longo da entrada.
-            \item \texttt{nameType}: Tipo de nome da entrada (curto ou longo).
-            \item \texttt{type}: Tipo da entrada (arquivo ou diretório).
-            \item \texttt{clusterIndexes}: Lista de clusters e posições onde esta entrada pode estar armazenada.
+            \item \texttt{entry}: Estrutura que armazena os metadados da entrada
+            \item \texttt{longEntries}: Lista contendo os nomes longos associados à entrada
+            \item \texttt{shortName}: Nome curto da entrada
+            \item \texttt{longName}: Nome longo da entrada
+            \item \texttt{nameType}: Tipo de nome da entrada (curto ou longo)
+            \item \texttt{type}: Tipo da entrada (arquivo ou diretório)
+            \item \texttt{clusterIndexes}: Lista de clusters e posições onde esta entrada pode estar armazenada
         \end{itemize}
     \item \textbf{Métodos Privados:}
         \begin{itemize}
-            \item \texttt{mountLongName}: Gera um nome longo a partir do nome curto da entrada.
+            \item \texttt{mountLongName}: Gera um nome longo a partir do nome curto da entrada
         \end{itemize}
     \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{Dentry}: Inicializa a entrada.
-            \item \texttt{getLongName}: Retorna o nome longo da entrada.
-            \item \texttt{getShortName}: Retorna o nome curto da entrada.
-            \item \texttt{getDataCluster}: Retorna o cluster onde os dados da entrada estão armazenados.
-            \item \texttt{setDataCluster}: Define o cluster onde esta entrada está armazenada.
-            \item \texttt{setFileSize}: Define o tamanho do arquivo.
-            \item \texttt{getFileSize}: Retorna o tamanho do arquivo.
-            \item \texttt{isDirectory}: Retorna verdadeiro se a entrada for um diretório.
-            \item \texttt{isHidden}: Retorna verdadeiro se a entrada estiver oculta.
-            \item \texttt{isReadOnly}: Retorna verdadeiro se a entrada for somente leitura.
-            \item \texttt{getCreationDay}: Retorna o dia de criação do arquivo.
-            \item \texttt{getCreationMonth}: Retorna o mês de criação do arquivo.
-            \item \texttt{getCreationYear}: Retorna o ano de criação do arquivo.
-            \item \texttt{getCreationHour}: Retorna a hora de criação do arquivo.
-            \item \texttt{getCreationMinute}: Retorna o minuto de criação do arquivo.
-            \item \texttt{getCreationSecond}: Retorna os segundos da criação do arquivo.
-            \item \texttt{getWriteDay}: Retorna o dia da última modificação do arquivo.
-            \item \texttt{getWriteMonth}: Retorna o mês da última modificação do arquivo.
-            \item \texttt{getWriteYear}: Retorna o ano da última modificação do arquivo.
-            \item \texttt{getWriteHour}: Retorna a hora da última modificação do arquivo.
-            \item \texttt{getWriteMinute}: Retorna o minuto da última modificação do arquivo.
-            \item \texttt{getWriteSecond}: Retorna os segundos da última modificação do arquivo.
-            \item \texttt{getLstAccDay}: Retorna o dia do último acesso ao arquivo.
-            \item \texttt{getLstAccMonth}: Retorna o mês do último acesso ao arquivo.
-            \item \texttt{getLstAccYear}: Retorna o ano do último acesso ao arquivo.
-            \item \texttt{getShortEntry}: Retorna a entrada curta associada a esta entrada.
-            \item \texttt{getLongEntries}: Retorna todas as entradas longas associadas a esta entrada.
-            \item \texttt{getClusterIndexes}: Retorna a lista de índices desta entrada nos clusters.
-            \item \texttt{getEntryType}: Retorna o tipo da entrada (arquivo ou diretório).
-            \item \texttt{getNameType}: Retorna o tipo de nome da entrada (curto ou longo).
+            \item \texttt{Dentry}: Inicializa a entrada
+            \item \texttt{getLongName}: Retorna o nome longo da entrada
+            \item \texttt{getShortName}: Retorna o nome curto da entrada
+            \item \texttt{getDataCluster}: Retorna o cluster onde os dados da entrada estão armazenados
+            \item \texttt{setDataCluster}: Define o cluster onde esta entrada está armazenada
+            \item \texttt{setFileSize}: Define o tamanho do arquivo
+            \item \texttt{getFileSize}: Retorna o tamanho do arquivo
+            \item \texttt{isDirectory}: Retorna verdadeiro se a entrada for um diretório
+            \item \texttt{isHidden}: Retorna verdadeiro se a entrada estiver oculta
+            \item \texttt{isReadOnly}: Retorna verdadeiro se a entrada for somente leitura
+            \item \texttt{getCreationDay}: Retorna o dia de criação do arquivo
+            \item \texttt{getCreationMonth}: Retorna o mês de criação do arquivo
+            \item \texttt{getCreationYear}: Retorna o ano de criação do arquivo
+            \item \texttt{getCreationHour}: Retorna a hora de criação do arquivo
+            \item \texttt{getCreationMinute}: Retorna o minuto de criação do arquivo
+            \item \texttt{getCreationSecond}: Retorna os segundos da criação do arquivo
+            \item \texttt{getWriteDay}: Retorna o dia da última modificação do arquivo
+            \item \texttt{getWriteMonth}: Retorna o mês da última modificação do arquivo
+            \item \texttt{getWriteYear}: Retorna o ano da última modificação do arquivo
+            \item \texttt{getWriteHour}: Retorna a hora da última modificação do arquivo
+            \item \texttt{getWriteMinute}: Retorna o minuto da última modificação do arquivo
+            \item \texttt{getWriteSecond}: Retorna os segundos da última modificação do arquivo
+            \item \texttt{getLstAccDay}: Retorna o dia do último acesso ao arquivo
+            \item \texttt{getLstAccMonth}: Retorna o mês do último acesso ao arquivo
+            \item \texttt{getLstAccYear}: Retorna o ano do último acesso ao arquivo
+            \item \texttt{getShortEntry}: Retorna a entrada curta associada a esta entrada
+            \item \texttt{getLongEntries}: Retorna todas as entradas longas associadas a esta entrada
+            \item \texttt{getClusterIndexes}: Retorna a lista de índices desta entrada nos clusters
+            \item \texttt{getEntryType}: Retorna o tipo da entrada (arquivo ou diretório)
+            \item \texttt{getNameType}: Retorna o tipo de nome da entrada (curto ou longo)
         \end{itemize}
 \end{itemize}
 
@@ -1531,34 +1531,34 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:cluster_
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{image}: Interface para leitura e escrita da imagem.
-            \item \texttt{bios}: Interface para manipulação da estrutura BPB.
-            \item \texttt{fsInfo}: Estrutura que armazena informações sobre os clusters.
-            \item \texttt{fatTable}: Interface para manipulação da tabela FAT.
-            \item \texttt{pathName}: Caminho atual no sistema de arquivos.
-            \item \texttt{NUM\_ENTRIES}: Número de entradas por cluster.
+            \item \texttt{image}: Interface para leitura e escrita da imagem
+            \item \texttt{bios}: Interface para manipulação da estrutura BPB
+            \item \texttt{fsInfo}: Estrutura que armazena informações sobre os clusters
+            \item \texttt{fatTable}: Interface para manipulação da tabela FAT
+            \item \texttt{pathName}: Caminho atual no sistema de arquivos
+            \item \texttt{NUM\_ENTRIES}: Número de entradas por cluster
         \end{itemize}
     \item \textbf{Métodos Privados:}
         \begin{itemize}
-            \item \texttt{generateEntries}: Gera as entradas correspondentes a um nome especificado.
-            \item \texttt{searchEmptyEntries}: Busca entradas vazias e continuas.
-            \item \texttt{insertDotEntries}: Inicializa e insere as entradas \texttt{.} (DOT) e \texttt{..} (DOTDOT) no diretório criado.
-            \item \texttt{createDirectoryEntry}: Cria uma entrada do tipo diretório e a insere no buffer de entrada.
-            \item \texttt{createArchiveEntry}: Cria uma entrada do tipo arquivo e a insere no buffer de entrada.
+            \item \texttt{generateEntries}: Gera as entradas correspondentes a um nome especificado
+            \item \texttt{searchEmptyEntries}: Busca entradas vazias e continuas
+            \item \texttt{insertDotEntries}: Inicializa e insere as entradas \texttt{.} (DOT) e \texttt{..} (DOTDOT) no diretório criado
+            \item \texttt{createDirectoryEntry}: Cria uma entrada do tipo diretório e a insere no buffer de entrada
+            \item \texttt{createArchiveEntry}: Cria uma entrada do tipo arquivo e a insere no buffer de entrada
         \end{itemize}
     \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{ClusterIO}: Inicializa a classe.
-            \item \texttt{readCluster}: Lê um cluster da memória para um buffer.
-            \item \texttt{writeCluster}: Escreve um cluster na imagem.
-            \item \texttt{allocNewCluster}: Aloca um novo cluster.
-            \item \texttt{getEntryClus}: Retorna o cluster da entrada atual.
-            \item \texttt{getListEntries}: Retorna uma lista com todas as entradas de um diretório.
-            \item \texttt{searchEntryByPath}: Busca uma entrada pelo caminho especificado.
-            \item \texttt{updateEntry}: Atualiza uma entrada dentro do cluster.
-            \item \texttt{removeEntry}: Remove uma entrada do cluster.
-            \item \texttt{deleteEntry}: Exclui uma entrada do sistema de arquivos.
-            \item \texttt{createEntry}: Aloca uma nova entrada e a insere no buffer.
+            \item \texttt{ClusterIO}: Inicializa a classe
+            \item \texttt{readCluster}: Lê um cluster da memória para um buffer
+            \item \texttt{writeCluster}: Escreve um cluster na imagem
+            \item \texttt{allocNewCluster}: Aloca um novo cluster
+            \item \texttt{getEntryClus}: Retorna o cluster da entrada atual
+            \item \texttt{getListEntries}: Retorna uma lista com todas as entradas de um diretório
+            \item \texttt{searchEntryByPath}: Busca uma entrada pelo caminho especificado
+            \item \texttt{updateEntry}: Atualiza uma entrada dentro do cluster
+            \item \texttt{removeEntry}: Remove uma entrada do cluster
+            \item \texttt{deleteEntry}: Exclui uma entrada do sistema de arquivos
+            \item \texttt{createEntry}: Aloca uma nova entrada e a insere no buffer
         \end{itemize}
 \end{itemize}
 
