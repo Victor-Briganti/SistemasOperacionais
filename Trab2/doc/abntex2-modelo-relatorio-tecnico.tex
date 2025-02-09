@@ -582,9 +582,13 @@ class Image
 
 public:
   explicit Image(const std::string &path);
+  
   ~Image();
+  
   void close();
+  
   bool read(DWORD offset, void *buffer, size_t size);
+  
   bool write(DWORD offset, const void *const buffer, size_t size);
 };
 \end{lstlisting}
@@ -630,14 +634,20 @@ class FileSystemAdapter
   bool isDeleted;
 
   bool clean(const std::string &path) const;
+  
   bool open(const std::string &path);
 
 public:
   explicit FileSystemAdapter(const std::string &path, FileOption option);
+  
   ~FileSystemAdapter();
+  
   bool write(DWORD offset, const void *const buffer, size_t size);
+  
   bool read(DWORD offset, void *buffer, size_t size);
+  
   bool remove();
+  
   bool getFileSize(size_t &fileSize);
 };
 \end{lstlisting}
@@ -679,13 +689,21 @@ class PathName
 public:
   PathName();
   [[nodiscard]] std::string getCurPath() const;
+  
   void setCurPath(const std::string &path);
+  
   [[nodiscard]] std::string getRootDir() const;
+  
   [[nodiscard]] std::vector<std::string> split(const std::string &path, char delim) const;
+  
   [[nodiscard]] std::string merge(const std::vector<std::string> &path) const;
+  
   [[nodiscard]] std::vector<std::string> generateFullPath(const std::string &path) const;
+  
   bool isRootDir(const std::vector<std::string> &listPath);
+  
   std::string getLastNameFromPath(std::string &path);
+  
   bool isExternalPath(const std::string &path) const;
 };
 \end{lstlisting}
@@ -744,25 +762,42 @@ private:
   std::shared_ptr<ClusterIO> clusterIO;
 
   void listClusterDir(DWORD num);
+  
   int updateParentTimestamp(std::string path);
+  
   bool copyInternalData(const std::string &from, const std::string &to);
+  
   bool copyExternalData(const std::string &from, const std::string &to);
+  
   bool copyInSystemData(const std::string &from, const std::string &to);
 
 public:
   explicit FatFS(const std::string &path);
+  
   void info();
+  
   bool cluster(DWORD num);
+  
   bool ls(const std::string &path);
+  
   bool rm(const std::string &path);
+  
   bool rmdir(const std::string &path);
+  
   std::string pwd();
+  
   bool cd(const std::string &path);
+  
   bool attr(const std::string &path);
+  
   bool touch(const std::string &path);
+  
   bool mkdir(const std::string &path);
+  
   bool rename(const std::string &from, const std::string &to);
+  
   bool mv(const std::string &from, const std::string &to);
+  
   bool cp(const std::string &from, const std::string &to);
 };
 \end{lstlisting}
@@ -808,8 +843,6 @@ Estrutura que representa o BPB~\ref{subsubsec:bpb} do FAT32, estrutura usada pel
 \begin{lstlisting}[caption={Estrutura que representa o BPB encontrado no volume FAT}, label={lst:bpb}]
   struct __attribute__((packed)) BPB
   {
-    // BPB comum para todos os FATs
-    
     BYTE jmpBoot[3];
     BYTE OEMName[8];
     WORD BytsPerSec;
@@ -824,9 +857,6 @@ Estrutura que representa o BPB~\ref{subsubsec:bpb} do FAT32, estrutura usada pel
     WORD NumHeads;
     DWORD HiddSec;
     DWORD TotSec32;
-    
-    // BPB para FAT32
-
     DWORD FATSz32;
     WORD ExtFlags;
     WORD FSVer;
@@ -884,7 +914,6 @@ Classe que abstrai o acesso às informações do BPB, utilizada por demais class
 \end{itemize}
 
 \begin{lstlisting}[caption={Classe que abstrai a extração de informações da estrutura BPB}, label={lst:biosblock}]
-// Classe para lidar com a estrutura BPB do FAT filesystem
 class BiosBlock
 {
 private:
