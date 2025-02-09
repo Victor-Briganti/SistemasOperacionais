@@ -509,6 +509,8 @@ O arquivo \texttt{types.hpp} define tipos de dados fundamentais para o sistema, 
 \subsubsection{\texttt{Shell}}
 \label{subsubsec:shell}
 
+Classe que define o \textit{shell} interativo do sistema, responsável por interpretar os comandos passados pelo usuário e fazer as chamadas ao sistema de arquivo, o código~\ref{lst:shell} apresenta as definições dessa classe.
+
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
@@ -549,9 +551,10 @@ public:
 };
 \end{lstlisting}
 
-
 \subsubsection{\texttt{Image}}
 \label{subsubsec:image}
+
+Classe que define uma abstração para a imagem que contém o sistema de arquivos. Usado por todas as outras classes para acessar as informações escritas na imagem. O código~\ref{lst:image} apresenta as definições dessa classe.
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -588,6 +591,8 @@ public:
 
 \subsubsection{\texttt{FileSystemAdapter}}
 \label{subsubsec:file_system_adapter}
+
+Classe que define uma abstração para o acesso a arquivos do sistema de arquivos do \textit{host}. Usado pelo \texttt{FatFS} nas operações de \texttt{mv} e \texttt{cp}. O código~\ref{lst:filesystemadapter} apresenta as definições dessa classe.
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -640,6 +645,8 @@ public:
 \subsubsection{\texttt{PathName}}
 \label{subsubsec:path_name}
 
+Classe para manipulação de caminhos. Usado pelo \texttt{FatFS} em todas suas operações. O código~\ref{lst:pathname} apresenta as definições dessa classe.
+
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
@@ -685,6 +692,8 @@ public:
 
 \subsubsection{\texttt{FatFS}}
 \label{subsubsec:fatfs}
+
+Classe que apresenta as interfaces de acesso ao sistema de arquivos, essa classe realiza a orquestração das demais estruturas que compõe o FAT32. O código~\ref{lst:fatfs} apresenta as definições dessa classe.
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -759,7 +768,9 @@ public:
 \end{lstlisting}
 
 \subsubsection{\texttt{BPB}}
-\label{subsubsec:bpb}
+\label{subsubsec:bpb_code}
+
+Estrutura que representa o BPB~\ref{subsubsec:bpb} do FAT32, estrutura usada pela classe \texttt{BiosBlock}~\ref{subsubsec:bios_block}. A definição desta estrutura é apresentada no código~\ref{lst:bpb}.
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -834,6 +845,8 @@ public:
 
 \subsubsection{\texttt{BiosBlock}}
 \label{subsubsec:bios_block}
+
+Classe que abstrai o acesso às informações do BPB, utilizada por demais classes no sistema para obter informações sobre o sistema de arquivos. O código~\ref{lst:biosblock} apresenta as definições dessa classe. 
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -918,9 +931,9 @@ public:
 \end{lstlisting}
 
 \subsubsection{\texttt{FSInfo}}
-\label{subsubsec:fsinfo}
+\label{subsubsec:fsinfo_code}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fsinfo}.
+Estrutura que representa o FSInfo~\ref{subsubsec:fsinfo} do FAT32, estrutura usada pela classe \texttt{FileSysInfo}~\ref{subsubsec:file_sys_info}. A definição desta estrutura é apresentada no código~\ref{lst:fsinfo}.
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -952,7 +965,7 @@ struct __attribute__((packed)) FSInfo
 \subsubsection{\texttt{FileSysInfo}}
 \label{subsubsec:file_sys_info}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fileinfo}.
+Classe que abstrai o acesso às informações do FSInfo, utilizada pela classe \texttt{ClusterIO}~\ref{subsubsec:cluster_io} para obter informações do sistema. O código~\ref{lst:fileinfo} apresenta as definições dessa classe. 
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -1012,7 +1025,7 @@ public:
 \subsubsection{\texttt{FatTable}}
 \label{subsubsec:fat_table}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fat_table}.
+Classe que abstrai o acesso às informações das tabelas FAT, utilizada por demais classes para extrair informações das tabelas. O código~\ref{lst:fat_table} apresenta as definições dessa classe. 
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -1097,7 +1110,7 @@ public:
 \subsubsection{\texttt{ShortEntry}}
 \label{subsubsec:short_entry}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:shortentry}.
+Estrutura que representa uma entrada curta~\ref{subsubsec:dentry} do sistema, usada pela classe \texttt{Dentry}~\ref{subsubsec:dentry_code}. A definição desta estrutura é apresentada no código~\ref{lst:shortentry}.
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -1138,7 +1151,7 @@ struct __attribute__((packed)) ShortEntry
 \subsubsection{\texttt{LongEntry}}
 \label{subsubsec:long_entry}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:longentry}.
+Estrutura que representa uma entrada longa~\ref{subsubsec:dentry} do sistema, usada pela classe \texttt{Dentry}~\ref{subsubsec:dentry_code}. A definição desta estrutura é apresentada no código~\ref{lst:longentry}.
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -1170,9 +1183,9 @@ struct __attribute__((packed)) LongEntry
 \end{lstlisting}
 
 \subsubsection{\texttt{Dentry}}
-\label{subsubsec:dentry}
+\label{subsubsec:dentry_code}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:dentry}.
+Classe que abstrai a entradas do sistema de arquivos, une a entrada curta e a longa em uma única abstração, utilizada por demais classes para extrair as informações de uma entrada. O código~\ref{lst:dentry} apresenta as definições dessa classe. 
 
 \begin{itemize}
     \item \textbf{Atributos:}
@@ -1313,7 +1326,7 @@ public:
 \subsubsection{\texttt{ClusterIO}}
 \label{subsubsec:cluster_io}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:cluster_io}.
+Classe que abstrai a manipulação dos \textit{clusters} no sistema, usada pela classe \texttt{FatFS}~\ref{subsubsec:fatfs} para acessar e salvar dados do sistema. O código~\ref{lst:cluster_io} apresenta as definições dessa classe. 
 
 \begin{itemize}
     \item \textbf{Atributos:}
