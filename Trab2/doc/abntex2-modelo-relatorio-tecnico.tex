@@ -502,60 +502,63 @@ O arquivo \texttt{types.hpp} define tipos de dados fundamentais para o sistema, 
 \subsection{Classes e Estruturas}
 \label{subsec:classes_estruturas}
 
-Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:cluster_io}.
-
-\begin{itemize}
-    \item \textbf{Atributos:}
-        \begin{itemize}
-            \item \texttt{Placeholders}:
-        \end{itemize}
-    \item \textbf{Métodos Privados:}
-        \begin{itemize}
-            \item \texttt{Placeholders}:
-        \end{itemize}
-    \item \textbf{Métodos Públicos:}
-        \begin{itemize}
-            \item \texttt{Placeholders}:
-        \end{itemize}
-\end{itemize}
-
-
 \subsubsection{\texttt{Shell}}
 \label{subsubsec:shell}
 
 \begin{lstlisting}[caption={Classe que implementa o \textit{shell}}, label={lst:shell}]
 class Shell
 {
-  // Ponteiro para a interface do sistema de arquivos
   std::unique_ptr<FatFS> fatFS;
 
-  /// @brief Dividi o comando passado em diferentes partes
-  ///
-  /// @param command Comando inserido pelo usuário
-  ///
-  /// @return Uma lista com todas as partes do comando
   std::vector<std::string> parser(const std::string &cmd) const;
 
-  /// @brief Analisa a string e retorna o comando
-  ///
-  /// @param command Comando inserido pelo usuário
-  ///
-  /// @return O FSApi referente ao comando
   FSApi command(const std::string &cmd) const;
 
-  /// @brief Executa o loop do shell iterativo
   void exec(FSApi cmd, std::vector<std::string> params);
 
 public:
-  /// @brief Inicia a estrutura do shell
-  ///
-  /// @param fatFS Interface do sistema de arquivos.
   explicit Shell(std::unique_ptr<FatFS> fatFS);
 
-  /// @brief Executa o loop do shell iterativo
   void interpreter();
 };
 \end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{fatFS}: Ponteiro exclusivo para a interface do sistema de arquivos.
+        \end{itemize}
+    \item \textbf{M\'etodos Privados:}
+        \begin{itemize}
+            \item \texttt{parser}: Divide o comando passado em diferentes partes.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{cmd} - Comando inserido pelo usuário.
+                \item \texttt{Retorno}: Uma lista contendo todas as partes do comando.
+            \end{itemize}
+            
+            \item \texttt{command}: Analisa a string e retorna o comando correspondente.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{cmd} - Comando inserido pelo usuário.
+                \item \texttt{Retorno}: O objeto FSApi referente ao comando.
+            \end{itemize}
+            
+            \item \texttt{exec}: Executa um comando no shell.
+            \begin{itemize}
+                \item \texttt{Parâmetros}: \textit{cmd} - Comando a ser executado. \textit{params} - Lista de parâmetros para o comando.
+            \end{itemize}
+        \end{itemize}
+    \item \textbf{M\'etodos P\'ublicos:}
+        \begin{itemize}
+            \item \texttt{Shell}: Construtor que inicializa a estrutura do shell.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{fatFS} - Interface do sistema de arquivos.
+            \end{itemize}
+            
+            \item \texttt{interpreter}: Inicia o loop do shell iterativo.
+        \end{itemize}
+\end{itemize}
+
+
 
 \subsubsection{\texttt{Image}}
 \label{subsubsec:image}
@@ -566,371 +569,348 @@ class Image
   std::fstream image;
 
 public:
-  /// @brief Construtor para a imagem
-  ///
-  /// Abre a imagem especificada pelo caminho.
-  ///
-  /// @param path Caminho para a imagem
-  ///
-  /// @exception Argumento inválido, quando o caminho não é válido
-  /// @exception Runtime error, quando não é possível abrir o arquivo
   explicit Image(const std::string &path);
-
   ~Image();
-
-  /// @brief Fecha o arquivo aberto
   void close();
-
-  /// @brief Lê a imagem
-  ///
-  /// @param offset Posição onde a leitura será iniciada
-  /// @param buffer Posição de memória que irá receber o dado lido
-  /// @param size Tamanho do dado a ser lido
-  ///
-  /// @return true se foi possível ler, false caso contrário
   bool read(DWORD offset, void *buffer, size_t size);
-
-  /// @brief Escreve na imagem
-  ///
-  /// @param offset Posição onde a escrita será iniciada
-  /// @param buffer Posição de memória que tem os dados a serem escritos
-  /// @param size Tamanho do dado a ser escrito
-  ///
-  /// @return true se foi possível escrever, false caso contrário
   bool write(DWORD offset, const void *const buffer, size_t size);
 };
 \end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{image}: Fluxo de arquivo utilizado para manipular a imagem.
+        \end{itemize}
+    \item \textbf{M\'etodos P\'ublicos:}
+        \begin{itemize}
+            \item \texttt{Image}: Construtor que abre a imagem especificada pelo caminho.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho para a imagem.
+                \item \texttt{Exceções}: Argumento inválido se o caminho não for válido. Erro em tempo de execução se o arquivo não puder ser aberto.
+            \end{itemize}
+            
+            \item \texttt{\textasciitilde Image}: Destrutor que garante o fechamento do arquivo.
+            
+            \item \texttt{close}: Fecha o arquivo aberto.
+            
+            \item \texttt{read}: Lê um trecho da imagem a partir de um deslocamento.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{offset} - Posição onde a leitura será iniciada.
+                \item \texttt{Parâmetro}: \textit{buffer} - Posição de memória que irá receber o dado lido.
+                \item \texttt{Parâmetro}: \textit{size} - Tamanho do dado a ser lido.
+                \item \texttt{Retorno}: \textit{true} se foi possível ler, \textit{false} caso contrário.
+            \end{itemize}
+            
+            \item \texttt{write}: Escreve um trecho na imagem a partir de um deslocamento.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{offset} - Posição onde a escrita será iniciada.
+                \item \texttt{Parâmetro}: \textit{buffer} - Posição de memória que contém os dados a serem escritos.
+                \item \texttt{Parâmetro}: \textit{size} - Tamanho do dado a ser escrito.
+                \item \texttt{Retorno}: \textit{true} se foi possível escrever, \textit{false} caso contrário.
+            \end{itemize}
+        \end{itemize}
+\end{itemize}
 
 \subsubsection{\texttt{FileSystemAdapter}}
 \label{subsubsec:file_system_adapter}
 
-\begin{lstlisting}[caption={Classe que realiza interface com sistema de arquivos do \textit{host}}, label={lst:fsadapter}]
+\begin{lstlisting}[caption={Classe para manipulação de arquivos no sistema}, label={lst:filesystemadapter}]
 class FileSystemAdapter
 {
-  /// Caminho para o arquivo sendo manipulado
   std::string filePath;
-
-  /// Ponteiro para o arquivo que vai ser manipulado
   std::fstream file;
-
-  /// Define o como o arquivo está aberto
   FileOption fileOption;
-
-  /// Flag para dizer se o arquivo foi ou não excluído
   bool isDeleted;
 
-  /// @brief Limpa o arquivo
-  ///
-  /// Está opção só deve ser usada quando o arquivo for aberto em maneira de
-  /// leitura.
-  ///
-  /// @param path Caminho para o arquivo que será limpo
-  ///
-  /// @return true se foi possível limpar o arquivo, false caso contrário
   bool clean(const std::string &path) const;
-
-  /// @brief Abre o arquivo conforme a opção passada
-  ///
-  /// @param path Caminho para o arquivo que será aberto
-  ///
-  /// @return true se foi possível abrir o arquivo, false caso contrário
   bool open(const std::string &path);
 
 public:
-  /// @brief Construtor para a manipulação do arquivo
-  ///
-  /// Abre o arquivo para manipulação especificada pelo caminho.
-  ///
-  /// @param path Caminho para o arquivo
-  /// @param option Opção usada ao abrir o arquivo
-  ///
-  /// @exception Argumento inválido, quando o caminho não é válido
-  /// @exception Runtime error, quando não é possível abrir o arquivo
   explicit FileSystemAdapter(const std::string &path, FileOption option);
-
   ~FileSystemAdapter();
-
-  /// @brief Escreve no arquivo
-  ///
-  /// @param offset Posição onde a escrita será iniciada
-  /// @param buffer Posição de memória que tem os dados a serem escritos
-  /// @param size Tamanho do dado a ser escrito
-  ///
-  /// @return true se foi possível escrever, false caso contrário
   bool write(DWORD offset, const void *const buffer, size_t size);
-
-  /// @brief Lê o arquivo
-  ///
-  /// @param offset Posição onde a leitura será iniciada
-  /// @param buffer Posição de memória que irá receber o dado lido
-  /// @param size Tamanho do dado a ser lido
-  ///
-  /// @return true se foi possível ler, false caso contrário
   bool read(DWORD offset, void *buffer, size_t size);
-
-  /// @brief Exclui o arquivo
-  ///
-  /// @return true se foi possível remover, false caso contrário
   bool remove();
-
-  /// @brief Retorna o tamanho do arquivo
-  ///
-  /// @param fileSize Referência que recebe o tamanho do arquivo
-  ///
-  /// @return true se foi possível ler o tamanho do arquivo, false caso contrário
   bool getFileSize(size_t &fileSize);
 };
 \end{lstlisting}
 
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{filePath}: Caminho para o arquivo sendo manipulado.
+            \item \texttt{file}: Ponteiro para manipular o arquivo.
+            \item \texttt{fileOption}: Define como o arquivo est\'a aberto.
+            \item \texttt{isDeleted}: Flag para indicar se o arquivo foi exclu\'ido.
+        \end{itemize}
+    \item \textbf{M\'etodos Privados:}
+        \begin{itemize}
+            \item \texttt{clean}: Limpa o arquivo quando aberto para leitura.
+            \begin{itemize}
+                \item \texttt{Par\^ametro}: \textit{path} - Caminho para o arquivo a ser limpo.
+                \item \texttt{Retorno}: \textit{true} se foi poss\'ivel limpar, \textit{false} caso contr\'ario.
+            \end{itemize}
+            
+            \item \texttt{open}: Abre o arquivo conforme a op\c{c}\~ao passada.
+            \begin{itemize}
+                \item \texttt{Par\^ametro}: \textit{path} - Caminho para o arquivo a ser aberto.
+                \item \texttt{Retorno}: \textit{true} se foi poss\'ivel abrir, \textit{false} caso contr\'ario.
+            \end{itemize}
+        \end{itemize}
+    \item \textbf{M\'etodos P\'ublicos:}
+        \begin{itemize}
+            \item \texttt{FileSystemAdapter}: Construtor que abre o arquivo para manipula\c{c}\~ao.
+            \begin{itemize}
+                \item \texttt{Par\^ametro}: \textit{path} - Caminho para o arquivo.
+                \item \texttt{Par\^ametro}: \textit{option} - Op\c{c}\~ao usada ao abrir o arquivo.
+                \item \texttt{Exce\c{c}\~oes}: Argumento inv\'alido se o caminho n\~ao for v\'alido. Erro em tempo de execu\c{c}\~ao se o arquivo n\~ao puder ser aberto.
+            \end{itemize}
+            
+            \item \texttt{\textasciitilde FileSystemAdapter}: Destrutor que garante o fechamento do arquivo.
+            
+            \item \texttt{write}: Escreve no arquivo a partir de um deslocamento.
+            \item \texttt{read}: L\'e do arquivo a partir de um deslocamento.
+            \item \texttt{remove}: Exclui o arquivo.
+            \item \texttt{getFileSize}: Retorna o tamanho do arquivo.
+        \end{itemize}
+\end{itemize}
+
 \subsubsection{\texttt{PathName}}
 \label{subsubsec:path_name}
 
-\begin{lstlisting}[caption={Classe que implementa o \textit{parser} de caminhos e nomes de entradas no sistema}, label={lst:pathname}]
+\begin{lstlisting}[caption={Classe para manipulação de caminhos no sistema}, label={lst:pathname}]
 class PathName
 {
-  /// Define o diretório raiz do sistema
   const std::string ROOT_DIR = "img/";
-
-  /// Define o diretório raiz do sistema
   const char EXTERNAL_PATH = '/';
-
-  /// Define o caminho atual do sistema
   std::string curPath;
 
 public:
   PathName();
-
-  /// @brief Retorna o caminho atual do sistema
   [[nodiscard]] std::string getCurPath() const;
-
-  /// @brief Atualiza o caminho atual do sistema
-  ///
-  /// @param path Novo caminho para o sistema
   void setCurPath(const std::string &path);
-
-  /// @brief Retorna o diretório raiz atual
   [[nodiscard]] std::string getRootDir() const;
-
-  /// @brief Dividi um caminho em suas partes
-  ///
-  /// @param path Caminho a ser dividido em partes
-  /// @param delim Caracter que delimita a divisão do caminho
-  ///
-  /// @return Um vetor contendo o nome de cada parte do caminho
-  [[nodiscard]] std::vector<std::string> split(const std::string &path,
-    char delim) const;
-
-  /// @brief Junta todas as partes de um caminho
-  ///
-  /// @param path Vetor com cada parte do caminho a ser unido
-  ///
-  /// @return Uma string com o caminho
+  [[nodiscard]] std::vector<std::string> split(const std::string &path, char delim) const;
   [[nodiscard]] std::string merge(const std::vector<std::string> &path) const;
-
-  /// @brief Gera o caminho completo a partir de um caminho qualquer
-  ///
-  /// @param path Caminho a ser tratado
-  ///
-  /// @return Uma lista com o caminho completo
-  [[nodiscard]] std::vector<std::string> generateFullPath(
-    const std::string &path) const;
-
-  /// @brief Verifica se a lista de caminho é referente ao root
-  ///
-  /// @param listPath Lista com caminhos a ser verificada
-  ///
-  /// @return true se for o diretório raiz, false caso contrário
+  [[nodiscard]] std::vector<std::string> generateFullPath(const std::string &path) const;
   bool isRootDir(const std::vector<std::string> &listPath);
-
-  /// @brief Dividi o caminho do arquivo
-  ///
-  /// @param path Referência o caminho que precisa ser divido em duas partes.
-  /// Durante a divisão este caminho e alterado.
-  ///
-  /// @exception Gera uma exceção se o caminho não for válido.
-  ///
-  /// @return O último nome dentro do caminho
   std::string getLastNameFromPath(std::string &path);
-
-  /// @brief Verifica se é um caminho externo
-  ///
-  /// @param path Caminho a ser verificado
-  ///
-  /// @return true se for um caminho externo, false caso contrário
   bool isExternalPath(const std::string &path) const;
 };
 \end{lstlisting}
 
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{ROOT\_DIR}: Diretório raiz do sistema, com valor fixo "img/".
+            \item \texttt{EXTERNAL\_PATH}: Caractere que define o caminho externo, valor fixo \texttt{'/'}.
+            \item \texttt{curPath}: Caminho atual do sistema, armazenado como string.
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{PathName}: Construtor da classe \texttt{PathName}.
+            \item \texttt{getCurPath}: Retorna o caminho atual do sistema.
+            \begin{itemize}
+                \item \texttt{Retorno}: Caminho atual como string.
+            \end{itemize}
+            \item \texttt{setCurPath}: Atualiza o caminho atual do sistema.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Novo caminho para o sistema.
+            \end{itemize}
+            \item \texttt{getRootDir}: Retorna o diretório raiz atual.
+            \begin{itemize}
+                \item \texttt{Retorno}: Diretório raiz como string.
+            \end{itemize}
+            \item \texttt{split}: Divide um caminho em suas partes com base em um delimitador.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser dividido.
+                \item \texttt{Parâmetro}: \textit{delim} - Caractere delimitador.
+                \item \texttt{Retorno}: Um vetor com o nome de cada parte do caminho.
+            \end{itemize}
+            \item \texttt{merge}: Junta as partes de um caminho em uma única string.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Vetor contendo as partes do caminho.
+                \item \texttt{Retorno}: Uma string com o caminho completo.
+            \end{itemize}
+            \item \texttt{generateFullPath}: Gera o caminho completo a partir de um caminho relativo.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser tratado.
+                \item \texttt{Retorno}: Lista com o caminho completo.
+            \end{itemize}
+            \item \texttt{isRootDir}: Verifica se a lista de caminhos é referente ao diretório raiz.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{listPath} - Lista com caminhos a ser verificada.
+                \item \texttt{Retorno}: \textit{true} se for o diretório raiz, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{getLastNameFromPath}: Divide o caminho do arquivo e retorna o último nome dentro do caminho.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho que precisa ser dividido.
+                \item \texttt{Exceção}: Gera uma exceção se o caminho não for válido.
+                \item \texttt{Retorno}: O último nome dentro do caminho.
+        \end{itemize}
+            \item \texttt{isExternalPath}: Verifica se é um caminho externo.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser verificado.
+                \item \texttt{Retorno}: \textit{true} se for um caminho externo, \textit{false} caso contrário.
+            \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+
 \subsubsection{\texttt{FatFS}}
 \label{subsubsec:fatfs}
 
-\begin{lstlisting}[caption={Classe que expõe as interfaces de interação com o sistema de arquivos}, label={lst:fatfs}]
+\begin{lstlisting}[caption={Classe para manipulação do sistema de arquivos FAT}, label={lst:fatfs}]
 class FatFS
 {
 private:
-  /// Interface usada para ler e escrever a imagem
   std::shared_ptr<Image> image;
-
-  /// Interface usada lidar com a estrutura BPB
   std::shared_ptr<BiosBlock> bios;
-
-  /// Interface para lidar com a tabela FAT
   std::shared_ptr<FatTable> fatTable;
-
-  /// Interface para lidar com a estrutura FSInfo
   std::shared_ptr<FileSysInfo> fsInfo;
-
-  /// Caminho atual no sistema de arquivos
   std::shared_ptr<PathName> pathName;
-
-  /// Classe para acesso aos clusters
   std::shared_ptr<ClusterIO> clusterIO;
 
-  /// @brief Helper para a listagem de diretórios
-  ///
-  /// @param num Número do cluster onde ocorrerá a listagem
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
   void listClusterDir(DWORD num);
-
-  /// @brief Atualiza as timestamps do diretório pai
-  ///
-  /// @param path Caminho para o diretório que precisa ter o seu tempo atualizado
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return 0 se foi possível atualizar, 1 se foi tentado atualizar o pai e -1 caso tenha algum erro.
   int updateParentTimestamp(std::string path);
-
-  /// @brief Cópia dados internos para uma localização externa
-  ///
-  /// @param from Caminho do arquivo interno
-  /// @param to Caminho para o arquivo externo
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível copiar, false caso contrário
   bool copyInternalData(const std::string &from, const std::string &to);
-
-  /// @brief Cópia dados externos para uma localização interna
-  ///
-  /// @param from Caminho do arquivo externo
-  /// @param to Caminho para o arquivo interno
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível copiar, false caso contrário
   bool copyExternalData(const std::string &from, const std::string &to);
-
-  /// @brief Cópia dados de um caminho interno para outro interno
-  ///
-  /// @param from Caminho do arquivo interno
-  /// @param to Caminho para o arquivo interno
-  ///
-  /// @exception Gera um exceção se houver algum problema durante a busca do
-  /// cluster.
-  /// @return true se foi possível copiar, false caso contrário
   bool copyInSystemData(const std::string &from, const std::string &to);
 
 public:
-  /// @brief Inicia a estrutura do sistema de arquivo
-  ///
-  /// Aloca cada uma das estruturas e as inicializa.
-  ///
-  /// @param path Caminho para a imagem FAT.
-  ///
-  /// @exception Gera uma exceção se não for possível alocar ou inicializar as
-  /// estruturas.
   explicit FatFS(const std::string &path);
-
-  /// @brief Mostra as informações sobre o sistema de arquivos
   void info();
-
-  /// @brief Mostra as informações de um cluster no formato texto
-  ///
-  /// @param num Número do cluster no qual as informações serão mostradas
-  ///
-  /// @return true se foi possível ler, false caso contrário
   bool cluster(DWORD num);
-
-  /// @brief Lista todos os diretórios/arquivos de um caminho especificado
-  ///
-  /// @param path Caminho a ser listado
-  ///
-  /// @return true se foi possível listar diretório, false caso contrário
   bool ls(const std::string &path);
-
-  /// @brief Remove um arquivo do sistema
-  ///
-  /// @param path Caminho do arquivo a ser removido
-  ///
-  /// @return true se foi possível remover arquivo, false caso contrário
   bool rm(const std::string &path);
-
-  /// @brief Remove um diretório vazio do sistema
-  ///
-  /// @param path Caminho do diretório vazio a ser removido
-  ///
-  /// @return true se foi possível remover diretório, false caso contrário
   bool rmdir(const std::string &path);
-
-  /// @brief Retorna o caminho atual do sistema
   std::string pwd();
-
-  /// @brief Altera o caminho atual
-  ///
-  /// @param path Novo caminho base do sistema
-  ///
-  /// @return true se foi possível alterar caminho atual, false caso contrário
   bool cd(const std::string &path);
-
-  /// @brief Imprime os atributos de uma entrada
-  ///
-  /// @param path Caminho para a entrada a ser apresentada
-  ///
-  /// @return true se foi possível listar atributos, false caso contrário
   bool attr(const std::string &path);
-
-  /// @brief Cria um arquivo vazio
-  ///
-  /// @param path Caminho para a entrada a ser criada
-  ///
-  /// @return true se foi possível criar arquivo, false caso contrário
   bool touch(const std::string &path);
-
-  /// @brief Cria um diretório
-  ///
-  /// @param path Caminho para o diretório a ser criado
-  ///
-  /// @return true se foi possível criar diretório, false caso contrário
   bool mkdir(const std::string &path);
-
-  /// @brief Renomeia um arquivo
-  ///
-  /// @param from Caminho do arquivo original
-  /// @param to Caminho do destino
-  ///
-  /// @return true se foi possível renomear, false caso contrário
   bool rename(const std::string &from, const std::string &to);
-
-  /// @brief Move um arquivo de um caminho a outro
-  ///
-  /// @param from Caminho do arquivo original
-  /// @param to Caminho do destino
-  ///
-  /// @return true se foi possível mover, false caso contrário
   bool mv(const std::string &from, const std::string &to);
-
-  /// @brief Copia um arquivo de um caminho a outro
-  ///
-  /// @param from Caminho do arquivo original
-  /// @param to Caminho do destino
-  ///
-  /// @return true se foi possível copiar, false caso contrário
   bool cp(const std::string &from, const std::string &to);
 };
 \end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{image}: Interface usada para ler e escrever a imagem do sistema de arquivos.
+            \item \texttt{bios}: Interface usada para lidar com a estrutura BPB do sistema de arquivos.
+            \item \texttt{fatTable}: Interface para manipular a tabela FAT do sistema de arquivos.
+            \item \texttt{fsInfo}: Interface para manipular a estrutura FSInfo do sistema de arquivos.
+            \item \texttt{pathName}: Interface para lidar com o caminho atual no sistema de arquivos.
+            \item \texttt{clusterIO}: Classe responsável pelo acesso aos clusters do sistema de arquivos.
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{listClusterDir}: Helper para a listagem de diretórios em um cluster.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{num} - Número do cluster onde ocorrerá a listagem.
+                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
+            \end{itemize}
+            \item \texttt{updateParentTimestamp}: Atualiza as timestamps do diretório pai.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho para o diretório cujo timestamp precisa ser atualizado.
+                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
+                \item \texttt{Retorno}: 0 se foi possível atualizar, 1 se foi tentado atualizar o pai, -1 se ocorreu um erro.
+            \end{itemize}
+            \item \texttt{copyInternalData}: Copia dados internos para uma localização externa.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo interno.
+                \item \texttt{Parâmetro}: \textit{to} - Caminho para o arquivo externo.
+                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
+                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{copyExternalData}: Copia dados externos para uma localização interna.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo externo.
+                \item \texttt{Parâmetro}: \textit{to} - Caminho para o arquivo interno.
+                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
+                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{copyInSystemData}: Copia dados de um caminho interno para outro.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo interno.
+                \item \texttt{Parâmetro}: \textit{to} - Caminho para o arquivo interno.
+                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
+                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
+            \end{itemize}
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{FatFS}: Construtor da classe \texttt{FatFS}, inicializa a estrutura do sistema de arquivos.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho para a imagem FAT.
+                \item \texttt{Exceção}: Gera uma exceção se não for possível alocar ou inicializar as estruturas.
+            \end{itemize}
+            \item \texttt{info}: Mostra informações sobre o sistema de arquivos.
+            \item \texttt{cluster}: Mostra as informações de um cluster no formato texto.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{num} - Número do cluster cujas informações serão mostradas.
+                \item \texttt{Retorno}: \textit{true} se foi possível ler, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{ls}: Lista todos os diretórios/arquivos de um caminho especificado.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser listado.
+                \item \texttt{Retorno}: \textit{true} se foi possível listar o diretório, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{rm}: Remove um arquivo do sistema.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho do arquivo a ser removido.
+                \item \texttt{Retorno}: \textit{true} se foi possível remover, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{rmdir}: Remove um diretório vazio do sistema.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho do diretório vazio a ser removido.
+                \item \texttt{Retorno}: \textit{true} se foi possível remover, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{pwd}: Retorna o caminho atual do sistema.
+            \item \texttt{cd}: Altera o caminho atual.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Novo caminho base do sistema.
+                \item \texttt{Retorno}: \textit{true} se foi possível alterar o caminho, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{attr}: Imprime os atributos de uma entrada.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho para a entrada a ser apresentada.
+                \item \texttt{Retorno}: \textit{true} se foi possível listar os atributos, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{touch}: Cria um arquivo vazio.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho para o arquivo a ser criado.
+                \item \texttt{Retorno}: \textit{true} se foi possível criar o arquivo, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{mkdir}: Cria um diretório.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{path} - Caminho para o diretório a ser criado.
+                \item \texttt{Retorno}: \textit{true} se foi possível criar o diretório, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{rename}: Renomeia um arquivo.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo original.
+                \item \texttt{Parâmetro}: \textit{to} - Caminho do destino.
+                \item \texttt{Retorno}: \textit{true} se foi possível renomear, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{mv}: Move um arquivo de um caminho a outro.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo original.
+                \item \texttt{Parâmetro}: \textit{to} - Caminho do destino.
+                \item \texttt{Retorno}: \textit{true} se foi possível mover, \textit{false} caso contrário.
+            \end{itemize}
+            \item \texttt{cp}: Copia um arquivo de um caminho a outro.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo original.
+                \item \texttt{Parâmetro}: \textit{to} - Caminho do destino.
+                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
+            \end{itemize}
+        \end{itemize}
+\end{itemize}
+
 
 \subsubsection{\texttt{BPB}}
 \label{subsubsec:bpb}
@@ -939,37 +919,73 @@ public:
   struct __attribute__((packed)) BPB
   {
     // BPB comum para todos os FATs
-    BYTE jmpBoot[3]; // Instrução para código de boot
-    BYTE OEMName[8]; // Indica o sistema que realizou a formatação do disco
-    WORD BytsPerSec; // Quantidade de bytes por sector
-    BYTE SecPerClus; // Número de setores por cluster
-    WORD RsvdSecCnt; // Número de setores reservados no inicio do volume
-    BYTE NumFATs; // Quantidade de estruturas FAT
-    WORD RootEntCnt; // Quantidade de entradas no dir raiz
-    WORD TotSec16; // Total de setores no volume. Usado em FAT12/FAT16
-    BYTE Media; // Tipo de mídia
-    WORD FATSz16; // Tamanho da estrutura FAT. Usado em FAT12/FAT16
-    WORD SecPerTrk; // Setores por cilindro
-    WORD NumHeads; // Quantidade de cabeças do dispositivo
-    DWORD HiddSec; // Quantidade de setores escondidos
-    DWORD TotSec32; // Total de setores no volume. Usado em FAT32
-
+    
+    BYTE jmpBoot[3];
+    BYTE OEMName[8];
+    WORD BytsPerSec;
+    BYTE SecPerClus;
+    WORD RsvdSecCnt;
+    BYTE NumFATs;
+    WORD RootEntCnt;
+    WORD TotSec16;
+    BYTE Media;
+    WORD FATSz16;
+    WORD SecPerTrk;
+    WORD NumHeads;
+    DWORD HiddSec;
+    DWORD TotSec32;
+    
     // BPB para FAT32
-    DWORD FATSz32; // Tamanho da estrutura FAT. Usado em FAT32
-    WORD ExtFlags; // Informações adicionais para a estrutura FAT
-    WORD FSVer; // Define a versão do FAT32
-    DWORD RootClus; // Número do cluster raiz.
-    WORD FSInfo; // Geralmente tem valor 1
-    WORD BkBootSec; // Deve ser 6
-    BYTE Reserved[12]; // Reservado
-    BYTE DrvNum; // Define o driver para o tipo do dispositivo
-    BYTE Reserved1; // Reservado
-    BYTE BootSig; // Assinatura do boot
-    DWORD VolID; // Determina um ID para o volume
-    BYTE VolLab[11]; // Nome do volume
-    BYTE FilSysType[8]; // String com o tipo do sistema
+
+    DWORD FATSz32;
+    WORD ExtFlags;
+    WORD FSVer;
+    DWORD RootClus;
+    WORD FSInfo;
+    WORD BkBootSec;
+    BYTE Reserved[12];
+    BYTE DrvNum;
+    BYTE Reserved1;
+    BYTE BootSig;
+    DWORD VolID;
+    BYTE VolLab[11];
+    BYTE FilSysType[8];
   };
 \end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{jmpBoot[3]}: Contém uma sequência de bytes de inicialização para o código de boot.
+            \item \texttt{OEMName[8]}: Nome do sistema que formatou o disco .
+            \item \texttt{BytsPerSec}: Número de bytes por setor no volume.
+            \item \texttt{SecPerClus}: Número de setores por cluster.
+            \item \texttt{RsvdSecCnt}: Quantidade de setores reservados no início do volume.
+            \item \texttt{NumFATs}: Número de tabelas de alocação de arquivos (FAT) presentes no volume.
+            \item \texttt{RootEntCnt}: Quantidade de entradas no diretório raiz.
+            \item \texttt{TotSec16}: Total de setores no volume para FAT12 e FAT16.
+            \item \texttt{Media}: Tipo de mídia.
+            \item \texttt{FATSz16}: Tamanho da tabela FAT para FAT12 e FAT16.
+            \item \texttt{SecPerTrk}: Número de setores por trilha/cilindro no dispositivo.
+            \item \texttt{NumHeads}: Número de cabeças do dispositivo de armazenamento (disco).
+            \item \texttt{HiddSec}: Quantidade de setores ocultos antes do início do volume.
+            \item \texttt{TotSec32}: Total de setores no volume para FAT32.
+            \item \texttt{FATSz32}: Tamanho da tabela FAT para FAT32.
+            \item \texttt{ExtFlags}: Flags adicionais específicas para FAT32, usadas para configurar a estrutura da FAT.
+            \item \texttt{FSVer}: Versão do sistema de arquivos FAT32.
+            \item \texttt{RootClus}: Número do cluster raiz, onde começa a estrutura de diretório raiz.
+            \item \texttt{FSInfo}: Setor onde a estrutura FSInfo está localizada, geralmente com valor 1.
+            \item \texttt{BkBootSec}: Setor de backup do código de boot, deve ter valor 6.
+            \item \texttt{Reserved[12]}: Espaço reservado para futuras extensões ou uso do sistema de arquivos.
+            \item \texttt{DrvNum}: Número de identificação do driver ou dispositivo de armazenamento.
+            \item \texttt{Reserved1}: Campo reservado para futuras extensões.
+            \item \texttt{BootSig}: Assinatura de inicialização do boot, geralmente 0x29.
+            \item \texttt{VolID}: ID único atribuído ao volume para identificação.
+            \item \texttt{VolLab[11]}: Nome do volume, normalmente representado por uma string de 11 caracteres.
+            \item \texttt{FilSysType[8]}: Tipo do sistema de arquivos, como "FAT32" ou "FAT16".
+        \end{itemize}
+\end{itemize}
+
 
 \subsubsection{\texttt{BiosBlock}}
 \label{subsubsec:bios_block}
@@ -979,129 +995,100 @@ public:
 class BiosBlock
 {
 private:
-  /// Estrutura do BPB
   BPB bpb;
-
-  /// Primeiro setor de dados
   DWORD firstDataSector;
-
-  /// Total de setores no diretório raiz
   DWORD rootDirSectors;
-
-  /// Total de setores no sistema de arquivos
   DWORD totSec;
-
-  /// Tamanho da FAT
   DWORD fatSz;
-
-  /// Total de setores de dados
   DWORD dataSecTotal;
-
-  /// Total de clusters no sistema
   DWORD countOfClusters;
 
-  /// @brief Inicializa a estrutura do BPB e demais estruturas.
-  ///
-  /// @return 0 se foi possível inicializar a estrutura, -1 caso contrário.
   int bpbInit();
-
-  /// @brief Determinar o tipo de FAT do sistema.
-  ///
-  /// @return 12 se for FAT12, 16 se for FAT16 e 32 se for FAT32.
   [[nodiscard]] inline int fatType() const;
 
 public:
-  /// @brief Inicia a estrutura BPB
-  ///
-  /// Lê a estrutura BPB em memória e inicializa informações necessárias para o
-  /// funcionamento dos sistema de arquivos.
-  ///
-  /// @param image Interface para fazer a leitura do sistema.
-  ///
-  /// @exception Gera uma exceção se não for possível ler a estrutura BPB, ou o
-  /// sistema de arquivos não ser do tipo FAT32.
   explicit BiosBlock(const std::shared_ptr<Image> &image);
   ~BiosBlock() = default;
 
-  /// @brief Imprime as informações do BPB
-  ///
-  /// @return 0 se foi possível imprimir, -1 se algo deu errado.
   void bpbPrint() const;
-
-  /// @brief Retorna o endereço do FAT especificado
-  ///
-  /// @param num Número do FAT. Não pode ser maior do que o valor salvo em
-  /// NumFATs
-  ///
-  /// @exception Gera uma exceção no caso do número especificado não ser válido.
-  /// @return O setor do FAT especificado.
   [[nodiscard]] DWORD fatSector(int num) const;
-
-  /// @brief Quantidade de FATs do sistema
-  ///
-  /// @return Retorna o valor de numFATs
   [[nodiscard]] inline BYTE getNumFATs() const { return bpb.NumFATs; }
-
-  /// @brief Tamanho da FAT do sistema em setores
-  ///
-  /// @return Retorna o valor de fatSz
   [[nodiscard]] inline DWORD getFATSz() const { return fatSz; }
-
-  /// @brief Quantidades de bytes por setor
-  ///
-  /// @return Retorna o valor de bpb.BytsPerSec
   [[nodiscard]] inline WORD getBytesPerSec() const { return bpb.BytsPerSec; }
-
-  /// @brief Quantidades de setores por cluster
-  ///
-  /// @return Retorna o valor de bpb.SecPerCluster
   [[nodiscard]] inline BYTE getSecPerCluster() const { return bpb.SecPerClus; }
-
-  /// @brief Total de setores na região de dados
-  ///
-  /// @return Retorna o valor de dataSecTotal
   [[nodiscard]] inline DWORD getDataSecTotal() const { return dataSecTotal; }
-
-  /// @brief Total de cluster no sistema de arquivos
-  ///
-  /// @return Retorna o valor de countOfClusters
-  [[nodiscard]] inline DWORD getCountOfClusters() const
-  {
-    return countOfClusters;
-  }
-
-  /// @brief Total de setores reservados
-  ///
-  /// @return Retorna o valor de bpb.RsvdSecCnt
+  [[nodiscard]] inline DWORD getCountOfClusters() const { return countOfClusters; }
   [[nodiscard]] inline WORD getRsvdSecCnt() const { return bpb.RsvdSecCnt; }
-
-  /// @brief Total de setores reservados
-  ///
-  /// @return Retorna o valor de bpb.RsvdSecCnt
   [[nodiscard]] inline DWORD firstSectorOfCluster(DWORD num) const
   {
     return (num - 2) * bpb.SecPerClus + firstDataSector;
   }
-
-  /// @brief Valor do cluster raiz
-  ///
-  /// @return Retorna o valor de bpb.RootClus
   [[nodiscard]] inline DWORD getRootClus() const { return bpb.RootClus; }
-
-  /// @brief Tamanho do cluster em bytes
-  ///
-  /// @return A quantidade de bytes por setor do clsuter
   [[nodiscard]] inline size_t totClusByts() const
   {
     return static_cast<size_t>(getSecPerCluster()) * getBytesPerSec();
   }
-
-  /// @brief Setor em que o FSInfo se encontra
-  ///
-  /// @return Retorna o valor de bpb.FSInfo
   [[nodiscard]] inline DWORD getFSInfo() const { return bpb.FSInfo; }
 };
 \end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{bpb}: Estrutura que contém as informações do BPB (BIOS Parameter Block), usada para definir o layout do sistema de arquivos FAT.
+            \item \texttt{firstDataSector}: Indica o primeiro setor da região de dados no sistema de arquivos.
+            \item \texttt{rootDirSectors}: Armazena o total de setores no diretório raiz.
+            \item \texttt{totSec}: Total de setores no sistema de arquivos.
+            \item \texttt{fatSz}: Tamanho da FAT (File Allocation Table) em setores.
+            \item \texttt{dataSecTotal}: Total de setores disponíveis para os dados no sistema de arquivos.
+            \item \texttt{countOfClusters}: Quantidade total de clusters no sistema de arquivos.
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{bpbInit}: Inicializa a estrutura BPB e outras estruturas relacionadas ao sistema de arquivos.
+            \begin{itemize}
+                \item \texttt{Retorno}: Retorna 0 se a estrutura foi inicializada com sucesso, -1 caso contrário.
+            \end{itemize}
+            \item \texttt{fatType}: Determina o tipo de FAT (FAT12, FAT16, ou FAT32) do sistema de arquivos.
+            \begin{itemize}
+                \item \texttt{Retorno}: Retorna 12, 16 ou 32 dependendo do tipo de FAT do sistema.
+            \end{itemize}
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{BiosBlock}: Construtor que lê a estrutura BPB e inicializa as informações do sistema de arquivos.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{image} - Interface que permite a leitura do sistema de arquivos.
+                \item \texttt{Exceção}: Gera uma exceção se a leitura do BPB falhar ou se o sistema de arquivos não for do tipo FAT32.
+            \end{itemize}
+            \item \texttt{bpbPrint}: Imprime as informações contidas na estrutura BPB.
+            \begin{itemize}
+                \item \texttt{Retorno}: Retorna 0 se a impressão for bem-sucedida, -1 se ocorrer um erro.
+            \end{itemize}
+            \item \texttt{fatSector}: Retorna o setor da FAT especificada.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{num} - Número da FAT.
+                \item \texttt{Exceção}: Gera uma exceção se o número da FAT for inválido.
+                \item \texttt{Retorno}: Retorna o setor da FAT correspondente ao número fornecido.
+            \end{itemize}
+            \item \texttt{getNumFATs}: Retorna o número de FATs no sistema de arquivos.
+            \item \texttt{getFATSz}: Retorna o tamanho da FAT em setores.
+            \item \texttt{getBytesPerSec}: Retorna a quantidade de bytes por setor no sistema de arquivos.
+            \item \texttt{getSecPerCluster}: Retorna o número de setores por cluster.
+            \item \texttt{getDataSecTotal}: Retorna o total de setores na região de dados do sistema de arquivos.
+            \item \texttt{getCountOfClusters}: Retorna o número total de clusters no sistema de arquivos.
+            \item \texttt{getRsvdSecCnt}: Retorna o número de setores reservados.
+            \item \texttt{firstSectorOfCluster}: Retorna o primeiro setor de um cluster especificado.
+            \begin{itemize}
+                \item \texttt{Parâmetro}: \textit{num} - Número do cluster.
+                \item \texttt{Retorno}: Retorna o setor do cluster solicitado.
+            \end{itemize}
+            \item \texttt{getRootClus}: Retorna o número do cluster raiz do sistema de arquivos.
+            \item \texttt{totClusByts}: Retorna o tamanho de um cluster em bytes.
+            \item \texttt{getFSInfo}: Retorna o setor onde a estrutura FSInfo está localizada.
+        \end{itemize}
+\end{itemize}
+
 
 \subsubsection{\texttt{FSInfo}}
 \label{subsubsec:fsinfo}
@@ -1845,9 +1832,9 @@ Responsável pela implementação das classes relacionadas aos \textit{clusters}
 \subsection{Luiz Gustavo Takeda}
 \label{subsec:luizinho}
 
-\subsection{Matheus Floriano Saito}
+\subsection{Matheus Floriano Saito da Silva}
 \label{subsec:peixoto}
-Responsável pela implementação das classes relacionadas ao \textit{shell}, e classes utilitárias, sendo estas para manipular \textit{logs} e o tempo, também implementou as classes que trabalha com o caminho do sistema de arquivos e teve participação em métodos da classe \texttt{FatFS} e \texttt{Entry}.
+Responsável pela implementação das classes relacionadas ao \textit{shell}, e classes utilitárias, sendo estas para manipular \textit{logs} e o tempo, também implementou as classes que trabalha com o caminho do sistema de arquivos, ademais a classe Dentry que une os nomes longos com os nomes curtos e os abstrai como um, e teve participação em métodos da classe \texttt{FatFS} e na implementação dos nomes longos e curtos.
 
 
 % --------------
