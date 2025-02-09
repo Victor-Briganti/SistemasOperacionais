@@ -244,7 +244,7 @@
 % resumo na língua vernácula (obrigatório)
 \begin{resumo}
 
-Este estudo teve como objetivo investigar e implementar um sistema de arquivos FAT32 operando em uma imagem de disco em um sistema GNU/Linux. A implementação foi realizada em C++, utilizando uma abordagem modular que facilitou a organização e a manutenção do código. O estudo incluiu uma análise detalhada das estruturas do FAT32, com ênfase na manipulação de tabelas de alocação, entradas de diretório e clusters. Como resultado, o trabalho proporcionou uma compreensão aprofundada, tanto teórica quanto prática, sobre a implementação e o funcionamento do sistema de arquivos FAT32.
+Este estudo teve como objetivo investigar e implementar um sistema de arquivos FAT32 operando em uma imagem de disco em um sistema GNU/Linux. A implementação foi realizada em C++, utilizando uma abordagem modular que facilitou a organização e a manutenção do código. O estudo incluiu uma análise detalhada das estruturas do FAT32, com ênfase na manipulação de tabelas de alocação, entradas de diretório e \textit{clusters}. Como resultado, o trabalho proporcionou uma compreensão aprofundada, tanto teórica quanto prática, sobre a implementação e o funcionamento do sistema de arquivos FAT32.
 
  \vspace{\onelineskip}
     
@@ -366,7 +366,7 @@ O sistema foi implementado na linguagem C++, e sua compilação foi testada util
 \subsection{Estruturas do FAT32}
 \label{subsec:estrutura_fat}
 
-O FAT32 é uma evolução dos sistemas FAT12 e FAT16, projetado para superar suas limitações de capacidade e eficiência. Ele utiliza endereçamento de 32 bits para clusters, dos quais 28 bits são efetivamente usados, permitindo suportar discos maiores e um sistema de arquivos mais eficiente. No entanto, o tamanho máximo de um arquivo no FAT32 é de 4 GB. Apesar dessas melhorias, sua estrutura ainda segue o princípio da tabela de alocação dos sistemas anteriores~\cite{osdev}.
+O FAT32 é uma evolução dos sistemas FAT12 e FAT16, projetado para superar suas limitações de capacidade e eficiência. Ele utiliza endereçamento de 32 bits para \textit{clusters}, dos quais 28 bits são efetivamente usados, permitindo suportar discos maiores e um sistema de arquivos mais eficiente. No entanto, o tamanho máximo de um arquivo no FAT32 é de 4 GB. Apesar dessas melhorias, sua estrutura ainda segue o princípio da tabela de alocação dos sistemas anteriores~\cite{osdev}.
 
 \subsubsection{BIOS Parameter Block (BPB)}
 \label{subsubsec:bpb}
@@ -387,7 +387,7 @@ Essa estrutura possui algumas diferenças entre a versão do FAT12/16 para a do 
 \subsubsection{FSInfo}
 \label{subsubsec:fsinfo}
 
-Devido ao tamanho dos volumes no FAT32, a estrutura FSInfo foi projetada para facilitar a manipulação de clusters no sistema. Os atributos dessa estrutura são:
+Devido ao tamanho dos volumes no FAT32, a estrutura FSInfo foi projetada para facilitar a manipulação de \textit{clusters} no sistema. Os atributos dessa estrutura são:
 
 \begin{itemize}
     \item \texttt{FSI\_LeadSig} e \texttt{FSI\_StrucSig}: Assinaturas (\texttt{0x41615252} e \texttt{0x61417272}) que validam o setor FSInfo.
@@ -406,7 +406,7 @@ Para garantir maior robustez e prevenir perda de dados, a FAT é geralmente redu
 \subsubsection{Entrada do Diretório}
 \label{subsubsec:dentry}
 
-No sistema FAT, as entradas de diretório são estruturas de 32 bytes que representam arquivos e diretórios. Cada entrada é composta por uma série de campos que descrevem as características do arquivo ou diretório, incluindo seu nome, atributos, data e hora de criação, último acesso e clusters alocados.
+No sistema FAT, as entradas de diretório são estruturas de 32 bytes que representam arquivos e diretórios. Cada entrada é composta por uma série de campos que descrevem as características do arquivo ou diretório, incluindo seu nome, atributos, data e hora de criação, último acesso e \textit{clusters} alocados.
 
 A estrutura de uma entrada de diretório é definida da seguinte forma:
 
@@ -420,7 +420,7 @@ A estrutura de uma entrada de diretório é definida da seguinte forma:
         \item \texttt{ATTR\_DIRECTORY}: Indica que a entrada corresponde a um diretório.
         \item \texttt{ATTR\_ARCHIVE}: Marca arquivos que foram  alterados desde o último backup.
     \end{itemize}
-    \item \texttt{DIR\_FstClusHI} e \texttt{DIR\_FstClusLO}: Contêm o número do cluster onde o arquivo ou diretório começa no disco. Juntos, formam um valor de 32 bits que aponta para o início do arquivo. 
+    \item \texttt{DIR\_FstClusHI} e \texttt{DIR\_FstClusLO}: Contêm o número do \textit{cluster} onde o arquivo ou diretório começa no disco. Juntos, formam um valor de 32 bits que aponta para o início do arquivo. 
     \item \texttt{DIR\_FileSize}: Armazena o tamanho do arquivo em bytes, sendo sempre 0 para diretórios. 
     \item Campos de data e hora: Incluem informações sobre a data e hora de criação, última modificação e último acesso do arquivo.
 \end{itemize}
@@ -509,6 +509,28 @@ O arquivo \texttt{types.hpp} define tipos de dados fundamentais para o sistema, 
 \subsubsection{\texttt{Shell}}
 \label{subsubsec:shell}
 
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{fatFS}: Interface para interação com o sistema de arquivos.
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{parser}: Divide o comando passado pelo usuário em diferentes parâmetros.
+            
+            \item \texttt{command}: Converte o comando passado de \textit{string} para seu \textit{enum} correspondente.
+            
+            \item \texttt{exec}: Realiza a chamada de sistema correspondente ao comando passado pelo usuário na estrutura \texttt{FatFS}.
+        \end{itemize}
+            
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{Shell}: Construtor que inicializa a estrutura do \textit{shell}.
+            
+            \item \texttt{interpreter}: Inicia o loop do \textit{shell} iterativo.
+        \end{itemize}
+\end{itemize}
+
 \begin{lstlisting}[caption={Classe que implementa o \textit{shell}}, label={lst:shell}]
 class Shell
 {
@@ -527,45 +549,28 @@ public:
 };
 \end{lstlisting}
 
-\begin{itemize}
-    \item \textbf{Atributos:}
-        \begin{itemize}
-            \item \texttt{fatFS}: Ponteiro exclusivo para a interface do sistema de arquivos.
-        \end{itemize}
-    \item \textbf{M\'etodos Privados:}
-        \begin{itemize}
-            \item \texttt{parser}: Divide o comando passado em diferentes partes.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{cmd} - Comando inserido pelo usuário.
-                \item \texttt{Retorno}: Uma lista contendo todas as partes do comando.
-            \end{itemize}
-            
-            \item \texttt{command}: Analisa a string e retorna o comando correspondente.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{cmd} - Comando inserido pelo usuário.
-                \item \texttt{Retorno}: O objeto FSApi referente ao comando.
-            \end{itemize}
-            
-            \item \texttt{exec}: Executa um comando no shell.
-            \begin{itemize}
-                \item \texttt{Parâmetros}: \textit{cmd} - Comando a ser executado. \textit{params} - Lista de parâmetros para o comando.
-            \end{itemize}
-        \end{itemize}
-    \item \textbf{M\'etodos P\'ublicos:}
-        \begin{itemize}
-            \item \texttt{Shell}: Construtor que inicializa a estrutura do shell.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{fatFS} - Interface do sistema de arquivos.
-            \end{itemize}
-            
-            \item \texttt{interpreter}: Inicia o loop do shell iterativo.
-        \end{itemize}
-\end{itemize}
-
-
 
 \subsubsection{\texttt{Image}}
 \label{subsubsec:image}
+
+\begin{itemize}
+    \item \textbf{Atributos:}
+        \begin{itemize}
+            \item \texttt{image}: \textit{Stream} utilizado para manipulação da imagem.
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{Image}: Construtor que abre a imagem especificada pelo usuário.
+            
+            \item \texttt{\textasciitilde Image}: Destrutor que garante que a imagem será fechada corretamente.
+            
+            \item \texttt{close}: Fecha a imagem aberta.
+            
+            \item \texttt{read}: Lê um trecho da imagem a partir de um deslocamento.
+            
+            \item \texttt{write}: Escreve um trecho na imagem a partir de um deslocamento.
+        \end{itemize}
+\end{itemize}
 
 \begin{lstlisting}[caption={Classe para interação do arquivo \texttt{.img} que contém o FAT32 gravado}, label={lst:image}]
 class Image
@@ -581,43 +586,35 @@ public:
 };
 \end{lstlisting}
 
+\subsubsection{\texttt{FileSystemAdapter}}
+\label{subsubsec:file_system_adapter}
+
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{image}: Fluxo de arquivo utilizado para manipular a imagem.
+            \item \texttt{filePath}: Caminho para o arquivo sendo manipulado.
+            \item \texttt{file}: Ponteiro para manipular o arquivo.
+            \item \texttt{fileOption}: Define as propriedades do arquivo, se ele está aberto para leitura ou escrita.
+            \item \texttt{isDeleted}: Flag para indicar se o arquivo foi excluído.
         \end{itemize}
-    \item \textbf{M\'etodos P\'ublicos:}
+    \item \textbf{M\'etodos Privados:}
         \begin{itemize}
-            \item \texttt{Image}: Construtor que abre a imagem especificada pelo caminho.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho para a imagem.
-                \item \texttt{Exceções}: Argumento inválido se o caminho não for válido. Erro em tempo de execução se o arquivo não puder ser aberto.
-            \end{itemize}
+            \item \texttt{clean}: Limpa o conteúdo de um arquivo. Método usado durante operações de escrita.
             
-            \item \texttt{\textasciitilde Image}: Destrutor que garante o fechamento do arquivo.
+            \item \texttt{open}: Abre o arquivo a ser manipulado.
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{FileSystemAdapter}: Construtor que abre o arquivo para manipulação.
+
+            \item \texttt{\textasciitilde FileSystemAdapter}: Destrutor que garante que o arquivo será fechado corretamente.
             
-            \item \texttt{close}: Fecha o arquivo aberto.
-            
-            \item \texttt{read}: Lê um trecho da imagem a partir de um deslocamento.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{offset} - Posição onde a leitura será iniciada.
-                \item \texttt{Parâmetro}: \textit{buffer} - Posição de memória que irá receber o dado lido.
-                \item \texttt{Parâmetro}: \textit{size} - Tamanho do dado a ser lido.
-                \item \texttt{Retorno}: \textit{true} se foi possível ler, \textit{false} caso contrário.
-            \end{itemize}
-            
-            \item \texttt{write}: Escreve um trecho na imagem a partir de um deslocamento.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{offset} - Posição onde a escrita será iniciada.
-                \item \texttt{Parâmetro}: \textit{buffer} - Posição de memória que contém os dados a serem escritos.
-                \item \texttt{Parâmetro}: \textit{size} - Tamanho do dado a ser escrito.
-                \item \texttt{Retorno}: \textit{true} se foi possível escrever, \textit{false} caso contrário.
-            \end{itemize}
+            \item \texttt{write}: Escreve no arquivo a partir de um deslocamento.
+            \item \texttt{read}: Lê do arquivo a partir de um deslocamento.
+            \item \texttt{remove}: Exclui o arquivo.
+            \item \texttt{getFileSize}: Retorna o tamanho do arquivo.
         \end{itemize}
 \end{itemize}
-
-\subsubsection{\texttt{FileSystemAdapter}}
-\label{subsubsec:file_system_adapter}
 
 \begin{lstlisting}[caption={Classe para manipulação de arquivos no sistema}, label={lst:filesystemadapter}]
 class FileSystemAdapter
@@ -640,48 +637,30 @@ public:
 };
 \end{lstlisting}
 
+\subsubsection{\texttt{PathName}}
+\label{subsubsec:path_name}
+
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{filePath}: Caminho para o arquivo sendo manipulado.
-            \item \texttt{file}: Ponteiro para manipular o arquivo.
-            \item \texttt{fileOption}: Define como o arquivo est\'a aberto.
-            \item \texttt{isDeleted}: Flag para indicar se o arquivo foi exclu\'ido.
+            \item \texttt{ROOT\_DIR}: Armazena o nome do diretório raiz do sistema.
+            \item \texttt{EXTERNAL\_PATH}: Armazena o nome do diretório raiz do sistema, para acesso ao sistema de arquivos externo a imagem.
+            \item \texttt{curPath}: Caminho atual do sistema, armazenado como \textit{string}.
         \end{itemize}
-    \item \textbf{M\'etodos Privados:}
+    \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{clean}: Limpa o arquivo quando aberto para leitura.
-            \begin{itemize}
-                \item \texttt{Par\^ametro}: \textit{path} - Caminho para o arquivo a ser limpo.
-                \item \texttt{Retorno}: \textit{true} se foi poss\'ivel limpar, \textit{false} caso contr\'ario.
-            \end{itemize}
-            
-            \item \texttt{open}: Abre o arquivo conforme a op\c{c}\~ao passada.
-            \begin{itemize}
-                \item \texttt{Par\^ametro}: \textit{path} - Caminho para o arquivo a ser aberto.
-                \item \texttt{Retorno}: \textit{true} se foi poss\'ivel abrir, \textit{false} caso contr\'ario.
-            \end{itemize}
-        \end{itemize}
-    \item \textbf{M\'etodos P\'ublicos:}
-        \begin{itemize}
-            \item \texttt{FileSystemAdapter}: Construtor que abre o arquivo para manipula\c{c}\~ao.
-            \begin{itemize}
-                \item \texttt{Par\^ametro}: \textit{path} - Caminho para o arquivo.
-                \item \texttt{Par\^ametro}: \textit{option} - Op\c{c}\~ao usada ao abrir o arquivo.
-                \item \texttt{Exce\c{c}\~oes}: Argumento inv\'alido se o caminho n\~ao for v\'alido. Erro em tempo de execu\c{c}\~ao se o arquivo n\~ao puder ser aberto.
-            \end{itemize}
-            
-            \item \texttt{\textasciitilde FileSystemAdapter}: Destrutor que garante o fechamento do arquivo.
-            
-            \item \texttt{write}: Escreve no arquivo a partir de um deslocamento.
-            \item \texttt{read}: L\'e do arquivo a partir de um deslocamento.
-            \item \texttt{remove}: Exclui o arquivo.
-            \item \texttt{getFileSize}: Retorna o tamanho do arquivo.
+            \item \texttt{PathName}: Construtor da classe \texttt{PathName}.
+            \item \texttt{getCurPath}: Retorna o caminho atual do sistema.
+            \item \texttt{setCurPath}: Atualiza o caminho atual do sistema.
+            \item \texttt{getRootDir}: Retorna o diretório raiz atual.
+            \item \texttt{split}: Divide um caminho em suas partes com base em um delimitador.
+            \item \texttt{merge}: Junta as partes de um caminho em uma única \textit{string}.
+            \item \texttt{generateFullPath}: Gera o caminho completo a partir de um caminho relativo.
+            \item \texttt{isRootDir}: Verifica se a lista de caminhos é referente ao diretório raiz.
+            \item \texttt{getLastNameFromPath}: Divide o caminho do arquivo e retorna o último nome no caminho.
+            \item \texttt{isExternalPath}: Verifica se o caminho passado está relacionado ao sistema de arquivos externo.
         \end{itemize}
 \end{itemize}
-
-\subsubsection{\texttt{PathName}}
-\label{subsubsec:path_name}
 
 \begin{lstlisting}[caption={Classe para manipulação de caminhos no sistema}, label={lst:pathname}]
 class PathName
@@ -704,66 +683,45 @@ public:
 };
 \end{lstlisting}
 
+\subsubsection{\texttt{FatFS}}
+\label{subsubsec:fatfs}
+
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{ROOT\_DIR}: Diretório raiz do sistema, com valor fixo "img/".
-            \item \texttt{EXTERNAL\_PATH}: Caractere que define o caminho externo, valor fixo \texttt{'/'}.
-            \item \texttt{curPath}: Caminho atual do sistema, armazenado como string.
+            \item \texttt{image}: Interface usada para ler e escrever a imagem do sistema de arquivos.
+            \item \texttt{bios}: Interface usada para lidar com a estrutura BPB do sistema de arquivos.
+            \item \texttt{fatTable}: Interface para manipular a tabela FAT do sistema de arquivos.
+            \item \texttt{fsInfo}: Interface para manipular a estrutura FSInfo do sistema de arquivos.
+            \item \texttt{pathName}: Interface para lidar com o caminho atual no sistema de arquivos.
+            \item \texttt{clusterIO}: Classe responsável pelo acesso aos \textit{clusters} do sistema de arquivos.
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{listClusterDir}: \textit{Helper} para a listagem de diretórios em um \textit{cluster}.
+            \item \texttt{updateParentTimestamp}: Atualiza as \textit{timestamps} do diretório pai.
+            \item \texttt{copyInternalData}: Copia dados do sistema de arquivos interno para o sistema de arquivos externo.
+            \item \texttt{copyExternalData}: Copia dados do sistema de arquivos externo para o sistema de arquivos interno.
+            \item \texttt{copyInSystemData}: Copia dados dentro do próprio sistema de arquivos.
         \end{itemize}
     \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{PathName}: Construtor da classe \texttt{PathName}.
-            \item \texttt{getCurPath}: Retorna o caminho atual do sistema.
-            \begin{itemize}
-                \item \texttt{Retorno}: Caminho atual como string.
-            \end{itemize}
-            \item \texttt{setCurPath}: Atualiza o caminho atual do sistema.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Novo caminho para o sistema.
-            \end{itemize}
-            \item \texttt{getRootDir}: Retorna o diretório raiz atual.
-            \begin{itemize}
-                \item \texttt{Retorno}: Diretório raiz como string.
-            \end{itemize}
-            \item \texttt{split}: Divide um caminho em suas partes com base em um delimitador.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser dividido.
-                \item \texttt{Parâmetro}: \textit{delim} - Caractere delimitador.
-                \item \texttt{Retorno}: Um vetor com o nome de cada parte do caminho.
-            \end{itemize}
-            \item \texttt{merge}: Junta as partes de um caminho em uma única string.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Vetor contendo as partes do caminho.
-                \item \texttt{Retorno}: Uma string com o caminho completo.
-            \end{itemize}
-            \item \texttt{generateFullPath}: Gera o caminho completo a partir de um caminho relativo.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser tratado.
-                \item \texttt{Retorno}: Lista com o caminho completo.
-            \end{itemize}
-            \item \texttt{isRootDir}: Verifica se a lista de caminhos é referente ao diretório raiz.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{listPath} - Lista com caminhos a ser verificada.
-                \item \texttt{Retorno}: \textit{true} se for o diretório raiz, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{getLastNameFromPath}: Divide o caminho do arquivo e retorna o último nome dentro do caminho.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho que precisa ser dividido.
-                \item \texttt{Exceção}: Gera uma exceção se o caminho não for válido.
-                \item \texttt{Retorno}: O último nome dentro do caminho.
-        \end{itemize}
-            \item \texttt{isExternalPath}: Verifica se é um caminho externo.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser verificado.
-                \item \texttt{Retorno}: \textit{true} se for um caminho externo, \textit{false} caso contrário.
-            \end{itemize}
+            \item \texttt{FatFS}: Construtor da classe \texttt{FatFS}, inicializa a estrutura do sistema de arquivos.
+            \item \texttt{info}: Mostra informações sobre o sistema de arquivos.
+            \item \texttt{cluster}: Mostra as informações de um \textit{cluster} no formato texto.
+            \item \texttt{ls}: Lista todos os diretórios/arquivos de um caminho especificado.
+            \item \texttt{rm}: Remove um arquivo do sistema.
+            \item \texttt{rmdir}: Remove um diretório vazio do sistema.
+            \item \texttt{pwd}: Retorna o caminho atual do sistema.
+            \item \texttt{cd}: Altera o caminho atual.
+            \item \texttt{attr}: Imprime os atributos de uma entrada.
+            \item \texttt{touch}: Cria um arquivo vazio.
+            \item \texttt{mkdir}: Cria um diretório.
+            \item \texttt{rename}: Renomeia um arquivo.
+            \item \texttt{mv}: Move um arquivo de um caminho a outro.
+            \item \texttt{cp}: Copia um arquivo de um caminho a outro.
         \end{itemize}
 \end{itemize}
-
-
-\subsubsection{\texttt{FatFS}}
-\label{subsubsec:fatfs}
 
 \begin{lstlisting}[caption={Classe para manipulação do sistema de arquivos FAT}, label={lst:fatfs}]
 class FatFS
@@ -800,124 +758,41 @@ public:
 };
 \end{lstlisting}
 
+\subsubsection{\texttt{BPB}}
+\label{subsubsec:bpb}
+
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{image}: Interface usada para ler e escrever a imagem do sistema de arquivos.
-            \item \texttt{bios}: Interface usada para lidar com a estrutura BPB do sistema de arquivos.
-            \item \texttt{fatTable}: Interface para manipular a tabela FAT do sistema de arquivos.
-            \item \texttt{fsInfo}: Interface para manipular a estrutura FSInfo do sistema de arquivos.
-            \item \texttt{pathName}: Interface para lidar com o caminho atual no sistema de arquivos.
-            \item \texttt{clusterIO}: Classe responsável pelo acesso aos clusters do sistema de arquivos.
-        \end{itemize}
-    \item \textbf{Métodos Privados:}
-        \begin{itemize}
-            \item \texttt{listClusterDir}: Helper para a listagem de diretórios em um cluster.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{num} - Número do cluster onde ocorrerá a listagem.
-                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
-            \end{itemize}
-            \item \texttt{updateParentTimestamp}: Atualiza as timestamps do diretório pai.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho para o diretório cujo timestamp precisa ser atualizado.
-                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
-                \item \texttt{Retorno}: 0 se foi possível atualizar, 1 se foi tentado atualizar o pai, -1 se ocorreu um erro.
-            \end{itemize}
-            \item \texttt{copyInternalData}: Copia dados internos para uma localização externa.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo interno.
-                \item \texttt{Parâmetro}: \textit{to} - Caminho para o arquivo externo.
-                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
-                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{copyExternalData}: Copia dados externos para uma localização interna.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo externo.
-                \item \texttt{Parâmetro}: \textit{to} - Caminho para o arquivo interno.
-                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
-                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{copyInSystemData}: Copia dados de um caminho interno para outro.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo interno.
-                \item \texttt{Parâmetro}: \textit{to} - Caminho para o arquivo interno.
-                \item \texttt{Exceção}: Gera uma exceção se houver algum problema durante a busca do cluster.
-                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
-            \end{itemize}
-        \end{itemize}
-    \item \textbf{Métodos Públicos:}
-        \begin{itemize}
-            \item \texttt{FatFS}: Construtor da classe \texttt{FatFS}, inicializa a estrutura do sistema de arquivos.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho para a imagem FAT.
-                \item \texttt{Exceção}: Gera uma exceção se não for possível alocar ou inicializar as estruturas.
-            \end{itemize}
-            \item \texttt{info}: Mostra informações sobre o sistema de arquivos.
-            \item \texttt{cluster}: Mostra as informações de um cluster no formato texto.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{num} - Número do cluster cujas informações serão mostradas.
-                \item \texttt{Retorno}: \textit{true} se foi possível ler, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{ls}: Lista todos os diretórios/arquivos de um caminho especificado.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho a ser listado.
-                \item \texttt{Retorno}: \textit{true} se foi possível listar o diretório, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{rm}: Remove um arquivo do sistema.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho do arquivo a ser removido.
-                \item \texttt{Retorno}: \textit{true} se foi possível remover, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{rmdir}: Remove um diretório vazio do sistema.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho do diretório vazio a ser removido.
-                \item \texttt{Retorno}: \textit{true} se foi possível remover, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{pwd}: Retorna o caminho atual do sistema.
-            \item \texttt{cd}: Altera o caminho atual.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Novo caminho base do sistema.
-                \item \texttt{Retorno}: \textit{true} se foi possível alterar o caminho, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{attr}: Imprime os atributos de uma entrada.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho para a entrada a ser apresentada.
-                \item \texttt{Retorno}: \textit{true} se foi possível listar os atributos, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{touch}: Cria um arquivo vazio.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho para o arquivo a ser criado.
-                \item \texttt{Retorno}: \textit{true} se foi possível criar o arquivo, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{mkdir}: Cria um diretório.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{path} - Caminho para o diretório a ser criado.
-                \item \texttt{Retorno}: \textit{true} se foi possível criar o diretório, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{rename}: Renomeia um arquivo.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo original.
-                \item \texttt{Parâmetro}: \textit{to} - Caminho do destino.
-                \item \texttt{Retorno}: \textit{true} se foi possível renomear, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{mv}: Move um arquivo de um caminho a outro.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo original.
-                \item \texttt{Parâmetro}: \textit{to} - Caminho do destino.
-                \item \texttt{Retorno}: \textit{true} se foi possível mover, \textit{false} caso contrário.
-            \end{itemize}
-            \item \texttt{cp}: Copia um arquivo de um caminho a outro.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{from} - Caminho do arquivo original.
-                \item \texttt{Parâmetro}: \textit{to} - Caminho do destino.
-                \item \texttt{Retorno}: \textit{true} se foi possível copiar, \textit{false} caso contrário.
-            \end{itemize}
+            \item \texttt{jmpBoot[3]}: Contém uma sequência de bytes de inicialização para o código de \textit{boot}.
+            \item \texttt{OEMName[8]}: Nome do sistema que formatou o disco.
+            \item \texttt{BytsPerSec}: Número de bytes por setor no volume.
+            \item \texttt{SecPerClus}: Número de setores por \textit{cluster}.
+            \item \texttt{RsvdSecCnt}: Quantidade de setores reservados no início do volume.
+            \item \texttt{NumFATs}: Número de tabelas de alocação de arquivos (FAT) presentes no volume.
+            \item \texttt{RootEntCnt}: Quantidade de entradas no diretório raiz.
+            \item \texttt{TotSec16}: Total de setores no volume para FAT12 e FAT16.
+            \item \texttt{Media}: Tipo de mídia.
+            \item \texttt{FATSz16}: Tamanho da tabela FAT para FAT12 e FAT16.
+            \item \texttt{SecPerTrk}: Número de setores por trilha/cilindro no dispositivo.
+            \item \texttt{NumHeads}: Número de cabeças do dispositivo de armazenamento (disco).
+            \item \texttt{HiddSec}: Quantidade de setores ocultos antes do início do volume.
+            \item \texttt{TotSec32}: Total de setores no volume para FAT32.
+            \item \texttt{FATSz32}: Tamanho da tabela FAT para FAT32.
+            \item \texttt{ExtFlags}: Flags adicionais específicas para FAT32, usadas para configurar a estrutura da FAT.
+            \item \texttt{FSVer}: Versão do sistema de arquivos FAT32.
+            \item \texttt{RootClus}: Número do \textit{cluster} raiz, onde começa a estrutura de diretório raiz.
+            \item \texttt{FSInfo}: Setor onde a estrutura FSInfo está localizada, geralmente com valor 1.
+            \item \texttt{BkBootSec}: Setor de \textit{backup} do código de \textit{boot}, deve ter valor 6.
+            \item \texttt{Reserved[12]}: Espaço reservado para futuras extensões ou uso do sistema de arquivos.
+            \item \texttt{DrvNum}: Número de identificação do driver ou dispositivo de armazenamento.
+            \item \texttt{Reserved1}: Campo reservado para futuras extensões.
+            \item \texttt{BootSig}: Assinatura de inicialização do boot, geralmente 0x29.
+            \item \texttt{VolID}: ID único atribuído ao volume para identificação.
+            \item \texttt{VolLab[11]}: Nome do volume, normalmente representado por uma \textit{string} de 11 caracteres.
+            \item \texttt{FilSysType[8]}: Tipo do sistema de arquivos, como ``FAT32'' ou ``FAT16''.
         \end{itemize}
 \end{itemize}
-
-
-\subsubsection{\texttt{BPB}}
-\label{subsubsec:bpb}
 
 \begin{lstlisting}[caption={Estrutura que representa o BPB encontrado no volume FAT}, label={lst:bpb}]
   struct __attribute__((packed)) BPB
@@ -957,42 +832,43 @@ public:
   };
 \end{lstlisting}
 
+\subsubsection{\texttt{BiosBlock}}
+\label{subsubsec:bios_block}
+
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{jmpBoot[3]}: Contém uma sequência de bytes de inicialização para o código de boot.
-            \item \texttt{OEMName[8]}: Nome do sistema que formatou o disco .
-            \item \texttt{BytsPerSec}: Número de bytes por setor no volume.
-            \item \texttt{SecPerClus}: Número de setores por cluster.
-            \item \texttt{RsvdSecCnt}: Quantidade de setores reservados no início do volume.
-            \item \texttt{NumFATs}: Número de tabelas de alocação de arquivos (FAT) presentes no volume.
-            \item \texttt{RootEntCnt}: Quantidade de entradas no diretório raiz.
-            \item \texttt{TotSec16}: Total de setores no volume para FAT12 e FAT16.
-            \item \texttt{Media}: Tipo de mídia.
-            \item \texttt{FATSz16}: Tamanho da tabela FAT para FAT12 e FAT16.
-            \item \texttt{SecPerTrk}: Número de setores por trilha/cilindro no dispositivo.
-            \item \texttt{NumHeads}: Número de cabeças do dispositivo de armazenamento (disco).
-            \item \texttt{HiddSec}: Quantidade de setores ocultos antes do início do volume.
-            \item \texttt{TotSec32}: Total de setores no volume para FAT32.
-            \item \texttt{FATSz32}: Tamanho da tabela FAT para FAT32.
-            \item \texttt{ExtFlags}: Flags adicionais específicas para FAT32, usadas para configurar a estrutura da FAT.
-            \item \texttt{FSVer}: Versão do sistema de arquivos FAT32.
-            \item \texttt{RootClus}: Número do cluster raiz, onde começa a estrutura de diretório raiz.
-            \item \texttt{FSInfo}: Setor onde a estrutura FSInfo está localizada, geralmente com valor 1.
-            \item \texttt{BkBootSec}: Setor de backup do código de boot, deve ter valor 6.
-            \item \texttt{Reserved[12]}: Espaço reservado para futuras extensões ou uso do sistema de arquivos.
-            \item \texttt{DrvNum}: Número de identificação do driver ou dispositivo de armazenamento.
-            \item \texttt{Reserved1}: Campo reservado para futuras extensões.
-            \item \texttt{BootSig}: Assinatura de inicialização do boot, geralmente 0x29.
-            \item \texttt{VolID}: ID único atribuído ao volume para identificação.
-            \item \texttt{VolLab[11]}: Nome do volume, normalmente representado por uma string de 11 caracteres.
-            \item \texttt{FilSysType[8]}: Tipo do sistema de arquivos, como "FAT32" ou "FAT16".
+            \item \texttt{bpb}: Estrutura que contém as informações do BPB, usada para definir o layout do sistema de arquivos FAT.
+            \item \texttt{firstDataSector}: Indica o primeiro setor da região de dados no sistema de arquivos.
+            \item \texttt{rootDirSectors}: Armazena o total de setores no diretório raiz.
+            \item \texttt{totSec}: Total de setores no sistema de arquivos.
+            \item \texttt{fatSz}: Tamanho da FAT em setores.
+            \item \texttt{dataSecTotal}: Total de setores disponíveis para os dados no sistema de arquivos.
+            \item \texttt{countOfClusters}: Quantidade total de \textit{clusters} no sistema de arquivos.
+        \end{itemize}
+    \item \textbf{Métodos Privados:}
+        \begin{itemize}
+            \item \texttt{bpbInit}: Inicializa a estrutura BPB e os atributos usados pelo sistema.
+            \item \texttt{fatType}: Determina o tipo de FAT (FAT12, FAT16, ou FAT32) do sistema de arquivos.
+        \end{itemize}
+    \item \textbf{Métodos Públicos:}
+        \begin{itemize}
+            \item \texttt{BiosBlock}: Construtor que lê a estrutura BPB e inicializa as informações do sistema de arquivos.
+            \item \texttt{bpbPrint}: Imprime as informações contidas na estrutura BPB.
+            \item \texttt{fatSector}: Retorna o setor na qual a FAT passada está especificada.
+            \item \texttt{getNumFATs}: Retorna o número de tabelas FAT no sistema de arquivos.
+            \item \texttt{getFATSz}: Retorna o tamanho da FAT em setores.
+            \item \texttt{getBytesPerSec}: Retorna a quantidade de bytes por setor no sistema de arquivos.
+            \item \texttt{getSecPerCluster}: Retorna o número de setores por \textit{cluster}.
+            \item \texttt{getDataSecTotal}: Retorna o total de setores na região de dados do sistema de arquivos.
+            \item \texttt{getCountOfClusters}: Retorna o número total de \textit{clusters} no sistema de arquivos.
+            \item \texttt{getRsvdSecCnt}: Retorna o número de setores reservados.
+            \item \texttt{firstSectorOfCluster}: Retorna o primeiro setor de um \textit{cluster} especificado.
+            \item \texttt{getRootClus}: Retorna o número do \textit{cluster} raiz do sistema de arquivos.
+            \item \texttt{totClusByts}: Retorna o tamanho de um \textit{cluster} em bytes.
+            \item \texttt{getFSInfo}: Retorna o setor onde a estrutura FSInfo está localizada.
         \end{itemize}
 \end{itemize}
-
-
-\subsubsection{\texttt{BiosBlock}}
-\label{subsubsec:bios_block}
 
 \begin{lstlisting}[caption={Classe que abstrai a extração de informações da estrutura BPB}, label={lst:biosblock}]
 // Classe para lidar com a estrutura BPB do FAT filesystem
@@ -1016,82 +892,30 @@ public:
 
   void bpbPrint() const;
   [[nodiscard]] DWORD fatSector(int num) const;
-  [[nodiscard]] inline BYTE getNumFATs() const { return bpb.NumFATs; }
-  [[nodiscard]] inline DWORD getFATSz() const { return fatSz; }
-  [[nodiscard]] inline WORD getBytesPerSec() const { return bpb.BytsPerSec; }
-  [[nodiscard]] inline BYTE getSecPerCluster() const { return bpb.SecPerClus; }
-  [[nodiscard]] inline DWORD getDataSecTotal() const { return dataSecTotal; }
-  [[nodiscard]] inline DWORD getCountOfClusters() const { return countOfClusters; }
-  [[nodiscard]] inline WORD getRsvdSecCnt() const { return bpb.RsvdSecCnt; }
-  [[nodiscard]] inline DWORD firstSectorOfCluster(DWORD num) const
-  {
-    return (num - 2) * bpb.SecPerClus + firstDataSector;
-  }
-  [[nodiscard]] inline DWORD getRootClus() const { return bpb.RootClus; }
-  [[nodiscard]] inline size_t totClusByts() const
-  {
-    return static_cast<size_t>(getSecPerCluster()) * getBytesPerSec();
-  }
-  [[nodiscard]] inline DWORD getFSInfo() const { return bpb.FSInfo; }
+  
+  [[nodiscard]] inline BYTE getNumFATs() const;
+  
+  [[nodiscard]] inline DWORD getFATSz() const;
+  
+  [[nodiscard]] inline WORD getBytesPerSec() const;
+  
+  [[nodiscard]] inline BYTE getSecPerCluster() const;
+  
+  [[nodiscard]] inline DWORD getDataSecTotal() const;
+  
+  [[nodiscard]] inline DWORD getCountOfClusters() const;
+  
+  [[nodiscard]] inline WORD getRsvdSecCnt() const;
+  
+  [[nodiscard]] inline DWORD firstSectorOfCluster(DWORD num) const;
+  
+  [[nodiscard]] inline DWORD getRootClus() const;
+  
+  [[nodiscard]] inline size_t totClusByts() const;
+  
+  [[nodiscard]] inline DWORD getFSInfo() const;
 };
 \end{lstlisting}
-
-\begin{itemize}
-    \item \textbf{Atributos:}
-        \begin{itemize}
-            \item \texttt{bpb}: Estrutura que contém as informações do BPB (BIOS Parameter Block), usada para definir o layout do sistema de arquivos FAT.
-            \item \texttt{firstDataSector}: Indica o primeiro setor da região de dados no sistema de arquivos.
-            \item \texttt{rootDirSectors}: Armazena o total de setores no diretório raiz.
-            \item \texttt{totSec}: Total de setores no sistema de arquivos.
-            \item \texttt{fatSz}: Tamanho da FAT (File Allocation Table) em setores.
-            \item \texttt{dataSecTotal}: Total de setores disponíveis para os dados no sistema de arquivos.
-            \item \texttt{countOfClusters}: Quantidade total de clusters no sistema de arquivos.
-        \end{itemize}
-    \item \textbf{Métodos Privados:}
-        \begin{itemize}
-            \item \texttt{bpbInit}: Inicializa a estrutura BPB e outras estruturas relacionadas ao sistema de arquivos.
-            \begin{itemize}
-                \item \texttt{Retorno}: Retorna 0 se a estrutura foi inicializada com sucesso, -1 caso contrário.
-            \end{itemize}
-            \item \texttt{fatType}: Determina o tipo de FAT (FAT12, FAT16, ou FAT32) do sistema de arquivos.
-            \begin{itemize}
-                \item \texttt{Retorno}: Retorna 12, 16 ou 32 dependendo do tipo de FAT do sistema.
-            \end{itemize}
-        \end{itemize}
-    \item \textbf{Métodos Públicos:}
-        \begin{itemize}
-            \item \texttt{BiosBlock}: Construtor que lê a estrutura BPB e inicializa as informações do sistema de arquivos.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{image} - Interface que permite a leitura do sistema de arquivos.
-                \item \texttt{Exceção}: Gera uma exceção se a leitura do BPB falhar ou se o sistema de arquivos não for do tipo FAT32.
-            \end{itemize}
-            \item \texttt{bpbPrint}: Imprime as informações contidas na estrutura BPB.
-            \begin{itemize}
-                \item \texttt{Retorno}: Retorna 0 se a impressão for bem-sucedida, -1 se ocorrer um erro.
-            \end{itemize}
-            \item \texttt{fatSector}: Retorna o setor da FAT especificada.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{num} - Número da FAT.
-                \item \texttt{Exceção}: Gera uma exceção se o número da FAT for inválido.
-                \item \texttt{Retorno}: Retorna o setor da FAT correspondente ao número fornecido.
-            \end{itemize}
-            \item \texttt{getNumFATs}: Retorna o número de FATs no sistema de arquivos.
-            \item \texttt{getFATSz}: Retorna o tamanho da FAT em setores.
-            \item \texttt{getBytesPerSec}: Retorna a quantidade de bytes por setor no sistema de arquivos.
-            \item \texttt{getSecPerCluster}: Retorna o número de setores por cluster.
-            \item \texttt{getDataSecTotal}: Retorna o total de setores na região de dados do sistema de arquivos.
-            \item \texttt{getCountOfClusters}: Retorna o número total de clusters no sistema de arquivos.
-            \item \texttt{getRsvdSecCnt}: Retorna o número de setores reservados.
-            \item \texttt{firstSectorOfCluster}: Retorna o primeiro setor de um cluster especificado.
-            \begin{itemize}
-                \item \texttt{Parâmetro}: \textit{num} - Número do cluster.
-                \item \texttt{Retorno}: Retorna o setor do cluster solicitado.
-            \end{itemize}
-            \item \texttt{getRootClus}: Retorna o número do cluster raiz do sistema de arquivos.
-            \item \texttt{totClusByts}: Retorna o tamanho de um cluster em bytes.
-            \item \texttt{getFSInfo}: Retorna o setor onde a estrutura FSInfo está localizada.
-        \end{itemize}
-\end{itemize}
 
 \subsubsection{\texttt{FSInfo}}
 \label{subsubsec:fsinfo}
@@ -1101,13 +925,13 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fsinfo}.
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{LeadSig}: Assinatura utilizada para validar a estrutura FSInfo
-            \item \texttt{Reserved1}: Campo reservado que não deve ser utilizado
-            \item \texttt{StrucSig}: Segunda assinatura utilizada para validar a estrutura FSInfo
-            \item \texttt{FreeCount}: Número de clusters livres no volume
-            \item \texttt{NextFree}: Próximo cluster livre disponível
-            \item \texttt{Reserved2}: Campo reservado que não deve ser utilizado
-            \item \texttt{TrailSig}: Terceira assinatura utilizada para validar a estrutura
+            \item \texttt{LeadSig}: Assinatura utilizada para validar a estrutura FSInfo.
+            \item \texttt{Reserved1}: Campo reservado que não deve ser utilizado.
+            \item \texttt{StrucSig}: Segunda assinatura utilizada para validar a estrutura FSInfo.
+            \item \texttt{FreeCount}: Número de \textit{clusters} livres no volume.
+            \item \texttt{NextFree}: Próximo \textit{cluster} livre disponível.
+            \item \texttt{Reserved2}: Campo reservado que não deve ser utilizado.
+            \item \texttt{TrailSig}: Terceira assinatura utilizada para validar a estrutura.
         \end{itemize}
 \end{itemize}
 
@@ -1133,24 +957,24 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fileinfo
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{UNKNOWN\_FREECLUS}: Valor utilizado quando a quantidade de clusters livres é desconhecida
-            \item \texttt{LEADISG}: Valor da assinatura do LeadSig
-            \item \texttt{STRUCSIG}: Valor da assinatura do StrucSig
-            \item \texttt{TRAILSIG}: Valor da assinatura do TrailSig
-            \item \texttt{fsinfo}: Estrutura do FSInfo
-            \item \texttt{image}: Interface usada para leitura e escrita da imagem
-            \item \texttt{offset}: Offset da estrutura no sistema de arquivos
-            \item \texttt{dirty}: Flag que indica se a estrutura foi alterada
-            \item \texttt{totalClus}: Total de clusters no sistema
+            \item \texttt{UNKNOWN\_FREECLUS}: Valor utilizado quando a quantidade de \textit{clusters} livres é desconhecida.
+            \item \texttt{LEADISG}: Valor da assinatura do LeadSig.
+            \item \texttt{STRUCSIG}: Valor da assinatura do StrucSig.
+            \item \texttt{TRAILSIG}: Valor da assinatura do TrailSig.
+            \item \texttt{fsinfo}: Estrutura do FSInfo.
+            \item \texttt{image}: Interface usada para leitura e escrita da imagem.
+            \item \texttt{offset}: \textit{Offset} da estrutura no sistema de arquivos.
+            \item \texttt{dirty}: Flag que indica se a estrutura foi alterada.
+            \item \texttt{totalClus}: Total de \textit{clusters} no sistema.
         \end{itemize}
     \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{FileSysInfo}: Inicializa a estrutura FSInfo, lê seus dados em memória e configura as informações necessárias para o funcionamento do sistema de arquivos
-            \item \texttt{\~FileSysInfo}: Verifica se a flag \texttt{dirty} está setada e, se estiver, escreve o FSInfo na imagem original
-            \item \texttt{getFreeCount}: Retorna a quantidade de clusters livres no sistema
-            \item \texttt{getNextFree}: Retorna o último cluster livre conhecido
-            \item \texttt{setFreeCount}: Atualiza o valor da quantidade de clusters livres
-            \item \texttt{setNextFree}: Atualiza o valor do último cluster livre conhecido
+            \item \texttt{FileSysInfo}: Inicializa a estrutura FSInfo, lê seus dados em memória e configura as informações necessárias para o funcionamento do sistema de arquivos.
+            \item \texttt{\~FileSysInfo}: Verifica se a flag \texttt{dirty} está setada e, se estiver, escreve o FSInfo na imagem original.
+            \item \texttt{getFreeCount}: Retorna a quantidade de \textit{clusters} livres no sistema.
+            \item \texttt{getNextFree}: Retorna o último \textit{cluster} livre conhecido.
+            \item \texttt{setFreeCount}: Atualiza o valor da quantidade de \textit{clusters} livres.
+            \item \texttt{setNextFree}: Atualiza o valor do último \textit{cluster} livre conhecido.
         \end{itemize}
 \end{itemize}
 
@@ -1193,33 +1017,33 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:fat_tabl
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{LSB\_MASK e MSB\_MASK}: Máscaras para leitura e escrita na tabela FAT
-            \item \texttt{FREE\_CLUSTER}: Indica que o cluster está livre
-            \item \texttt{EOC}: Indica o final da cadeia de clusters
-            \item \texttt{image}: Interface usada para ler e escrever na FAT
-            \item \texttt{bios}: Interface para manipulação do BPB
-            \item \texttt{table}: Tabela FAT armazenada em memória
+            \item \texttt{LSB\_MASK e MSB\_MASK}: Máscaras para leitura e escrita na tabela FAT.
+            \item \texttt{FREE\_CLUSTER}: Indica que o \textit{cluster} está livre.
+            \item \texttt{EOC}: Indica o final da cadeia de \textit{clusters}.
+            \item \texttt{image}: Interface usada para ler e escrever na FAT.
+            \item \texttt{bios}: Interface para manipulação do BPB.
+            \item \texttt{table}: Tabela FAT armazenada em memória.
         \end{itemize}
     \item \textbf{Métodos Privados:}
         \begin{itemize}
-            \item \texttt{readFatTable}: Lê uma das tabelas FAT para a memória
-            \item \texttt{writeFatTable}: Escreve uma das tabelas FAT na imagem
-            \item \texttt{writeInTable}: Escreve em uma das entradas da tabela FAT na memória
-            \item \texttt{readFromTable}: Lê uma entrada da tabela FAT na memória
+            \item \texttt{readFatTable}: Lê uma das tabelas FAT para a memória.
+            \item \texttt{writeFatTable}: Escreve uma das tabelas FAT na imagem.
+            \item \texttt{writeInTable}: Escreve em uma das entradas da tabela FAT na memória.
+            \item \texttt{readFromTable}: Lê uma entrada da tabela FAT na memória.
         \end{itemize}
     \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{FatTable}: Inicializa a FAT em memória
-            \item \texttt{printTable}: Exibe a tabela FAT atual
-            \item \texttt{printInfo}: Mostra informações sobre o espaço da tabela atual
-            \item \texttt{listChain}: Retorna a cadeia de clusters alocados
-            \item \texttt{removeChain}: Remove uma cadeia de clusters alocados
-            \item \texttt{usedClusters}: Retorna a quantidade de clusters em uso na tabela FAT atual
-            \item \texttt{freeClusters}: Retorna a quantidade de clusters livres na tabela FAT atual
-            \item \texttt{searchFreeEntry}: Busca por uma entrada livre na tabela FAT
-            \item \texttt{searchListFreeEntry}: Busca por uma sequência de entradas livres na tabela FAT
-            \item \texttt{allocClusters}: Aloca novos clusters na FAT
-            \item \texttt{maxFreeClusByts}: Retorna o tamanho máximo, em bytes, dos clusters livres
+            \item \texttt{FatTable}: Inicializa a FAT em memória.
+            \item \texttt{printTable}: Exibe a tabela FAT atual.
+            \item \texttt{printInfo}: Mostra informações sobre o espaço da tabela atual.
+            \item \texttt{listChain}: Retorna a cadeia de \textit{clusters} alocados.
+            \item \texttt{removeChain}: Remove uma cadeia de \textit{clusters} alocados.
+            \item \texttt{usedClusters}: Retorna a quantidade de \textit{clusters} em uso na tabela FAT atual.
+            \item \texttt{freeClusters}: Retorna a quantidade de \textit{clusters} livres na tabela FAT atual.
+            \item \texttt{searchFreeEntry}: Busca por uma entrada livre na tabela FAT.
+            \item \texttt{searchListFreeEntry}: Busca por uma sequência de entradas livres na tabela FAT.
+            \item \texttt{allocClusters}: Aloca novos \textit{clusters} na FAT.
+            \item \texttt{maxFreeClusByts}: Retorna o tamanho máximo, em bytes, dos \textit{clusters} livres.
         \end{itemize}
 \end{itemize}
 
@@ -1278,18 +1102,18 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:shortent
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{name}: Nome curto da entrada
-            \item \texttt{attr}: Atributos associados ao arquivo
-            \item \texttt{ntres}: Campo reservado
-            \item \texttt{crtTimeTenth}: Milissegundos da criação do arquivo
-            \item \texttt{crtTime}: Hora e minutos da criação do arquivo
-            \item \texttt{crtDate}: Data de criação do arquivo
-            \item \texttt{lstAccDate}: Data do último acesso
-            \item \texttt{fstClusHI}: Parte alta do número do cluster inicial
-            \item \texttt{wrtTime}: Hora e minutos da última modificação
-            \item \texttt{wrtDate}: Data da última modificação
-            \item \texttt{fstClusLO}: Parte baixa do número do cluster inicial
-            \item \texttt{fileSize}: Tamanho do arquivo (0 para diretórios)
+            \item \texttt{name}: Nome curto da entrada.
+            \item \texttt{attr}: Atributos associados ao arquivo.
+            \item \texttt{ntres}: Campo reservado.
+            \item \texttt{crtTimeTenth}: Milissegundos da criação do arquivo.
+            \item \texttt{crtTime}: Hora e minutos da criação do arquivo.
+            \item \texttt{crtDate}: Data de criação do arquivo.
+            \item \texttt{lstAccDate}: Data do último acesso.
+            \item \texttt{fstClusHI}: Parte alta do número do \textit{cluster} inicial.
+            \item \texttt{wrtTime}: Hora e minutos da última modificação.
+            \item \texttt{wrtDate}: Data da última modificação.
+            \item \texttt{fstClusLO}: Parte baixa do número do \textit{cluster} inicial.
+            \item \texttt{fileSize}: Tamanho do arquivo (0 para diretórios).
         \end{itemize}
 \end{itemize}
 
@@ -1319,14 +1143,14 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:longentr
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{ord}: A ordem dessa entrada na sequência de nomes longos
-            \item \texttt{name1}: Caracteres de 1-5 do nome longo
-            \item \texttt{attr}: Deve ser igual a \texttt{ATTR\_LONG\_NAME}
-            \item \texttt{type}: 0 é um diretório, outros valores remetem a arquivos
-            \item \texttt{chckSum}: Checksum usado para verificar esta entrada
-            \item \texttt{name2}: Caracteres 6-11 do nome longo
-            \item \texttt{fstClusLO}: Deve ser 0. Está aqui só por compatibilidade
-            \item \texttt{name3}: Caracteres 12-13 do nome longo
+            \item \texttt{ord}: A ordem dessa entrada na sequência de nomes longos.
+            \item \texttt{name1}: Caracteres de 1-5 do nome longo.
+            \item \texttt{attr}: Deve ser igual a \texttt{ATTR\_LONG\_NAME}.
+            \item \texttt{type}: 0 é um diretório, outros valores remetem a arquivos.
+            \item \texttt{chckSum}: Checksum usado para verificar esta entrada.
+            \item \texttt{name2}: Caracteres 6-11 do nome longo.
+            \item \texttt{fstClusLO}: Deve ser 0. Está aqui só por compatibilidade.
+            \item \texttt{name3}: Caracteres 12-13 do nome longo.
         \end{itemize}
 \end{itemize}
 
@@ -1353,50 +1177,50 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:dentry}.
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{entry}: Estrutura que armazena os metadados da entrada
-            \item \texttt{longEntries}: Lista contendo os nomes longos associados à entrada
-            \item \texttt{shortName}: Nome curto da entrada
-            \item \texttt{longName}: Nome longo da entrada
-            \item \texttt{nameType}: Tipo de nome da entrada (curto ou longo)
-            \item \texttt{type}: Tipo da entrada (arquivo ou diretório)
-            \item \texttt{clusterIndexes}: Lista de clusters e posições onde esta entrada pode estar armazenada
+            \item \texttt{entry}: Estrutura que armazena os metadados da entrada.
+            \item \texttt{longEntries}: Lista contendo os nomes longos associados à entrada.
+            \item \texttt{shortName}: Nome curto da entrada.
+            \item \texttt{longName}: Nome longo da entrada.
+            \item \texttt{nameType}: Tipo de nome da entrada (curto ou longo).
+            \item \texttt{type}: Tipo da entrada (arquivo ou diretório).
+            \item \texttt{clusterIndexes}: Lista de \textit{clusters} e posições onde esta entrada pode estar armazenada.
         \end{itemize}
     \item \textbf{Métodos Privados:}
         \begin{itemize}
-            \item \texttt{mountLongName}: Gera um nome longo a partir do nome curto da entrada
+            \item \texttt{mountLongName}: Gera um nome longo a partir do nome curto da entrada.
         \end{itemize}
     \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{Dentry}: Inicializa a entrada
-            \item \texttt{getLongName}: Retorna o nome longo da entrada
-            \item \texttt{getShortName}: Retorna o nome curto da entrada
-            \item \texttt{getDataCluster}: Retorna o cluster onde os dados da entrada estão armazenados
-            \item \texttt{setDataCluster}: Define o cluster onde esta entrada está armazenada
-            \item \texttt{setFileSize}: Define o tamanho do arquivo
-            \item \texttt{getFileSize}: Retorna o tamanho do arquivo
-            \item \texttt{isDirectory}: Retorna verdadeiro se a entrada for um diretório
-            \item \texttt{isHidden}: Retorna verdadeiro se a entrada estiver oculta
-            \item \texttt{isReadOnly}: Retorna verdadeiro se a entrada for somente leitura
-            \item \texttt{getCreationDay}: Retorna o dia de criação do arquivo
-            \item \texttt{getCreationMonth}: Retorna o mês de criação do arquivo
-            \item \texttt{getCreationYear}: Retorna o ano de criação do arquivo
-            \item \texttt{getCreationHour}: Retorna a hora de criação do arquivo
-            \item \texttt{getCreationMinute}: Retorna o minuto de criação do arquivo
-            \item \texttt{getCreationSecond}: Retorna os segundos da criação do arquivo
-            \item \texttt{getWriteDay}: Retorna o dia da última modificação do arquivo
-            \item \texttt{getWriteMonth}: Retorna o mês da última modificação do arquivo
-            \item \texttt{getWriteYear}: Retorna o ano da última modificação do arquivo
-            \item \texttt{getWriteHour}: Retorna a hora da última modificação do arquivo
-            \item \texttt{getWriteMinute}: Retorna o minuto da última modificação do arquivo
-            \item \texttt{getWriteSecond}: Retorna os segundos da última modificação do arquivo
-            \item \texttt{getLstAccDay}: Retorna o dia do último acesso ao arquivo
-            \item \texttt{getLstAccMonth}: Retorna o mês do último acesso ao arquivo
-            \item \texttt{getLstAccYear}: Retorna o ano do último acesso ao arquivo
-            \item \texttt{getShortEntry}: Retorna a entrada curta associada a esta entrada
-            \item \texttt{getLongEntries}: Retorna todas as entradas longas associadas a esta entrada
-            \item \texttt{getClusterIndexes}: Retorna a lista de índices desta entrada nos clusters
-            \item \texttt{getEntryType}: Retorna o tipo da entrada (arquivo ou diretório)
-            \item \texttt{getNameType}: Retorna o tipo de nome da entrada (curto ou longo)
+            \item \texttt{Dentry}: Inicializa a entrada.
+            \item \texttt{getLongName}: Retorna o nome longo da entrada.
+            \item \texttt{getShortName}: Retorna o nome curto da entrada.
+            \item \texttt{getDataCluster}: Retorna o \textit{cluster} onde os dados da entrada estão armazenados.
+            \item \texttt{setDataCluster}: Define o \textit{cluster} onde esta entrada está armazenada.
+            \item \texttt{setFileSize}: Define o tamanho do arquivo.
+            \item \texttt{getFileSize}: Retorna o tamanho do arquivo.
+            \item \texttt{isDirectory}: Retorna verdadeiro se a entrada for um diretório.
+            \item \texttt{isHidden}: Retorna verdadeiro se a entrada estiver oculta.
+            \item \texttt{isReadOnly}: Retorna verdadeiro se a entrada for somente leitura.
+            \item \texttt{getCreationDay}: Retorna o dia de criação do arquivo.
+            \item \texttt{getCreationMonth}: Retorna o mês de criação do arquivo.
+            \item \texttt{getCreationYear}: Retorna o ano de criação do arquivo.
+            \item \texttt{getCreationHour}: Retorna a hora de criação do arquivo.
+            \item \texttt{getCreationMinute}: Retorna o minuto de criação do arquivo.
+            \item \texttt{getCreationSecond}: Retorna os segundos da criação do arquivo.
+            \item \texttt{getWriteDay}: Retorna o dia da última modificação do arquivo.
+            \item \texttt{getWriteMonth}: Retorna o mês da última modificação do arquivo.
+            \item \texttt{getWriteYear}: Retorna o ano da última modificação do arquivo.
+            \item \texttt{getWriteHour}: Retorna a hora da última modificação do arquivo.
+            \item \texttt{getWriteMinute}: Retorna o minuto da última modificação do arquivo.
+            \item \texttt{getWriteSecond}: Retorna os segundos da última modificação do arquivo.
+            \item \texttt{getLstAccDay}: Retorna o dia do último acesso ao arquivo.
+            \item \texttt{getLstAccMonth}: Retorna o mês do último acesso ao arquivo.
+            \item \texttt{getLstAccYear}: Retorna o ano do último acesso ao arquivo.
+            \item \texttt{getShortEntry}: Retorna a entrada curta associada a esta entrada.
+            \item \texttt{getLongEntries}: Retorna todas as entradas longas associadas a esta entrada.
+            \item \texttt{getClusterIndexes}: Retorna a lista de índices desta entrada nos clusters.
+            \item \texttt{getEntryType}: Retorna o tipo da entrada (arquivo ou diretório).
+            \item \texttt{getNameType}: Retorna o tipo de nome da entrada (curto ou longo).
         \end{itemize}
 \end{itemize}
 
@@ -1494,34 +1318,34 @@ Explicação da classe em si(o que ela faz, onde ela é usada)~\ref{lst:cluster_
 \begin{itemize}
     \item \textbf{Atributos:}
         \begin{itemize}
-            \item \texttt{image}: Interface para leitura e escrita da imagem
-            \item \texttt{bios}: Interface para manipulação da estrutura BPB
-            \item \texttt{fsInfo}: Estrutura que armazena informações sobre os clusters
-            \item \texttt{fatTable}: Interface para manipulação da tabela FAT
-            \item \texttt{pathName}: Caminho atual no sistema de arquivos
-            \item \texttt{NUM\_ENTRIES}: Número de entradas por cluster
+            \item \texttt{image}: Interface para leitura e escrita da imagem.
+            \item \texttt{bios}: Interface para manipulação da estrutura BPB.
+            \item \texttt{fsInfo}: Estrutura que armazena informações sobre os \textit{clusters}.
+            \item \texttt{fatTable}: Interface para manipulação da tabela FAT.
+            \item \texttt{pathName}: Caminho atual no sistema de arquivos.
+            \item \texttt{NUM\_ENTRIES}: Número de entradas por \textit{cluster}.
         \end{itemize}
     \item \textbf{Métodos Privados:}
         \begin{itemize}
-            \item \texttt{generateEntries}: Gera as entradas correspondentes a um nome especificado
-            \item \texttt{searchEmptyEntries}: Busca entradas vazias e continuas
-            \item \texttt{insertDotEntries}: Inicializa e insere as entradas \texttt{.} (DOT) e \texttt{..} (DOTDOT) no diretório criado
-            \item \texttt{createDirectoryEntry}: Cria uma entrada do tipo diretório e a insere no buffer de entrada
-            \item \texttt{createArchiveEntry}: Cria uma entrada do tipo arquivo e a insere no buffer de entrada
+            \item \texttt{generateEntries}: Gera as entradas correspondentes a um nome especificado.
+            \item \texttt{searchEmptyEntries}: Busca entradas vazias e continuas.
+            \item \texttt{insertDotEntries}: Inicializa e insere as entradas ``\texttt{.}'' (DOT) e ``\texttt{..}'' (DOTDOT) no diretório criado.
+            \item \texttt{createDirectoryEntry}: Cria uma entrada do tipo diretório e a insere no \textit{buffer} de entrada.
+            \item \texttt{createArchiveEntry}: Cria uma entrada do tipo arquivo e a insere no \textit{buffer} de entrada.
         \end{itemize}
     \item \textbf{Métodos Públicos:}
         \begin{itemize}
-            \item \texttt{ClusterIO}: Inicializa a classe
-            \item \texttt{readCluster}: Lê um cluster da memória para um buffer
-            \item \texttt{writeCluster}: Escreve um cluster na imagem
-            \item \texttt{allocNewCluster}: Aloca um novo cluster
-            \item \texttt{getEntryClus}: Retorna o cluster da entrada atual
-            \item \texttt{getListEntries}: Retorna uma lista com todas as entradas de um diretório
-            \item \texttt{searchEntryByPath}: Busca uma entrada pelo caminho especificado
-            \item \texttt{updateEntry}: Atualiza uma entrada dentro do cluster
-            \item \texttt{removeEntry}: Remove uma entrada do cluster
-            \item \texttt{deleteEntry}: Exclui uma entrada do sistema de arquivos
-            \item \texttt{createEntry}: Aloca uma nova entrada e a insere no buffer
+            \item \texttt{ClusterIO}: Inicializa a classe.
+            \item \texttt{readCluster}: Lê um \textit{cluster} da memória para um \textit{buffer}.
+            \item \texttt{writeCluster}: Escreve um \textit{cluster} na imagem.
+            \item \texttt{allocNewCluster}: Aloca um novo \textit{cluster}.
+            \item \texttt{getEntryClus}: Retorna o \textit{cluster} da entrada atual.
+            \item \texttt{getListEntries}: Retorna uma lista com todas as entradas de um diretório.
+            \item \texttt{searchEntryByPath}: Busca uma entrada pelo caminho especificado.
+            \item \texttt{updateEntry}: Atualiza uma entrada do \textit{cluster}.
+            \item \texttt{removeEntry}: Remove uma entrada do \textit{cluster}.
+            \item \texttt{deleteEntry}: Exclui uma entrada do sistema de arquivos.
+            \item \texttt{createEntry}: Aloca uma nova entrada e a insere no \textit{buffer}.
         \end{itemize}
 \end{itemize}
 
@@ -1587,7 +1411,7 @@ public:
 \section{\textit{Bugs} Conhecidos}
 \label{sec:bugs}
 
-Os \textit{bugs} encontrados durante o desenvolvimento do sistema foram corrigidos, demais \textit{bugs} que possam aparecer durante testes da ferramenta não são de conhecimento dos autores.
+Os \textit{bugs} encontrados durante o desenvolvimento do sistema foram corrigidos, demais \textit{bugs} que possam aparecer durante o uso da ferramenta não são de conhecimento dos autores.
 
 \section{Divisão do Trabalho}
 \label{sec:trabalhadores_univos}
@@ -1651,7 +1475,7 @@ O comando \texttt{ls} lista os arquivos e diretórios do caminho atual ou do cam
 \label{subsec:cluster}
 Comando: \$ \texttt{cluster <número do cluster>}
 
-O comando \texttt{cluster} exibe o conteúdo de um cluster em específico, exemplo de uso na Figura~\ref{fig:cluester}.
+O comando \texttt{cluster} exibe o conteúdo de um \textit{cluster} em específico, exemplo de uso na Figura~\ref{fig:cluester}.
 
 \begin{figure}[H]
     \centering
@@ -1871,7 +1695,7 @@ O comando \texttt{pwd} exibe o caminho absoluto atual, um exemplo da sua saída 
 
 \section{Conclusões}
 \label{sec:conclusoes}
-A implementação do sistema de arquivos FAT32 permitiu consolidar conceitos teóricos sobre a organização e implementação de um sistema de arquivos, em especial o FAT32, destacando a sua organização de dados em disco, gerenciamento de metadados e alocação de clusters. A estrutura modular do código, dividida em componentes como tabela FAT, entradas de diretório e manipulação de imagens de disco, facilitou a manutenção e o teste individual de cada funcionalidade. O \textit{shell} desenvolvido provou ser eficaz na interação com o sistema, executando comandos complexos como cópia entre sistemas de arquivos externos e internos, movimentação de arquivos e renomeação. Os principais desafios durante a implementação do sistema foi a manipulação de nomes longos e a garantia de integridade do sistema todo. Ainda assim, acreditamos que o resultado foi positivo, tanto para o nosso aprendizado quanto para o êxito do projeto em si.
+A implementação do sistema de arquivos FAT32 permitiu consolidar conceitos teóricos sobre a organização e implementação de um sistema de arquivos, em especial o FAT32, destacando a sua organização de dados em disco, gerenciamento de metadados e alocação de \textit{clusters}. A estrutura modular do código, dividida em componentes como tabela FAT, entradas de diretório e manipulação de imagens de disco, facilitou a manutenção e o teste individual de cada funcionalidade. O \textit{shell} desenvolvido provou ser eficaz na interação com o sistema, executando comandos complexos como cópia entre sistemas de arquivos externos e internos, movimentação de arquivos e renomeação. Os principais desafios durante a implementação do sistema foi a manipulação de nomes longos e a garantia de integridade do sistema todo. Ainda assim, acreditamos que o resultado foi positivo, tanto para o nosso aprendizado quanto para o êxito do projeto em si.
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
