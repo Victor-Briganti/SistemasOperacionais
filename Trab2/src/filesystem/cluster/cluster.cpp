@@ -124,7 +124,7 @@ int ClusterIO::searchEmptyEntries(DWORD cluster,
 
     // O index desse cluster chegou ao fim. Salva e continua verificação.
     if (index.clusterNum != 0) {
-      index.endPos = NUM_ENTRIES;
+      index.endPos = NUM_ENTRIES - 1;
       clusterIndexes.push_back(index);
     }
   }
@@ -376,6 +376,8 @@ std::vector<Dentry> ClusterIO::getListEntries(DWORD num)
         } else {
           auto endPos = static_cast<DWORD>(i);
           if (clusterIndexes.empty()) {
+            clusterIndexes.push_back({ cluster, endPos, endPos });
+          } else if (clusterIndexes.back().endPos != 0) {
             clusterIndexes.push_back({ cluster, endPos, endPos });
           } else {
             clusterIndexes.back().endPos = endPos;
